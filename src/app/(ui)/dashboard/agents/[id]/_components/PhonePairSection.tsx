@@ -1,0 +1,63 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useWaStartByPhone, useWaLoginStatus } from '@/app/features/whatsapp';
+
+export default function PhonePairSection({ agentId }: { agentId: string }) {
+  const [phone, setPhone] = useState('');
+  const pair = useWaStartByPhone(agentId);
+  const status = useWaLoginStatus(agentId, 2000);
+
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function requestCode() {
+    setErr(null);
+    setPairingCode(null);
+    try {
+      const res = await pair.mutateAsync({ phone });
+      if (res?.pairingCode) setPairingCode(res.pairingCode);
+    } catch (e: any) {
+      setErr(e?.details?.message || e?.message || 'Failed to request pairing code');
+    }
+  }
+
+  const connected = !!status.data?.loggedIn;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          On your phone: WhatsApp → <b>Linked devices</b> → <b>Link with phone number</b> → enter the code shown.
+        </p>
+        <div className="flex gap-2">
+          <Input placeholder="+39349xxxxxxx" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <Button variant="secondary" onClick={requestCode} disabled={pair.isPending || !phone}>
+            {pair.isPending ? 'Requesting…' : 'Get Code'}
+          </Button>
+        </div>
+        {err && <div className="text-sm text-destructive">{err}</div>}
+        {connected && (
+          <div className="text-sm rounded-md border bg-emerald-50 text-emerald-700 p-3">
+            Connected 🎉
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center">
+        {pairingCode ? (
+          <div className="text-center">
+            <div className="text-xs text-muted-foreground mb-1">Pairing code</div>
+            <div className="text-4xl font-semibold tracking-wider">{pairingCode}</div>
+          </div>
+        ) : (
+          <div className="w-[340px] h-[120px] grid place-items-center rounded-xl border text-muted-foreground">
+            No code yet
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
