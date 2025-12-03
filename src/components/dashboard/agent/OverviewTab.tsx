@@ -111,7 +111,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -124,7 +124,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
               />
             </svg>
             <input
-              className="w-full sm:w-64 pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 transition-all"
+              className="w-full sm:w-64 pl-10 pr-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all"
               placeholder="Search agents..."
               value={search}
               onChange={(e) => {
@@ -134,7 +134,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
             />
           </div>
           <select
-            className="w-full sm:w-auto px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 transition-all"
+            className="w-full sm:w-auto px-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all"
             value={sort ?? ""}
             onChange={(e) => setSort(e.target.value || "createdAt:desc")}
           >
@@ -147,7 +147,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
 
         <button
           onClick={() => setShowCreate(true)}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-black hover:bg-gray-800 text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -159,13 +159,21 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {isLoading &&
           Array.from({ length: 8 }).map((_, i) => (
-            <div key={`skeleton-${i}`} className="h-52 rounded-xl border border-gray-200 animate-pulse bg-gray-50" />
+            <div
+              key={`skeleton-${i}`}
+              className="h-52 rounded-xl border border-slate-200 dark:border-white/10 animate-pulse bg-slate-100 dark:bg-white/5"
+            />
           ))}
 
         {error && !isLoading && (
-          <div className="col-span-full p-6 rounded-xl bg-red-50 border border-red-200">
+          <div className="col-span-full p-6 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30">
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5 text-red-600 dark:text-red-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -173,7 +181,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="text-red-600 font-medium">{(error as Error).message}</span>
+              <span className="text-red-600 dark:text-red-400 font-medium">{(error as Error).message}</span>
             </div>
           </div>
         )}
@@ -183,7 +191,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
 
       <div className="mt-8 flex items-center justify-center gap-3">
         <button
-          className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="px-4 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page <= 1}
         >
@@ -191,13 +199,13 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <div className="px-4 py-2 rounded-lg bg-gray-100 text-sm font-medium">
-          <span className="text-black">{page}</span>
-          <span className="text-gray-400 mx-1">/</span>
-          <span className="text-gray-600">{totalPages}</span>
+        <div className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-white/10 text-sm font-medium">
+          <span className="text-slate-900 dark:text-white">{page}</span>
+          <span className="text-slate-400 dark:text-slate-500 mx-1">/</span>
+          <span className="text-slate-600 dark:text-slate-400">{totalPages}</span>
         </div>
         <button
-          className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="px-4 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page >= totalPages}
         >
@@ -229,12 +237,12 @@ function AgentCard({ agent }: { agent: Agent }) {
   return (
     <Link
       href={`/dashboard/agents/${agent.id}`}
-      className="group relative h-52 rounded-xl border border-gray-200 bg-white text-left p-5 hover:border-gray-400 hover:shadow-lg transition-all duration-300 cursor-pointer"
+      className="group relative h-52 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-left p-5 hover:border-slate-400 dark:hover:border-white/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
     >
       <div className="relative h-full flex flex-col">
         <div className="flex items-start gap-3 mb-4">
           <div className="relative">
-            <div className="h-12 w-12 rounded-xl bg-black flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -245,23 +253,30 @@ function AgentCard({ agent }: { agent: Agent }) {
               </svg>
             </div>
             {agent.isActive && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0d1424]" />
             )}
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-black truncate mb-1 group-hover:text-gray-700 transition-colors">
+            <h3 className="font-semibold text-slate-900 dark:text-white truncate mb-1 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
               {agent.name}
             </h3>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700">{badge}</span>
+              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                {badge}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="space-y-2 flex-1">
           <div className="flex items-center gap-2 text-xs">
-            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -269,14 +284,14 @@ function AgentCard({ agent }: { agent: Agent }) {
                 d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
               />
             </svg>
-            <span className="text-gray-900 font-medium">{provider}</span>
-            <span className="text-gray-300">•</span>
-            <span className="text-gray-500 truncate" title={String(model)}>
+            <span className="text-slate-900 dark:text-white font-medium">{provider}</span>
+            <span className="text-slate-300 dark:text-slate-600">•</span>
+            <span className="text-slate-500 dark:text-slate-400 truncate" title={String(model)}>
               {model}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -286,7 +301,7 @@ function AgentCard({ agent }: { agent: Agent }) {
               />
             </svg>
             <span>{new Date(agent.createdAt).toLocaleDateString()}</span>
-            <span className="text-gray-300">•</span>
+            <span className="text-slate-300 dark:text-slate-600">•</span>
             <span>History: {agent.historyLimit ?? 0}</span>
           </div>
         </div>
@@ -368,15 +383,15 @@ function CreateAgentModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-[101] w-full max-w-4xl rounded-xl bg-white border border-gray-200 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+      <div className="relative z-[101] w-full max-w-4xl rounded-xl bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-50 dark:bg-white/5">
           <div>
-            <h3 className="font-semibold text-lg text-black">Create New Agent</h3>
-            <p className="text-sm text-gray-500 mt-0.5">Configure your AI agent settings</p>
+            <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Create New Agent</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Configure your AI agent settings</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-all"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
             aria-label="Close"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -387,12 +402,12 @@ function CreateAgentModal({
 
         <form onSubmit={submit} className="p-6 space-y-5 overflow-y-auto">
           <label className="text-sm block">
-            <span className="block mb-2 font-medium text-gray-700">Agent Name *</span>
+            <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">Agent Name *</span>
             <input
-              className={`w-full border rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 transition-all ${
+              className={`w-full border rounded-lg px-4 py-2.5 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 transition-all ${
                 errorMessage
-                  ? "border-red-500 focus:ring-red-200 focus:border-red-500"
-                  : "border-gray-300 focus:ring-gray-200 focus:border-gray-400"
+                  ? "border-red-500 dark:border-red-500 focus:ring-red-200 dark:focus:ring-red-900/30 focus:border-red-500"
+                  : "border-slate-200 dark:border-white/10 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30"
               }`}
               placeholder="Enter agent name"
               value={form.name}
@@ -400,7 +415,7 @@ function CreateAgentModal({
               required
             />
             {errorMessage && (
-              <div className="mt-2 flex items-start gap-2 text-red-600 text-sm">
+              <div className="mt-2 flex items-start gap-2 text-red-600 dark:text-red-400 text-sm">
                 <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -416,13 +431,13 @@ function CreateAgentModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="text-sm block">
-              <span className="block mb-2 font-medium text-gray-700">Status</span>
+              <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">Status</span>
               <div className="flex items-center gap-3 h-[42px]">
                 <button
                   type="button"
                   onClick={() => update("isActive", !form.isActive)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    form.isActive ? "bg-green-600" : "bg-gray-300"
+                    form.isActive ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
                   }`}
                 >
                   <span
@@ -431,18 +446,20 @@ function CreateAgentModal({
                     }`}
                   />
                 </button>
-                <span className={`text-sm font-medium ${form.isActive ? "text-green-600" : "text-gray-500"}`}>
+                <span
+                  className={`text-sm font-medium ${form.isActive ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"}`}
+                >
                   {form.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
             </label>
 
             <label className="text-sm block">
-              <span className="block mb-2 font-medium text-gray-700">History Limit</span>
+              <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">History Limit</span>
               <input
                 type="number"
                 min={0}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 transition-all"
+                className="w-full border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all"
                 value={form.historyLimit}
                 onChange={(e) => update("historyLimit", Number.parseInt(e.target.value || "0", 10) || 0)}
               />
@@ -450,9 +467,9 @@ function CreateAgentModal({
           </div>
 
           <label className="text-sm block">
-            <span className="block mb-2 font-medium text-gray-700">System Prompt</span>
+            <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">System Prompt</span>
             <textarea
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 transition-all resize-none"
+              className="w-full border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all resize-none"
               rows={4}
               value={form.prompt}
               onChange={(e) => update("prompt", e.target.value)}
@@ -463,14 +480,14 @@ function CreateAgentModal({
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
-              className="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
+              className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-lg bg-black hover:bg-gray-800 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
+              className="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
               disabled={create.isPending}
             >
               {create.isPending ? (

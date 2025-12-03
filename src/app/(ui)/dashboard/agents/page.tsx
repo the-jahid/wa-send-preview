@@ -1,18 +1,10 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useState, useEffect } from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
-// shadcn/ui
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import OverviewTab from '@/components/dashboard/agent/OverviewTab';
-import WhatsappTab from '@/components/dashboard/agent/waTab';
-
-
+import OverviewTab from "@/components/dashboard/agent/OverviewTab"
 
 export default function AgentsTabsPage() {
   const [qc] = useState(
@@ -23,31 +15,75 @@ export default function AgentsTabsPage() {
           mutations: { retry: 0 },
         },
       }),
-  );
+  )
 
   // which agent to manage on WhatsApp tab (set after create or user selection)
-  const [waAgentId, setWaAgentId] = useState<string | null>(null);
-  const [tab, setTab] = useState<'overview' | 'whatsapp'>('overview');
+
+  /* ------------------------ THEME ------------------------ */
+  const [isDark, setIsDark] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    const savedTheme = localStorage.getItem("theme")
+    if (savedTheme) {
+      setIsDark(savedTheme === "dark")
+    } else {
+      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+    }
+  }, [])
+
+  // Save theme to localStorage and apply to document
+  useEffect(() => {
+    if (!mounted) return
+    localStorage.setItem("theme", isDark ? "dark" : "light")
+    if (isDark) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }, [isDark, mounted])
+
+  // Listen for changes from other tabs/windows
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "theme" && e.newValue) {
+        setIsDark(e.newValue === "dark")
+      }
+    }
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [])
+
+  const toggleTheme = () => setIsDark(!isDark)
+
+  // Prevent flash of wrong theme
+  if (!mounted) {
+    return (
+      <div className="h-full flex items-center justify-center bg-slate-50 dark:bg-[#0a0f1a]">
+        <div className="animate-pulse">
+          <div className="h-12 w-12 rounded-lg bg-slate-200 dark:bg-white/10" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <QueryClientProvider client={qc}>
-      <main className="mx-auto max-w-7xl p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Agents</h1>
-          <p className="text-sm text-slate-500">
-            Manage your AI agents and connect WhatsApp.
-          </p>
+      <main className="mx-auto max-w-7xl p-6 bg-slate-50 dark:bg-[#0a0f1a] min-h-screen transition-colors duration-300">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Agents</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Manage your AI agents.</p>
+          </div>
+
+       
         </div>
 
-        <OverviewTab
-              onConnectWhatsapp={(agentId) => {
-                setWaAgentId(agentId);
-                setTab('whatsapp');
-              }}
-            />
+        <OverviewTab />
       </main>
-
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-  );
+  )
 }
