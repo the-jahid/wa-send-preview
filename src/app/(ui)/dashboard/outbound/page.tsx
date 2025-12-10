@@ -8,7 +8,7 @@ import type { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Search, Plus, MoreVertical, Trash2, Eye, X, Calendar, TrendingUp } from "lucide-react"
+import { Search, Plus, MoreVertical, Trash2, Eye, X, Calendar, TrendingUp, Sun, Moon } from "lucide-react"
 
 import { useAgents } from "@/app/features/agent/query"
 import { useCampaigns, useCreateCampaign, useDeleteCampaign } from "@/app/features/outbound_campaign/query"
@@ -38,12 +38,32 @@ function setSearchParams(
   router.replace(`?${sp.toString()}`, { scroll: false })
 }
 
-const STATUS_COLORS: Record<OutboundCampaignStatus, string> = {
-  DRAFT: "bg-slate-50 text-slate-700 border-slate-200",
-  SCHEDULED: "bg-blue-50 text-blue-700 border-blue-200",
-  RUNNING: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  COMPLETED: "bg-gray-50 text-gray-600 border-gray-200",
-  CANCELLED: "bg-rose-50 text-rose-700 border-rose-200",
+const STATUS_COLORS: Record<OutboundCampaignStatus, { light: string; dark: string }> = {
+  DRAFT: {
+    light: "bg-slate-50 text-slate-700 border-slate-200",
+    dark: "dark:bg-slate-400/20 dark:text-slate-300 dark:border-slate-500/30",
+  },
+  SCHEDULED: {
+    light: "bg-sky-50 text-sky-700 border-sky-200",
+    dark: "dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-500/30",
+  },
+  RUNNING: {
+    light: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    dark: "dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30",
+  },
+  COMPLETED: {
+    light: "bg-gray-50 text-gray-600 border-gray-200",
+    dark: "dark:bg-gray-500/20 dark:text-gray-300 dark:border-gray-500/30",
+  },
+  CANCELLED: {
+    light: "bg-rose-50 text-rose-700 border-rose-200",
+    dark: "dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30",
+  },
+}
+
+function getStatusClasses(status: OutboundCampaignStatus): string {
+  const colors = STATUS_COLORS[status]
+  return `${colors.light} ${colors.dark}`
 }
 
 type CreateForm = z.infer<typeof CreateOutboundCampaignBodySchema>
@@ -55,6 +75,48 @@ export default function OutboundListPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  /* ------------------------ THEME ------------------------ */
+  const [isDark, setIsDark] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    const savedTheme = localStorage.getItem("theme")
+    if (savedTheme) {
+      setIsDark(savedTheme === "dark")
+    } else {
+      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+    }
+  }, [])
+
+  // Save theme to localStorage and apply to document
+  useEffect(() => {
+    if (!mounted) return
+
+    localStorage.setItem("theme", isDark ? "dark" : "light")
+    if (isDark) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }, [isDark, mounted])
+
+  // Listen for changes from other tabs/windows
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "theme" && e.newValue) {
+        setIsDark(e.newValue === "dark")
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [])
+
+  const toggleTheme = () => setIsDark(!isDark)
+
+  /* ---------------------- URL PARAMS ---------------------- */
   const urlAgentId = searchParams.get("agentId") || null
   const urlSearch = searchParams.get("search") ?? ""
   const urlStatus = (searchParams.get("status") as OutboundCampaignStatus | null) || undefined
@@ -194,21 +256,33 @@ export default function OutboundListPage() {
     }
   }
 
+  // Prevent flash of wrong theme
+  if (!mounted) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0a0f1a]">
+        <div className="animate-pulse">
+          <TrendingUp className="h-12 w-12 text-emerald-500" />
+        </div>
+      </div>
+    )
+  }
+
   if (!isLoaded)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-500">Loading…</div>
+      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+        <div className="text-slate-500 dark:text-slate-400">Loading…</div>
       </div>
     )
   if (!user)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-500">Please sign in.</div>
+      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+        <div className="text-slate-500 dark:text-slate-400">Please sign in.</div>
       </div>
     )
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+      {/* Toast Notification */}
       {toast && (
         <div
           className={`fixed right-4 top-4 px-4 py-3 rounded-lg shadow-lg z-50 text-sm font-medium backdrop-blur-sm ${
@@ -219,13 +293,14 @@ export default function OutboundListPage() {
         </div>
       )}
 
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-[#0d1424]/95 backdrop-blur-sm border-b border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-gray-900">Campaigns</h1>
+              <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Campaigns</h1>
               {agentsLoading ? (
-                <div className="h-10 w-52 bg-gray-100 animate-pulse rounded-lg" />
+                <div className="h-10 w-52 bg-slate-200 dark:bg-white/10 animate-pulse rounded-lg" />
               ) : (
                 <select
                   value={agentId ?? ""}
@@ -235,10 +310,10 @@ export default function OutboundListPage() {
                     setPage(1)
                     setStatusFilter(undefined)
                   }}
-                  className="h-10 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="h-10 px-4 py-2 text-sm font-medium border border-slate-300 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-slate-900 dark:text-white hover:border-slate-400 dark:hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                 >
                   {agents.map((a) => (
-                    <option key={a.id} value={a.id}>
+                    <option key={a.id} value={a.id} className="bg-white dark:bg-[#0d1424]">
                       {a.name ?? a.id}
                     </option>
                   ))}
@@ -247,8 +322,22 @@ export default function OutboundListPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Theme Toggle */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleTheme}
+                className="h-10 w-10 border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"
+              >
+                {isDark ? (
+                  <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                ) : (
+                  <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                )}
+              </Button>
+
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <Input
                   placeholder="Search campaigns..."
                   value={search}
@@ -259,13 +348,13 @@ export default function OutboundListPage() {
                       refetch()
                     }
                   }}
-                  className="pl-9 w-72 h-10 text-sm border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="pl-9 w-72 h-10 text-sm border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
               </div>
               <Button
                 size="sm"
                 onClick={() => setOpenCreate(true)}
-                className="h-10 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm"
+                className="h-10 px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium shadow-sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 New Campaign
@@ -273,6 +362,7 @@ export default function OutboundListPage() {
             </div>
           </div>
 
+          {/* Status Filter Tabs */}
           <div className="flex gap-2">
             <button
               onClick={() => {
@@ -282,8 +372,8 @@ export default function OutboundListPage() {
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 statusFilter === undefined
-                  ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
               }`}
             >
               All <span className="ml-1.5 font-semibold">{allTotal}</span>
@@ -296,8 +386,8 @@ export default function OutboundListPage() {
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 statusFilter === "RUNNING"
-                  ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
               }`}
             >
               Running <span className="ml-1.5 font-semibold">{runningTotal}</span>
@@ -310,8 +400,8 @@ export default function OutboundListPage() {
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 statusFilter === "SCHEDULED"
-                  ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
               }`}
             >
               Scheduled <span className="ml-1.5 font-semibold">{scheduledTotal}</span>
@@ -323,7 +413,9 @@ export default function OutboundListPage() {
                 refetch()
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                statusFilter === "DRAFT" ? "bg-emerald-50 text-emerald-700 shadow-sm" : "text-gray-600 hover:bg-gray-50"
+                statusFilter === "DRAFT"
+                  ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
               }`}
             >
               Draft <span className="ml-1.5 font-semibold">{draftTotal}</span>
@@ -332,48 +424,55 @@ export default function OutboundListPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {/* Create Campaign Card */}
             <Card
-              className="border-2 border-dashed border-gray-300 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[160px] group"
+              className="border-2 border-dashed border-slate-300 dark:border-white/20 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[160px] group bg-transparent"
               onClick={() => setOpenCreate(true)}
             >
               <CardContent className="p-6 flex flex-col items-center justify-center">
-                <div className="h-12 w-12 rounded-full bg-gray-100 group-hover:bg-emerald-100 flex items-center justify-center mb-3 transition-colors">
-                  <Plus className="h-6 w-6 text-gray-400 group-hover:text-emerald-600 transition-colors" />
+                <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-white/10 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 flex items-center justify-center mb-3 transition-colors">
+                  <Plus className="h-6 w-6 text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
                 </div>
-                <span className="text-sm font-medium text-gray-600 group-hover:text-emerald-700">Create Campaign</span>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                  Create Campaign
+                </span>
               </CardContent>
             </Card>
 
+            {/* Loading Skeletons */}
             {listLoading ? (
               Array.from({ length: 7 }).map((_, i) => (
-                <Card key={`sk-${i}`} className="min-h-[160px] border border-gray-200">
+                <Card key={`sk-${i}`} className="min-h-[160px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424]">
                   <CardContent className="p-5">
-                    <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
-                    <div className="h-4 w-1/2 bg-gray-100 rounded animate-pulse mb-3" />
-                    <div className="h-3 w-1/3 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-5 w-3/4 bg-slate-200 dark:bg-white/10 rounded animate-pulse mb-3" />
+                    <div className="h-4 w-1/2 bg-slate-100 dark:bg-white/5 rounded animate-pulse mb-3" />
+                    <div className="h-3 w-1/3 bg-slate-100 dark:bg-white/5 rounded animate-pulse" />
                   </CardContent>
                 </Card>
               ))
             ) : items.length === 0 ? (
-              <div className="col-span-full border-2 border-dashed border-gray-300 rounded-xl p-12 text-center bg-white">
-                <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="h-8 w-8 text-gray-400" />
+              /* Empty State */
+              <div className="col-span-full border-2 border-dashed border-slate-300 dark:border-white/20 rounded-xl p-12 text-center bg-white dark:bg-[#0d1424]">
+                <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="h-8 w-8 text-slate-400 dark:text-slate-500" />
                 </div>
-                <p className="text-gray-900 font-semibold mb-2 text-lg">No campaigns found</p>
-                <p className="text-sm text-gray-500 mb-6">Get started by creating your first campaign</p>
+                <p className="text-slate-900 dark:text-white font-semibold mb-2 text-lg">No campaigns found</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get started by creating your first campaign</p>
                 <Button
                   size="sm"
                   onClick={() => setOpenCreate(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 h-10 px-6"
+                  className="bg-emerald-500 hover:bg-emerald-600 h-10 px-6 text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Campaign
                 </Button>
               </div>
             ) : (
+              /* Campaign Cards */
               items.map((c: OutboundCampaignEntity) => (
                 <CampaignCard
                   key={c.id}
@@ -390,15 +489,16 @@ export default function OutboundListPage() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200">
+      {/* Footer / Pagination */}
+      <div className="sticky bottom-0 bg-white/95 dark:bg-[#0d1424]/95 backdrop-blur-sm border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Page <span className="font-semibold text-gray-900">{listResp?.page ?? page}</span> of{" "}
-            <span className="font-semibold text-gray-900">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
+            Page <span className="font-semibold text-slate-900 dark:text-white">{listResp?.page ?? page}</span> of{" "}
+            <span className="font-semibold text-slate-900 dark:text-white">
               {listResp ? Math.max(1, Math.ceil((listResp.total || 0) / (listResp.limit || limit))) : 1}
             </span>
-            <span className="mx-2 text-gray-400">•</span>
-            <span className="font-semibold text-gray-900">{total}</span> total
+            <span className="mx-2 text-slate-400 dark:text-slate-600">•</span>
+            <span className="font-semibold text-slate-900 dark:text-white">{total}</span> total
           </div>
           <div className="flex gap-2">
             <Button
@@ -406,7 +506,7 @@ export default function OutboundListPage() {
               size="sm"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="h-9 px-4 rounded-lg"
+              className="h-9 px-4 rounded-lg border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50"
             >
               Previous
             </Button>
@@ -415,7 +515,7 @@ export default function OutboundListPage() {
               size="sm"
               disabled={!hasNext}
               onClick={() => setPage((p) => p + 1)}
-              className="h-9 px-4 rounded-lg"
+              className="h-9 px-4 rounded-lg border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50"
             >
               Next
             </Button>
@@ -423,6 +523,7 @@ export default function OutboundListPage() {
         </div>
       </div>
 
+      {/* Create Campaign Modal */}
       {openCreate && (
         <Modal title="Create New Campaign" onClose={() => setOpenCreate(false)}>
           <form
@@ -442,35 +543,35 @@ export default function OutboundListPage() {
             className="space-y-5"
           >
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Agent</label>
+              <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Agent</label>
               <select
                 {...createForm.register("agentId")}
                 defaultValue={agentId ?? ""}
-                className="w-full h-11 px-4 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="w-full h-11 px-4 py-2 text-sm border border-slate-300 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-slate-900 dark:text-white hover:border-slate-400 dark:hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               >
-                <option value="" disabled>
+                <option value="" disabled className="bg-white dark:bg-[#0d1424]">
                   Select an agent...
                 </option>
                 {agents.map((a) => (
-                  <option key={a.id} value={a.id}>
+                  <option key={a.id} value={a.id} className="bg-white dark:bg-[#0d1424]">
                     {a.name ?? a.id}
                   </option>
                 ))}
               </select>
               {createForm.formState.errors.agentId && (
-                <p className="text-xs text-rose-600 mt-1.5">{createForm.formState.errors.agentId.message}</p>
+                <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5">{createForm.formState.errors.agentId.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Campaign Name</label>
+              <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Campaign Name</label>
               <Input
                 placeholder="e.g., Black Friday 2025"
                 {...createForm.register("name")}
-                className="h-11 text-sm border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="h-11 text-sm border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
               {createForm.formState.errors.name && (
-                <p className="text-xs text-rose-600 mt-1.5">{createForm.formState.errors.name.message}</p>
+                <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5">{createForm.formState.errors.name.message}</p>
               )}
             </div>
 
@@ -480,7 +581,7 @@ export default function OutboundListPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setOpenCreate(false)}
-                className="h-10 px-5 rounded-lg"
+                className="h-10 px-5 rounded-lg border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10"
               >
                 Cancel
               </Button>
@@ -488,7 +589,7 @@ export default function OutboundListPage() {
                 type="submit"
                 size="sm"
                 disabled={createMut.isPending || !createForm.watch("agentId") || !createForm.watch("name")}
-                className="h-10 px-5 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                className="h-10 px-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg disabled:opacity-50"
               >
                 {createMut.isPending ? "Creating..." : "Create Campaign"}
               </Button>
@@ -497,11 +598,12 @@ export default function OutboundListPage() {
         </Modal>
       )}
 
+      {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <Modal title="Delete Campaign" onClose={() => !deleteMut.isPending && setDeleteTarget(null)}>
           <div className="space-y-5">
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Are you sure you want to delete <span className="font-semibold text-gray-900">{deleteTarget.name}</span>?
+            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Are you sure you want to delete <span className="font-semibold text-slate-900 dark:text-white">{deleteTarget.name}</span>?
               This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
@@ -511,7 +613,7 @@ export default function OutboundListPage() {
                 size="sm"
                 onClick={() => setDeleteTarget(null)}
                 disabled={deleteMut.isPending}
-                className="h-10 px-5 rounded-lg"
+                className="h-10 px-5 rounded-lg border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10"
               >
                 Cancel
               </Button>
@@ -520,7 +622,7 @@ export default function OutboundListPage() {
                 size="sm"
                 onClick={handleConfirmDelete}
                 disabled={deleteMut.isPending}
-                className="h-10 px-5 bg-rose-600 hover:bg-rose-700 rounded-lg"
+                className="h-10 px-5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg disabled:opacity-50"
               >
                 {deleteMut.isPending ? "Deleting..." : "Delete Campaign"}
               </Button>
@@ -568,11 +670,11 @@ function CampaignCard({
   return (
     <Card
       onClick={handleCardClick}
-      className="hover:shadow-lg hover:scale-[1.02] transition-all duration-200 min-h-[160px] relative group cursor-pointer border border-gray-200 hover:border-emerald-200 bg-white"
+      className="hover:shadow-lg dark:hover:shadow-emerald-500/5 hover:scale-[1.02] transition-all duration-200 min-h-[160px] relative group cursor-pointer border border-slate-200 dark:border-white/10 hover:border-emerald-300 dark:hover:border-emerald-500/50 bg-white dark:bg-[#0d1424]"
     >
       <CardContent className="p-5">
         <div className="flex justify-between items-start gap-2 mb-3">
-          <h3 className="font-semibold text-base text-gray-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
+          <h3 className="font-semibold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
             {campaign.name}
           </h3>
 
@@ -582,21 +684,21 @@ function CampaignCard({
                 e.stopPropagation()
                 onOpenMenu(menuOpen ? null : campaign.id)
               }}
-              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
             >
-              <MoreVertical className="h-4 w-4 text-gray-500" />
+              <MoreVertical className="h-4 w-4 text-slate-500 dark:text-slate-400" />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-9 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-20 py-1 overflow-hidden">
+              <div className="absolute right-0 top-9 w-44 bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 rounded-lg shadow-xl dark:shadow-2xl z-20 py-1 overflow-hidden">
                 <Link
                   href={{ pathname: `/dashboard/outbound/${campaign.id}/campaign`, query: { agentId } }}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 no-underline transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 no-underline transition-colors"
                   onClick={(e) => {
                     e.stopPropagation()
                     onCloseMenu()
                   }}
                 >
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                   Open Campaign
                 </Link>
                 <button
@@ -605,7 +707,7 @@ function CampaignCard({
                     onCloseMenu()
                     onDelete()
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete
@@ -615,11 +717,11 @@ function CampaignCard({
           </div>
         </div>
 
-        <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 ${STATUS_COLORS[campaign.status]}`}>
+        <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 ${getStatusClasses(campaign.status)}`}>
           {campaign.status}
         </Badge>
 
-        <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+        <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <Calendar className="h-3.5 w-3.5" />
           <span>
             {new Date(campaign.createdAt).toLocaleDateString("en-US", {
@@ -637,14 +739,14 @@ function CampaignCard({
 function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-white rounded-xl shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <X className="h-5 w-5 text-gray-500" />
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-white dark:bg-[#0d1424] rounded-xl shadow-2xl border border-slate-200 dark:border-white/10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-white/10">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{title}</h3>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
+            <X className="h-5 w-5 text-slate-500 dark:text-slate-400" />
           </button>
         </div>
         <div className="px-6 py-5">{children}</div>

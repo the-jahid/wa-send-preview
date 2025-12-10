@@ -57,11 +57,14 @@ function classNames(...s: (string | false | null | undefined)[]) {
 function Badge({ value }: { value?: string | null }) {
   const tone = statusTone[value ?? ""] ?? "gray"
   const map: any = {
-    gray: "bg-gray-50 text-gray-700 border border-gray-200",
-    amber: "bg-amber-50 text-amber-700 border border-amber-200",
-    red: "bg-red-50 text-red-700 border border-red-200",
-    green: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    success: "bg-green-50 text-green-700 border border-green-200",
+    gray: "bg-slate-50 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-500/30",
+    amber:
+      "bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30",
+    red: "bg-rose-50 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30",
+    green:
+      "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30",
+    success:
+      "bg-green-50 dark:bg-green-500/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-500/30",
   }
   return (
     <span className={classNames("inline-flex items-center px-3 py-1 rounded-full text-xs font-medium", map[tone])}>
@@ -89,7 +92,7 @@ function preview(obj?: Record<string, any> | null, max = 3) {
 }
 
 function Skeleton({ className }: { className?: string }) {
-  return <div className={classNames("h-4 w-32 animate-pulse rounded-lg bg-gray-100", className)} />
+  return <div className={classNames("h-4 w-32 animate-pulse rounded-lg bg-slate-200 dark:bg-white/10", className)} />
 }
 
 /* ------------ Excel helpers ------------ */
@@ -128,7 +131,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
       sortBy: "createdAt",
       sortOrder: "desc",
     }),
-    [page, limit, q, statusFilter],
+    [page, limit, q, statusFilter]
   )
 
   const { data, isLoading, isError, error, refetch, isFetching } = useCampaignLeads(campaignId, params)
@@ -373,12 +376,17 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
     const toTemplates = `/dashboard/outbound/${campaignId}/campaign?${sp.toString()}`
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 p-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1a] p-6 transition-colors duration-300">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white dark:bg-[#0d1424] rounded-3xl shadow-sm border border-slate-200 dark:border-white/10 p-8">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl mx-auto flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-emerald-600 dark:text-emerald-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -387,14 +395,14 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-semibold text-gray-900">No Template Selected</h3>
-              <p className="text-gray-600 max-w-md mx-auto">
+              <h3 className="text-2xl font-semibold text-slate-900 dark:text-white">No Template Selected</h3>
+              <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
                 To add leads or start broadcasting, first choose a template for this campaign.
               </p>
               <div className="pt-4">
                 <Link
                   href={toTemplates}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-3 text-white font-medium shadow-sm hover:shadow-md transition-all"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 px-6 py-3 text-white font-medium shadow-sm hover:shadow-md transition-all"
                 >
                   Select a Template
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -411,26 +419,26 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
 
   /* ------------------------------ UI ------------------------------ */
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-green-50/20 via-white to-emerald-50/20">
+    <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
       {/* Sticky Header */}
-      <div className="flex-shrink-0 sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <div className="flex-shrink-0 sticky top-0 z-40 bg-white/95 dark:bg-[#0d1424]/95 backdrop-blur-sm border-b border-slate-200 dark:border-white/10 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 md:px-4 py-2.5">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
             <div>
-              <h1 className="text-lg md:text-xl font-bold text-gray-900">Leads Manager</h1>
-              <p className="text-gray-600 text-xs flex items-center gap-2">
+              <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Leads Manager</h1>
+              <p className="text-slate-600 dark:text-slate-400 text-xs flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                   Total Leads:
                 </span>
-                <span className="font-semibold text-gray-900">{total}</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{total}</span>
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5">
               <button
                 onClick={() => setShowCreate((s) => !s)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 hover:bg-green-700 px-3 py-1.5 text-white text-xs font-medium shadow-sm transition-all"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 text-white text-xs font-medium shadow-sm transition-all"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -440,7 +448,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
 
               <button
                 onClick={() => setShowImport((s) => !s)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-3 py-1.5 text-gray-700 text-xs font-medium transition-all"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-3 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all"
                 title="Upload .xlsx, .xls, or .csv"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -456,7 +464,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
 
               <button
                 onClick={() => refetch()}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-3 py-1.5 text-gray-700 text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-3 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={busy}
                 title="Refresh"
               >
@@ -480,7 +488,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
           <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="relative">
               <svg
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -497,17 +505,19 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                 placeholder="Search by name or phone..."
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-gray-200 focus:border-green-500 focus:ring-1 focus:ring-green-500/20 transition-all outline-none"
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all outline-none"
               />
             </div>
             <select
               value={statusFilter || ""}
               onChange={(e) => setStatusFilter(e.target.value || undefined)}
-              className="px-3 py-1.5 text-xs rounded-lg border border-gray-200 focus:border-green-500 focus:ring-1 focus:ring-green-500/20 transition-all outline-none bg-white"
+              className="px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all outline-none"
             >
-              <option value="">All Statuses</option>
+              <option value="" className="bg-white dark:bg-[#0d1424]">
+                All Statuses
+              </option>
               {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>
+                <option key={s} value={s} className="bg-white dark:bg-[#0d1424]">
                   {s}
                 </option>
               ))}
@@ -520,8 +530,8 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
         <div className="max-w-7xl mx-auto px-3 md:px-4 py-3">
           <div className="space-y-2">
             {showCreate && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Add New Lead</h3>
+              <div className="bg-white dark:bg-[#0d1424] rounded-lg shadow-sm border border-slate-200 dark:border-white/10 p-4">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Add New Lead</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                   <LabeledInput
                     label="Phone Number"
@@ -559,19 +569,19 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                   />
                 </div>
 
-                {createErr && <p className="mt-2 text-xs text-red-600">{createErr}</p>}
+                {createErr && <p className="mt-2 text-xs text-rose-600 dark:text-rose-400">{createErr}</p>}
 
                 <div className="flex items-center gap-2 mt-4">
                   <button
                     onClick={onCreate}
                     disabled={creating}
-                    className="rounded-lg bg-green-600 hover:bg-green-700 px-4 py-1.5 text-white text-xs font-medium shadow-sm transition-all disabled:opacity-50"
+                    className="rounded-lg bg-emerald-500 hover:bg-emerald-600 px-4 py-1.5 text-white text-xs font-medium shadow-sm transition-all disabled:opacity-50"
                   >
                     {creating ? "Creating..." : "Create"}
                   </button>
                   <button
                     onClick={() => setShowCreate(false)}
-                    className="rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-4 py-1.5 text-gray-700 text-xs font-medium transition-all"
+                    className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-4 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all"
                   >
                     Cancel
                   </button>
@@ -580,11 +590,13 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
             )}
 
             {showImport && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Import Leads from Excel</h3>
+              <div className="bg-white dark:bg-[#0d1424] rounded-lg shadow-sm border border-slate-200 dark:border-white/10 p-4">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Import Leads from Excel</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Upload File</label>
+                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Upload File
+                    </label>
                     <input
                       type="file"
                       accept=".xlsx,.xls,.csv"
@@ -592,9 +604,11 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                         const f = e.target.files?.[0]
                         if (f) handleFile(f)
                       }}
-                      className="block w-full text-xs text-gray-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
+                      className="block w-full text-xs text-slate-700 dark:text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-50 dark:file:bg-emerald-500/20 file:text-emerald-700 dark:file:text-emerald-400 hover:file:bg-emerald-100 dark:hover:file:bg-emerald-500/30 cursor-pointer"
                     />
-                    {fileName && <p className="mt-1 text-xs text-gray-500">File: {fileName}</p>}
+                    {fileName && (
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">File: {fileName}</p>
+                    )}
                   </div>
 
                   {headers.length > 0 && (
@@ -614,11 +628,13 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                     </div>
                   )}
 
-                  {importMsg && <p className="text-xs text-green-600 font-medium">{importMsg}</p>}
+                  {importMsg && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">{importMsg}</p>
+                  )}
                   {importErrs.length > 0 && (
-                    <div className="max-h-32 overflow-auto bg-red-50 border border-red-200 rounded-lg p-2">
+                    <div className="max-h-32 overflow-auto bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-lg p-2">
                       {importErrs.map((err, i) => (
-                        <p key={i} className="text-xs text-red-700">
+                        <p key={i} className="text-xs text-rose-700 dark:text-rose-400">
                           {err}
                         </p>
                       ))}
@@ -626,9 +642,9 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                   )}
 
                   {rows.length > 0 && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
-                      <p className="text-xs text-gray-700">
-                        Detected <strong>{rows.length}</strong> row(s).
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg p-2">
+                      <p className="text-xs text-slate-700 dark:text-slate-300">
+                        Detected <strong className="text-slate-900 dark:text-white">{rows.length}</strong> row(s).
                       </p>
                     </div>
                   )}
@@ -637,13 +653,13 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                     <button
                       onClick={importSelectedRows}
                       disabled={importing || !mapName || !mapPhone || !rows.length}
-                      className="rounded-lg bg-green-600 hover:bg-green-700 px-4 py-1.5 text-white text-xs font-medium shadow-sm transition-all disabled:opacity-50"
+                      className="rounded-lg bg-emerald-500 hover:bg-emerald-600 px-4 py-1.5 text-white text-xs font-medium shadow-sm transition-all disabled:opacity-50"
                     >
                       {importing ? "Importing..." : "Import Leads"}
                     </button>
                     <button
                       onClick={() => setShowImport(false)}
-                      className="rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-4 py-1.5 text-gray-700 text-xs font-medium transition-all"
+                      className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-4 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all"
                     >
                       Cancel
                     </button>
@@ -653,17 +669,22 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
             )}
 
             {isError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-xs text-red-700">{(error as any)?.message ?? "Failed to load leads"}</p>
+              <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-lg p-3">
+                <p className="text-xs text-rose-700 dark:text-rose-400">
+                  {(error as any)?.message ?? "Failed to load leads"}
+                </p>
               </div>
             )}
 
             {isLoading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-white rounded-lg border border-gray-200 p-3 animate-pulse">
+                  <div
+                    key={i}
+                    className="bg-white dark:bg-[#0d1424] rounded-lg border border-slate-200 dark:border-white/10 p-3 animate-pulse"
+                  >
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex-shrink-0" />
+                      <div className="w-8 h-8 bg-slate-100 dark:bg-white/10 rounded-full flex-shrink-0" />
                       <div className="flex-1 space-y-2">
                         <Skeleton className="h-3 w-24" />
                         <Skeleton className="h-2 w-32" />
@@ -673,9 +694,14 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                 ))}
               </div>
             ) : leads.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-                <div className="w-12 h-12 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-white dark:bg-[#0d1424] rounded-lg border border-slate-200 dark:border-white/10 p-6 text-center">
+                <div className="w-12 h-12 bg-slate-100 dark:bg-white/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-slate-400 dark:text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -684,7 +710,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                     />
                   </svg>
                 </div>
-                <p className="text-sm text-gray-600">No leads found</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">No leads found</p>
               </div>
             ) : (
               leads.map((row: any) => {
@@ -694,7 +720,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                 return (
                   <div
                     key={row.id}
-                    className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-all"
+                    className="bg-white dark:bg-[#0d1424] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm hover:shadow dark:hover:border-white/20 transition-all"
                   >
                     {isEditing && form ? (
                       <div className="p-3">
@@ -760,13 +786,13 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                           <button
                             onClick={() => saveEdit(row.id)}
                             disabled={updating}
-                            className="rounded-lg bg-green-600 hover:bg-green-700 px-3 py-1 text-white text-xs font-medium transition-all disabled:opacity-50"
+                            className="rounded-lg bg-emerald-500 hover:bg-emerald-600 px-3 py-1 text-white text-xs font-medium transition-all disabled:opacity-50"
                           >
                             {updating ? "Saving..." : "Save"}
                           </button>
                           <button
                             onClick={() => cancelEdit(row.id)}
-                            className="rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-3 py-1 text-gray-700 text-xs font-medium transition-all"
+                            className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-3 py-1 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all"
                           >
                             Cancel
                           </button>
@@ -775,9 +801,9 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                     ) : (
                       <div className="p-3">
                         <div className="flex items-start gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                             <svg
-                              className="w-4 h-4 text-green-600"
+                              className="w-4 h-4 text-emerald-600 dark:text-emerald-400"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -794,10 +820,10 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1 min-w-0">
-                                <h3 className="text-sm font-semibold text-gray-900 truncate">
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                                   {row.firstName || "Unnamed"}
                                 </h3>
-                                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-600">
+                                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-slate-600 dark:text-slate-400">
                                   <svg
                                     className="w-3 h-3 flex-shrink-0"
                                     fill="none"
@@ -814,7 +840,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                                   <span className="truncate">{row.phoneNumber || "—"}</span>
                                 </div>
                                 {row.createdAt && (
-                                  <p className="text-[10px] text-gray-500 mt-0.5">
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-0.5">
                                     {new Date(row.createdAt).toLocaleDateString()}
                                   </p>
                                 )}
@@ -833,7 +859,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                                   }
                                 }}
                                 disabled={busy}
-                                className="inline-flex items-center gap-1 rounded-md bg-blue-50 hover:bg-blue-100 px-2 py-1 text-[11px] font-medium text-blue-700 transition-all disabled:opacity-50"
+                                className="inline-flex items-center gap-1 rounded-md bg-sky-50 dark:bg-sky-500/20 hover:bg-sky-100 dark:hover:bg-sky-500/30 px-2 py-1 text-[11px] font-medium text-sky-700 dark:text-sky-300 transition-all disabled:opacity-50"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path
@@ -849,7 +875,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                               <button
                                 onClick={() => startEdit(row)}
                                 disabled={busy}
-                                className="inline-flex items-center gap-1 rounded-md bg-gray-50 hover:bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-700 transition-all disabled:opacity-50"
+                                className="inline-flex items-center gap-1 rounded-md bg-slate-50 dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/20 px-2 py-1 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path
@@ -865,7 +891,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                               <button
                                 onClick={() => onViewJson(row.id)}
                                 disabled={busy}
-                                className="inline-flex items-center gap-1 rounded-md bg-gray-50 hover:bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-700 transition-all disabled:opacity-50"
+                                className="inline-flex items-center gap-1 rounded-md bg-slate-50 dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/20 px-2 py-1 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path
@@ -891,7 +917,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                                   }
                                 }}
                                 disabled={busy}
-                                className="inline-flex items-center gap-1 rounded-md bg-red-50 hover:bg-red-100 px-2 py-1 text-[11px] font-medium text-red-700 transition-all disabled:opacity-50"
+                                className="inline-flex items-center gap-1 rounded-md bg-rose-50 dark:bg-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/30 px-2 py-1 text-[11px] font-medium text-rose-700 dark:text-rose-300 transition-all disabled:opacity-50"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path
@@ -916,17 +942,18 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
         </div>
       </div>
 
-      <div className="flex-shrink-0 sticky bottom-0 z-30 bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-sm">
+      <div className="flex-shrink-0 sticky bottom-0 z-30 bg-white/95 dark:bg-[#0d1424]/95 backdrop-blur-sm border-t border-slate-200 dark:border-white/10 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 md:px-4 py-2">
-          <div className="flex items-center justify-between text-xs text-gray-600">
+          <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
             <div>
-              Page <strong>{page}</strong> of <strong>{pageCount}</strong>
+              Page <strong className="text-slate-900 dark:text-white">{page}</strong> of{" "}
+              <strong className="text-slate-900 dark:text-white">{pageCount}</strong>
             </div>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1 || busy}
-                className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -936,7 +963,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
               <button
                 onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
                 disabled={page >= pageCount || busy}
-                className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -969,10 +996,10 @@ function LabeledInput({
 }) {
   return (
     <label className={classNames("flex flex-col gap-1.5", className)}>
-      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">{label}</span>
       <input
         type={type}
-        className="px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none"
+        className="px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none"
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
@@ -996,14 +1023,14 @@ function LabeledSelect({
 }) {
   return (
     <label className={classNames("flex flex-col gap-1.5", className)}>
-      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">{label}</span>
       <select
-        className="px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none bg-white"
+        className="px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
         {options.map((s) => (
-          <option key={s} value={s}>
+          <option key={s} value={s} className="bg-white dark:bg-[#0d1424]">
             {s}
           </option>
         ))}
@@ -1027,9 +1054,9 @@ function LabeledTextarea({
 }) {
   return (
     <label className={classNames("flex flex-col gap-1.5", className)}>
-      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">{label}</span>
       <textarea
-        className="px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none font-mono resize-none"
+        className="px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-mono resize-none"
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
