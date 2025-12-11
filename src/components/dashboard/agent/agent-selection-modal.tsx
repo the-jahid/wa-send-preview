@@ -19,9 +19,16 @@ import { useAgents } from "@/app/features/agent/query"
 interface AgentSelectionModalProps {
     isOpen: boolean
     onClose: () => void
+    title?: string
+    onSelect?: (agentId: string) => void
 }
 
-export function AgentSelectionModal({ isOpen, onClose }: AgentSelectionModalProps) {
+export function AgentSelectionModal({
+    isOpen,
+    onClose,
+    title = "Select Booking Agent",
+    onSelect
+}: AgentSelectionModalProps) {
     const router = useRouter()
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -36,22 +43,24 @@ export function AgentSelectionModal({ isOpen, onClose }: AgentSelectionModalProp
     }, [agentsResp])
 
     // Filter agents client-side for immediate feedback
-    const filteredAgents = agents.filter(agent =>
-        agent.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || []
+    const filteredAgents = filteredAgentsList(agents, searchQuery)
 
     const handleAgentSelect = (agentId: string) => {
         onClose()
-        router.push(`/dashboard/agents/${agentId}/googlecalendar`)
+        if (onSelect) {
+            onSelect(agentId)
+        } else {
+            router.push(`/dashboard/agents/${agentId}/googlecalendar`)
+        }
     }
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 shadow-2xl">
                 <DialogHeader>
-                    <DialogTitle className="text-slate-900 dark:text-white">Select Booking Agent</DialogTitle>
+                    <DialogTitle className="text-slate-900 dark:text-white">{title}</DialogTitle>
                     <DialogDescription className="text-slate-500 dark:text-slate-400">
-                        Choose an agent to manage appointment settings.
+                        Choose an agent to proceed.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -118,4 +127,10 @@ export function AgentSelectionModal({ isOpen, onClose }: AgentSelectionModalProp
             </DialogContent>
         </Dialog>
     )
+}
+
+function filteredAgentsList(agents: any[], query: string) {
+    return agents.filter(agent =>
+        agent.name.toLowerCase().includes(query.toLowerCase())
+    ) || []
 }

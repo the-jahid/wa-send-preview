@@ -1,7 +1,7 @@
 "use client"
 
 import { use, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
@@ -46,6 +46,9 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
 
 function AgentDetailInner({ id }: { id: string }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const activeTab = searchParams.get("tab") || "whatsapp"
+
   const { data, isLoading, error, refetch } = useAgent(id, { staleTime: 30_000 })
   const agent = data?.data as Agent | undefined
 
@@ -148,7 +151,7 @@ function AgentDetailInner({ id }: { id: string }) {
         </div>
       </div>
 
-      <Tabs defaultValue="whatsapp" className="w-full">
+      <Tabs defaultValue={activeTab} className="w-full">
         <div className="sticky top-0 z-10 bg-slate-50/80 dark:bg-[#0a0f1a]/80 backdrop-blur pb-2">
           <TabsList className="grid w-full grid-cols-5 bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10">
             <TabsTrigger
