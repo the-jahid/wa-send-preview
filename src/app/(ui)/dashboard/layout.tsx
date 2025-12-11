@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  Calendar,
 } from "lucide-react"
 import { UserButton, useUser } from "@clerk/nextjs"
 
@@ -22,6 +23,7 @@ import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { AgentSelectionModal } from "@/components/dashboard/agent/agent-selection-modal"
 
 // Primary nav sections
 const NAV_MAIN = [
@@ -39,6 +41,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
 
   // Load theme from localStorage on mount
   useEffect(() => {
@@ -105,6 +108,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="h-dvh bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+      <AgentSelectionModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+      />
       <div
         className={cn(
           "grid h-dvh transition-all duration-300",
@@ -136,6 +143,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           {/* Navigation */}
           <ScrollArea className="flex-1 py-4">
             <div className={cn("px-3", sidebarCollapsed && "px-2")}>
+              <div className="mb-6">
+                <Button
+                  onClick={() => setIsBookingModalOpen(true)}
+                  className={cn(
+                    "w-full bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-300",
+                    sidebarCollapsed ? "h-10 w-10 p-0 rounded-lg justify-center" : "justify-start px-3 h-11"
+                  )}
+                  title="Book Appointment"
+                >
+                  <Calendar className={cn("h-4 w-4", !sidebarCollapsed && "mr-2")} />
+                  {!sidebarCollapsed && "Book Appointment"}
+                </Button>
+              </div>
+
               {!sidebarCollapsed && (
                 <div className="mb-2 px-3 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                   Main Menu
