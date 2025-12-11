@@ -55,7 +55,6 @@ function AgentDetailInner({ id }: { id: string }) {
   const update = useUpdateAgent(id)
   const remove = useDeleteAgent(id, { onSuccess: () => router.push("/dashboard/agents") })
 
-  const [editing, setEditing] = useState(false)
   const [kbOpen, setKbOpen] = useState(false)
 
   if (isLoading) {
@@ -83,7 +82,6 @@ function AgentDetailInner({ id }: { id: string }) {
 
   const onSave = async (payload: any) => {
     await update.mutateAsync(payload)
-    setEditing(false)
     refetch()
   }
 
@@ -122,24 +120,6 @@ function AgentDetailInner({ id }: { id: string }) {
             <BookOpen className="h-4 w-4" />
             Knowledgebase
           </Button>
-          {!editing ? (
-            <Button
-              variant="secondary"
-              onClick={() => setEditing(true)}
-              className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10"
-            >
-              Edit
-            </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              onClick={() => setEditing(false)}
-              disabled={update.isPending}
-              className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
-            >
-              Cancel
-            </Button>
-          )}
           <Button
             variant="destructive"
             onClick={onDelete}
@@ -194,32 +174,13 @@ function AgentDetailInner({ id }: { id: string }) {
               <CardTitle className="text-slate-900 dark:text-white">Agent Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!editing ? (
-                <AgentDetailsView agent={agent} modelShown={String(modelShown)} />
-              ) : (
-                <AgentEditForm
-                  initial={agent}
-                  isSaving={update.isPending}
-                  onCancel={() => setEditing(false)}
-                  onSave={onSave}
-                />
-              )}
+              <AgentEditForm
+                initial={agent}
+                isSaving={update.isPending}
+                onCancel={() => refetch()}
+                onSave={onSave}
+              />
             </CardContent>
-            <CardFooter className="justify-end gap-2 border-t border-slate-200 dark:border-white/10">
-              {!editing ? (
-                <Button
-                  variant="secondary"
-                  onClick={() => setEditing(true)}
-                  className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10"
-                >
-                  Edit
-                </Button>
-              ) : (
-                <Button disabled className="bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500">
-                  Editing…
-                </Button>
-              )}
-            </CardFooter>
           </Card>
         </TabsContent>
 

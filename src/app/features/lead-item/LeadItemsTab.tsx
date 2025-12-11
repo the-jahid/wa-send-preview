@@ -52,8 +52,8 @@ function SectionHeader({
   return (
     <div className="flex items-start gap-6 justify-between mb-6">
       <div className="flex-1">
-        <h2 className="text-lg font-semibold text-slate-900 mb-2">{title}</h2>
-        {subtitle && <p className="text-sm text-slate-600 leading-relaxed">{subtitle}</p>}
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{title}</h2>
+        {subtitle && <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{subtitle}</p>}
       </div>
       {right && <div className="flex-shrink-0">{right}</div>}
     </div>
@@ -62,8 +62,8 @@ function SectionHeader({
 
 function Tip({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 flex items-start gap-3">
-      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-200 flex items-center justify-center text-xs font-medium text-blue-700 mt-0.5">
+    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200 flex items-start gap-3">
+      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-200 dark:bg-green-800/50 flex items-center justify-center text-xs font-medium text-green-700 dark:text-green-200 mt-0.5">
         i
       </div>
       <div className="flex-1">{children}</div>
@@ -83,11 +83,11 @@ function EmptyState({
   icon?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 p-12 bg-slate-50/50 text-center">
-      {icon && <div className="mb-4 text-slate-400">{icon}</div>}
+    <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 dark:border-white/10 p-12 bg-slate-50/50 dark:bg-white/5 text-center">
+      {icon && <div className="mb-4 text-slate-400 dark:text-slate-500">{icon}</div>}
       <div className="mb-2">
-        <h3 className="font-medium text-slate-900">{title}</h3>
-        {hint && <p className="mt-2 text-sm text-slate-600 max-w-md">{hint}</p>}
+        <h3 className="font-medium text-slate-900 dark:text-white">{title}</h3>
+        {hint && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-md">{hint}</p>}
       </div>
       {action && <div className="mt-4">{action}</div>}
     </div>
@@ -111,12 +111,12 @@ function Pagination({
 
   return (
     <div className="flex items-center justify-between">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
         Showing page {page} of {Math.max(1, totalPages)}
       </p>
       <div className="flex items-center gap-2">
         <button
-          className={`${buttonClass} rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
+          className={`${buttonClass} rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
           onClick={onPrev}
           disabled={page <= 1}
           aria-label="Previous page"
@@ -124,7 +124,7 @@ function Pagination({
           ← Previous
         </button>
         <button
-          className={`${buttonClass} rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
+          className={`${buttonClass} rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
           onClick={onNext}
           disabled={page >= totalPages}
           aria-label="Next page"
@@ -148,16 +148,16 @@ function FilterSection({
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
   return (
-    <div className="border border-slate-200 rounded-lg bg-white">
+    <div className="border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0d1424]">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
       >
-        <span className="font-medium text-slate-900">{title}</span>
-        <span className={`transform transition-transform ${isOpen ? "rotate-180" : ""}`}>↓</span>
+        <span className="font-medium text-slate-900 dark:text-white">{title}</span>
+        <span className={`transform transition-transform ${isOpen ? "rotate-180" : ""} text-slate-500`}>↓</span>
       </button>
       {isOpen && (
-        <div className="px-4 pb-4 border-t border-slate-100">
+        <div className="px-4 pb-4 border-t border-slate-100 dark:border-white/10">
           <div className="pt-4">{children}</div>
         </div>
       )}
@@ -312,13 +312,13 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <div className="rounded-xl border border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
+      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 bg-white dark:bg-[#0d1424]">
         <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <span className="text-blue-600 font-semibold text-sm">?</span>
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
+            <span className="text-green-600 dark:text-green-200 font-semibold text-sm">?</span>
           </div>
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-slate-900 mb-3">How Lead Management Works</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-3">How Lead Management Works</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -326,8 +326,8 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                     1
                   </span>
                   <div>
-                    <p className="font-medium text-slate-900">Enable Lead Collection</p>
-                    <p className="text-sm text-slate-600">Activate data collection for this agent</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-200">Enable Lead Collection</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Activate data collection for this agent</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -335,8 +335,8 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                     2
                   </span>
                   <div>
-                    <p className="font-medium text-slate-900">Configure Lead Fields</p>
-                    <p className="text-sm text-slate-600">
+                    <p className="font-medium text-slate-900 dark:text-slate-200">Configure Lead Fields</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
                       Define what information to collect (name, email, phone, etc.)
                     </p>
                   </div>
@@ -348,8 +348,8 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                     3
                   </span>
                   <div>
-                    <p className="font-medium text-slate-900">Connect Channels</p>
-                    <p className="text-sm text-slate-600">Set up WhatsApp, Website forms, or other sources</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-200">Connect Channels</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Set up WhatsApp, Website forms, or other sources</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -357,8 +357,8 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                     4
                   </span>
                   <div>
-                    <p className="font-medium text-slate-900">Review & Manage</p>
-                    <p className="text-sm text-slate-600">Monitor captured leads and update their status</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-200">Review & Manage</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Monitor captured leads and update their status</p>
                   </div>
                 </div>
               </div>
@@ -367,21 +367,20 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                leadsActive ? "bg-green-100" : "bg-slate-100"
-              }`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center ${leadsActive ? "bg-green-100 dark:bg-green-900/30" : "bg-slate-100 dark:bg-white/10"
+                }`}
             >
-              <span className={`text-xl ${leadsActive ? "text-green-600" : "text-slate-400"}`}>
+              <span className={`text-xl ${leadsActive ? "text-green-600 dark:text-green-400" : "text-slate-400 dark:text-slate-500"}`}>
                 {leadsActive ? "✓" : "○"}
               </span>
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900">Lead Collection</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-semibold text-slate-900 dark:text-white">Lead Collection</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 {leadsActive
                   ? "Your agent is actively collecting lead data from connected channels"
                   : "Enable lead collection to start capturing visitor information"}
@@ -390,11 +389,10 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
           </div>
           <button
             onClick={onToggleLeads}
-            className={`px-6 py-3 rounded-lg font-medium transition-all ${
-              leadsActive
-                ? "bg-green-600 text-white hover:bg-green-700 shadow-sm"
-                : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-            }`}
+            className={`px-6 py-3 rounded-lg font-medium transition-all ${leadsActive
+              ? "bg-green-600 text-white hover:bg-green-700 shadow-sm"
+              : "bg-green-600 text-white hover:bg-green-700 shadow-sm"
+              }`}
             disabled={agentQuery.isLoading || updateAgent.isPending}
             aria-pressed={leadsActive}
           >
@@ -417,14 +415,14 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
           title="Lead collection is currently disabled"
           hint="Enable lead collection above to start configuring fields and capturing visitor information through your agent."
           icon={
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
-              <span className="text-2xl text-slate-400">📋</span>
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center">
+              <span className="text-2xl text-slate-400 dark:text-slate-500">📋</span>
             </div>
           }
           action={
             <button
               onClick={onToggleLeads}
-              className="px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
               disabled={agentQuery.isLoading || updateAgent.isPending}
             >
               Enable Lead Collection
@@ -459,27 +457,27 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
             <FilterSection title="Filter & Sort Options" defaultOpen={false}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Field Name</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Field Name</label>
                   <input
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder="Search by name..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
                   <input
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder="Search description..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Sort By</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
                   <select
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
                   >
@@ -490,9 +488,9 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Order</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
                   <select
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value as any)}
                   >
@@ -503,24 +501,24 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
               </div>
             </FilterSection>
 
-            <div className="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+            <div className="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0d1424] shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
                     <tr>
-                      <th className="text-left p-4 font-semibold text-slate-900">Field Name</th>
-                      <th className="text-left p-4 font-semibold text-slate-900">Description</th>
-                      <th className="text-left p-4 font-semibold text-slate-900">Last Updated</th>
-                      <th className="text-right p-4 font-semibold text-slate-900">Actions</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Field Name</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Description</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Last Updated</th>
+                      <th className="text-right p-4 font-semibold text-slate-900 dark:text-white">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {isLoading && (
                       <tr>
                         <td colSpan={4} className="p-8 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-slate-600">Loading fields...</span>
+                            <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-slate-600 dark:text-slate-400">Loading fields...</span>
                           </div>
                         </td>
                       </tr>
@@ -542,14 +540,14 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                             title="No lead fields configured yet"
                             hint="Create your first field to start collecting visitor information. Common fields include Full Name, Email Address, and Phone Number."
                             icon={
-                              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span className="text-blue-600 text-xl">📝</span>
+                              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
+                                <span className="text-green-600 dark:text-green-200 text-xl">📝</span>
                               </div>
                             }
                             action={
                               <button
                                 onClick={() => setCreateOpen(true)}
-                                className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+                                className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
                               >
                                 Create First Field
                               </button>
@@ -559,12 +557,12 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                       </tr>
                     )}
                     {items.map((it) => (
-                      <tr key={it.id} className="hover:bg-slate-50/50 transition-colors">
+                      <tr key={it.id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
                         <td className="p-4">
-                          <span className="font-medium text-slate-900">{it.name}</span>
+                          <span className="font-medium text-slate-900 dark:text-white">{it.name}</span>
                         </td>
                         <td className="p-4">
-                          <span className="text-slate-600">{it.description || "—"}</span>
+                          <span className="text-slate-600 dark:text-slate-400">{it.description || "—"}</span>
                         </td>
                         <td className="p-4">
                           <span className="text-slate-500 text-sm">
@@ -580,13 +578,13 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                         <td className="p-4">
                           <div className="flex items-center justify-end gap-2">
                             <button
-                              className="px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                              className="px-3 py-1.5 rounded-md border border-slate-300 dark:border-white/10 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                               onClick={() => setEditItem(it)}
                             >
                               Edit
                             </button>
                             <button
-                              className="px-3 py-1.5 rounded-md border border-red-300 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                              className="px-3 py-1.5 rounded-md border border-red-300 dark:border-red-800 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                               onClick={() => {
                                 if (
                                   confirm(`Are you sure you want to delete "${it.name}"? This action cannot be undone.`)
@@ -653,45 +651,45 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
             <FilterSection title="Filter Captured Leads" defaultOpen={true}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
                   <input
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder='e.g. "NEW", "QUALIFIED"'
                     value={leadStatus}
                     onChange={(e) => setLeadStatus(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Source</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Source</label>
                   <input
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder="e.g. WhatsApp, Website"
                     value={leadSource}
                     onChange={(e) => setLeadSource(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">From Date</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">From Date</label>
                   <input
                     type="date"
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
                     value={leadCreatedAfter}
                     onChange={(e) => setLeadCreatedAfter(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">To Date</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">To Date</label>
                   <input
                     type="date"
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
                     value={leadCreatedBefore}
                     onChange={(e) => setLeadCreatedBefore(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Sort By</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
                   <select
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={leadSortBy}
                     onChange={(e) => setLeadSortBy(e.target.value as any)}
                   >
@@ -702,9 +700,9 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Order</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
                   <select
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={leadSortOrder}
                     onChange={(e) => setLeadSortOrder(e.target.value as any)}
                   >
@@ -715,25 +713,25 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
               </div>
             </FilterSection>
 
-            <div className="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+            <div className="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0d1424] shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
                     <tr>
-                      <th className="text-left p-4 font-semibold text-slate-900">Status</th>
-                      <th className="text-left p-4 font-semibold text-slate-900">Source</th>
-                      <th className="text-left p-4 font-semibold text-slate-900">Lead Data</th>
-                      <th className="text-left p-4 font-semibold text-slate-900">Last Updated</th>
-                      <th className="text-right p-4 font-semibold text-slate-900">Actions</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Status</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Source</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Lead Data</th>
+                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Last Updated</th>
+                      <th className="text-right p-4 font-semibold text-slate-900 dark:text-white">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {leadsQuery.isLoading && (
                       <tr>
                         <td colSpan={5} className="p-8 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-slate-600">Loading captured leads...</span>
+                            <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-slate-600 dark:text-slate-400">Loading captured leads...</span>
                           </div>
                         </td>
                       </tr>
@@ -755,8 +753,8 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                             title="No leads captured yet"
                             hint="Once your agent starts collecting information from visitors through your connected channels, they'll appear here. Try testing the flow by sending a message to your agent."
                             icon={
-                              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                                <span className="text-green-600 text-xl">👥</span>
+                              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                <span className="text-green-600 dark:text-green-400 text-xl">👥</span>
                               </div>
                             }
                           />
@@ -764,28 +762,27 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                       </tr>
                     )}
                     {leads.map((lead: Lead) => (
-                      <tr key={lead.id} className="hover:bg-slate-50/50 transition-colors">
+                      <tr key={lead.id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
                         <td className="p-4">
                           <span
-                            className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                              lead.status === "NEW"
-                                ? "bg-blue-100 text-blue-800"
-                                : lead.status === "QUALIFIED"
+                            className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${lead.status === "NEW"
+                              ? "bg-green-100 text-green-800"
+                              : lead.status === "QUALIFIED"
                                 ? "bg-green-100 text-green-800"
                                 : lead.status === "CONTACTED"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-slate-100 text-slate-800"
-                            }`}
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-slate-100 text-slate-800"
+                              }`}
                           >
                             {lead.status}
                           </span>
                         </td>
                         <td className="p-4">
-                          <span className="text-slate-900 font-medium">{lead.source || "—"}</span>
+                          <span className="text-slate-900 dark:text-white font-medium">{lead.source || "—"}</span>
                         </td>
                         <td className="p-4">
                           <div className="max-w-xs">
-                            <pre className="whitespace-pre-wrap break-words text-xs bg-slate-50 rounded-lg p-3 border text-slate-700 font-mono">
+                            <pre className="whitespace-pre-wrap break-words text-xs bg-slate-50 dark:bg-white/5 rounded-lg p-3 border dark:border-white/10 text-slate-700 dark:text-slate-300 font-mono">
                               {JSON.stringify(lead.data ?? {}, null, 2)}
                             </pre>
                           </div>
@@ -804,7 +801,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                         <td className="p-4">
                           <div className="flex items-center justify-end">
                             <button
-                              className="px-3 py-1.5 rounded-md border border-red-300 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                              className="px-3 py-1.5 rounded-md border border-red-300 dark:border-red-800 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                               onClick={() => {
                                 if (
                                   confirm("Are you sure you want to delete this lead? This action cannot be undone.")
@@ -859,16 +856,16 @@ function LeadItemForm(props: {
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={props.onCancel} />
         <div
-          className="relative bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+          className="relative bg-white dark:bg-[#0d1424] rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/10"
           role="dialog"
           aria-modal="true"
           aria-label={props.title}
         >
-          <div className="px-6 py-4 border-b border-slate-200">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">{props.title}</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{props.title}</h3>
               <button
-                className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+                className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors p-1"
                 onClick={props.onCancel}
                 aria-label="Close"
               >
@@ -881,11 +878,11 @@ function LeadItemForm(props: {
 
           <div className="px-6 py-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-900 mb-2">
+              <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
                 Field Name <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Full Name, Email Address, Phone Number"
@@ -894,11 +891,11 @@ function LeadItemForm(props: {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-900 mb-2">
-                Description <span className="text-slate-500">(optional)</span>
+              <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                Description <span className="text-slate-500 dark:text-slate-400">(optional)</span>
               </label>
               <textarea
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                 rows={3}
                 value={description ?? ""}
                 onChange={(e) => setDescription(e.target.value)}
@@ -906,14 +903,14 @@ function LeadItemForm(props: {
               />
             </div>
 
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-200 flex items-center justify-center text-xs font-medium text-blue-700 mt-0.5">
+                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-200 dark:bg-green-800/50 flex items-center justify-center text-xs font-medium text-green-700 dark:text-green-200 mt-0.5">
                   💡
                 </div>
                 <div>
-                  <h4 className="font-medium text-blue-900 mb-2">Best Practices</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                  <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">Best Practices</h4>
+                  <ul className="text-sm text-green-800 dark:text-green-200 space-y-1">
                     <li>• Use clear, descriptive names (e.g., "Phone Number" not "Phone")</li>
                     <li>• Avoid duplicate fields to keep your form simple</li>
                     <li>• Start with essential fields only - you can add more later</li>
@@ -924,16 +921,16 @@ function LeadItemForm(props: {
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+          <div className="px-6 py-4 border-t border-slate-200 dark:border-white/10 flex justify-end gap-3">
             <button
-              className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
               onClick={props.onCancel}
               disabled={props.submitting}
             >
               Cancel
             </button>
             <button
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
               onClick={() => {
                 const trimmed = name.trim()
                 if (!trimmed) {

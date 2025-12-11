@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import type { Agent } from "@/app/features/agent"
-import type { Provider, MemoryType } from "./model-options"
-import { MODEL_OPTIONS, PROVIDERS } from "./model-options"
+import type { MemoryType } from "./model-options"
 
 // shadcn/ui
 import { Label } from "@/components/ui/label"
@@ -26,192 +25,131 @@ export default function AgentEditForm({
   // local state
   const [name, setName] = useState("")
   const [isActive, setIsActive] = useState(true)
-  const [memoryType, setMemoryType] = useState<MemoryType>("BUFFER")
   const [historyLimit, setHistoryLimit] = useState<number>(0)
   const [prompt, setPrompt] = useState("")
-  const [useOwnApiKey, setUseOwnApiKey] = useState(false)
-  const [provider, setProvider] = useState<Provider>("CHATGPT")
-  const [model, setModel] = useState<string | null>(null)
-  const [apiKey, setApiKey] = useState("")
 
   // hydrate when initial changes
   useEffect(() => {
     setName(initial.name)
     setIsActive(initial.isActive)
-    setMemoryType((initial.memoryType as MemoryType) ?? "BUFFER")
     setHistoryLimit(initial.historyLimit ?? 0)
     setPrompt(initial.prompt ?? "")
-    setUseOwnApiKey(initial.useOwnApiKey ?? false)
-    const p: Provider = (initial.modelType as Provider) || "CHATGPT"
-    setProvider(p)
-    setModel(initial.openAIModel || initial.geminiModel || initial.claudeModel || null)
-    setApiKey("")
   }, [initial])
-
-  const availableModels = useMemo(() => MODEL_OPTIONS[provider] ?? [], [provider])
 
   const handleSave = async () => {
     const payload: any = {
       name: name.trim(),
       isActive,
-      memoryType,
+      memoryType: "BUFFER",
       prompt: prompt.trim() || null,
-      useOwnApiKey,
+      useOwnApiKey: false,
       historyLimit: Math.max(0, historyLimit),
-    }
-
-    if (useOwnApiKey) {
-      if (!apiKey.trim()) {
-        alert('Please enter your API key or turn off "Use my own API key".')
-        return
-      }
-      payload.apiKey = apiKey.trim()
-      payload.modelType = provider
-      payload.openAIModel = provider === "CHATGPT" ? model || null : null
-      payload.geminiModel = provider === "GEMINI" ? model || null : null
-      payload.claudeModel = provider === "CLAUDE" ? model || null : null
-    } else {
-      payload.apiKey = null
-      payload.modelType = "CHATGPT"
-      payload.openAIModel = null
-      payload.geminiModel = null
-      payload.claudeModel = null
+      apiKey: null,
+      modelType: "CHATGPT",
+      openAIModel: null,
+      geminiModel: null,
+      claudeModel: null,
     }
 
     await onSave(payload)
   }
 
-  return (
-    <div className="space-y-4">
-      <div>
-        <Label className="text-slate-700 dark:text-slate-300">Agent Name</Label>
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
-        />
-      </div>
+  // Check if form is dirty
+  const isDirty =
+    name.trim() !== initial.name ||
+    isActive !== initial.isActive ||
+    (historyLimit || 0) !== (initial.historyLimit || 0) ||
+    (prompt || "").trim() !== (initial.prompt || "").trim()
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <Label className="text-slate-700 dark:text-slate-300">Active</Label>
-          <div className="flex items-center gap-2 mt-2">
-            <Switch checked={isActive} onCheckedChange={(v) => setIsActive(Boolean(v))} />
-            <span className="text-sm text-slate-500 dark:text-slate-400">{isActive ? "Enabled" : "Disabled"}</span>
+  return (
+    <div className="space-y-8">
+      {/* Top Bar Configuration */}
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 p-5 rounded-2xl bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-slate-800">
+
+        {/* Agent Name */}
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <Label className="text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap min-w-[80px]">Agent Name</Label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-8 bg-transparent border-none shadow-none focus-visible:ring-0 p-0 text-slate-900 dark:text-white font-semibold w-full lg:min-w-[150px]"
+            placeholder="Agent Name"
+          />
+        </div>
+
+        <div className="hidden lg:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
+
+        {/* Active Status */}
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <Label className="text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap min-w-[50px]">Active</Label>
+          <div className="flex items-center gap-2">
+            <span className={`font-semibold text-sm ${isActive ? "text-slate-900 dark:text-white" : "text-slate-500"}`}>
+              {isActive ? "Enabled" : "Disabled"}
+            </span>
+            <Switch
+              checked={isActive}
+              onCheckedChange={(v) => setIsActive(Boolean(v))}
+              className="scale-90 data-[state=checked]:bg-emerald-500"
+            />
           </div>
         </div>
 
-        <div>
-          <Label className="text-slate-700 dark:text-slate-300">History Limit</Label>
+        <div className="hidden lg:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
+
+        {/* History Limit */}
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <Label className="text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap min-w-[80px]">History Limit</Label>
           <Input
             type="number"
             min={0}
             value={historyLimit}
             onChange={(e) => setHistoryLimit(Number.parseInt(e.target.value || "0", 10) || 0)}
-            className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
+            className="h-8 bg-transparent border-none shadow-none focus-visible:ring-0 p-0 text-slate-900 dark:text-white font-semibold w-16"
           />
         </div>
-      </div>
 
-      <div>
-        <Label className="text-slate-700 dark:text-slate-300">Memory</Label>
-        <select
-          className="w-full border border-slate-200 dark:border-white/10 rounded-md h-9 px-3 text-sm bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-          value={memoryType}
-          onChange={(e) => setMemoryType(e.target.value as MemoryType)}
-        >
-          {(["BUFFER", "NONE", "RAG", "VECTOR"] as MemoryType[]).map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-      </div>
+        <div className="hidden lg:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
 
-      <div className="rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 space-y-4">
-        <div className="flex items-center gap-2">
-          <Switch checked={useOwnApiKey} onCheckedChange={(v) => setUseOwnApiKey(Boolean(v))} />
-          <span className="text-sm font-medium text-slate-900 dark:text-white">Use my own API key</span>
+        {/* Created Date (Read-only) */}
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <Label className="text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap min-w-[60px]">Created</Label>
+          <span className="text-slate-900 dark:text-white font-semibold text-sm">
+            {new Date(initial.createdAt).toLocaleDateString()}
+          </span>
         </div>
-
-        {!useOwnApiKey ? (
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            This agent will use the application's default API key & models. Turn this on to choose a provider/model and
-            supply your key.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-slate-700 dark:text-slate-300">Provider</Label>
-              <select
-                className="w-full border border-slate-200 dark:border-white/10 rounded-md h-9 px-3 text-sm bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-                value={provider}
-                onChange={(e) => {
-                  setProvider(e.target.value as Provider)
-                  setModel(null)
-                }}
-              >
-                {PROVIDERS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <Label className="text-slate-700 dark:text-slate-300">Model</Label>
-              <select
-                className="w-full border border-slate-200 dark:border-white/10 rounded-md h-9 px-3 text-sm bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-                value={model ?? ""}
-                onChange={(e) => setModel(e.target.value || null)}
-              >
-                <option value="">Select model…</option>
-                {(availableModels ?? []).map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="sm:col-span-2">
-              <Label className="text-slate-700 dark:text-slate-300">My API key *</Label>
-              <Input
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Required when using your own key"
-                autoComplete="off"
-                className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400"
-              />
-            </div>
-          </div>
-        )}
       </div>
 
-      <div>
-        <Label className="text-slate-700 dark:text-slate-300">Prompt</Label>
+      {/* System Prompt */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">System Prompt</Label>
         <Textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="System prompt (optional)"
-          className="h-28 bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400"
+          placeholder="You are a helpful assistant..."
+          className="min-h-[150px] font-mono text-sm leading-relaxed bg-slate-50 dark:bg-[#1e293b]/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-emerald-500/20 focus:border-emerald-500 resize-y p-6 rounded-2xl border"
         />
       </div>
 
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={onCancel}
-          disabled={isSaving}
-          className="border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300"
-        >
-          Cancel
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-emerald-500 hover:bg-emerald-600 text-white">
-          {isSaving ? "Saving…" : "Save"}
-        </Button>
-      </div>
+      {/* Footer Actions (Only visible when dirty) */}
+      {isDirty && (
+        <div className="flex justify-end gap-3 pt-2 animate-in fade-in slide-in-from-bottom-2">
+          <Button
+            variant="ghost"
+            onClick={onCancel}
+            disabled={isSaving}
+            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+          >
+            Reset Changes
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[100px] shadow-sm"
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
