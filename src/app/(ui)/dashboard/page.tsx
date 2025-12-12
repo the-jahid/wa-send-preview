@@ -38,7 +38,7 @@ export default function OverviewPage() {
   // Save theme to localStorage and apply to document
   useEffect(() => {
     if (!mounted) return
-    
+
     localStorage.setItem("theme", isDark ? "dark" : "light")
     if (isDark) {
       document.documentElement.classList.add("dark")
@@ -106,17 +106,17 @@ export default function OverviewPage() {
   /* ------------------ OUTBOUND CAMPAIGNS ------------------ */
   const campaignsParams = primaryAgent
     ? {
-        agentId: primaryAgent.id,
-        page: 1,
-        limit: 10,
-        sortBy: "createdAt" as const,
-        sortOrder: "desc" as const,
-      }
+      agentId: primaryAgent.id,
+      page: 1,
+      limit: 10,
+      sortBy: "createdAt" as const,
+      sortOrder: "desc" as const,
+    }
     : {
-        agentId: DUMMY_AGENT_ID,
-        page: 1,
-        limit: 10,
-      }
+      agentId: DUMMY_AGENT_ID,
+      page: 1,
+      limit: 10,
+    }
 
   const {
     data: campaignsRaw,
@@ -170,157 +170,155 @@ export default function OverviewPage() {
   return (
     <div className="h-full overflow-auto bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Overview</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Monitor your agents and outbound campaigns at a glance
-            </p>
-          </div>
+        {/* Header - Landing Page Style */}
+        <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                <Bot className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Monitor your agents and campaigns at a glance
+                </p>
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              className="border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"
-            >
-              {isDark ? (
-                <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              ) : (
-                <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              )}
-            </Button>
+            <div className="flex items-center gap-3">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+              >
+                {isDark ? (
+                  <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                ) : (
+                  <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                )}
+              </button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300"
-            >
-              {isRefreshing ? "Refreshing…" : "Refresh Data"}
-            </Button>
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all disabled:opacity-50"
+              >
+                {isRefreshing ? "Refreshing…" : "Refresh"}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Landing Page Style */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Total Agents */}
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 transition-all hover:shadow-md dark:hover:border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Agents</CardTitle>
-              <Bot className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              {agentsLoading && !agents.length ? (
-                <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
-              ) : agentsError ? (
-                <p className="text-xs text-red-500 dark:text-red-400">Failed to load</p>
-              ) : (
-                <div className="space-y-1">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalAgents}</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                    All configured agents
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Agents</span>
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
+                <Bot className="h-5 w-5 text-white" />
+              </div>
+            </div>
+            {agentsLoading && !agents.length ? (
+              <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
+            ) : agentsError ? (
+              <p className="text-xs text-red-500 dark:text-red-400">Failed to load</p>
+            ) : (
+              <div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalAgents}</div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">All configured agents</p>
+              </div>
+            )}
+          </div>
 
           {/* Active Status */}
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 transition-all hover:shadow-md dark:hover:border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">Active Status</CardTitle>
-              <Activity className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              {agentsLoading && !agents.length ? (
-                <Skeleton className="h-8 w-20 bg-slate-200 dark:bg-white/10" />
-              ) : agentsError ? (
-                <p className="text-xs text-red-500 dark:text-red-400">Error loading</p>
-              ) : (
-                <div className="space-y-1">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{activeCount}</span>
-                    <span className="text-lg text-slate-400 dark:text-slate-500">/ {activeCount + inactiveCount}</span>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Active agents online</p>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Active Status</span>
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-sm shadow-cyan-500/25">
+                <Activity className="h-5 w-5 text-white" />
+              </div>
+            </div>
+            {agentsLoading && !agents.length ? (
+              <Skeleton className="h-8 w-20 bg-slate-200 dark:bg-white/10" />
+            ) : agentsError ? (
+              <p className="text-xs text-red-500 dark:text-red-400">Error loading</p>
+            ) : (
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{activeCount}</span>
+                  <span className="text-lg text-slate-400 dark:text-slate-500">/ {activeCount + inactiveCount}</span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Active agents online</p>
+              </div>
+            )}
+          </div>
 
           {/* Campaigns */}
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 transition-all hover:shadow-md dark:hover:border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">Campaigns</CardTitle>
-              <Radio className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              {!primaryAgent ? (
-                <p className="text-xs text-slate-500 dark:text-slate-400">Create an agent first</p>
-              ) : campaignsLoading && !campaigns.length ? (
-                <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
-              ) : campaignsError ? (
-                <p className="text-xs text-red-500 dark:text-red-400">Failed to load</p>
-              ) : (
-                <div className="space-y-1">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCampaigns}</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Outbound campaigns</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Campaigns</span>
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shadow-sm shadow-violet-500/25">
+                <Radio className="h-5 w-5 text-white" />
+              </div>
+            </div>
+            {!primaryAgent ? (
+              <p className="text-xs text-slate-500 dark:text-slate-400">Create an agent first</p>
+            ) : campaignsLoading && !campaigns.length ? (
+              <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
+            ) : campaignsError ? (
+              <p className="text-xs text-red-500 dark:text-red-400">Failed to load</p>
+            ) : (
+              <div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCampaigns}</div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Outbound campaigns</p>
+              </div>
+            )}
+          </div>
 
           {/* Providers */}
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 transition-all hover:shadow-md dark:hover:border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">Providers</CardTitle>
-              <Brain className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              {agentsLoading && !agents.length ? (
-                <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
-              ) : agentsError ? (
-                <p className="text-xs text-red-500 dark:text-red-400">Error</p>
-              ) : (
-                <div className="space-y-1">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white">{providers.length}</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">AI model providers</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Providers</span>
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm shadow-amber-500/25">
+                <Brain className="h-5 w-5 text-white" />
+              </div>
+            </div>
+            {agentsLoading && !agents.length ? (
+              <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
+            ) : agentsError ? (
+              <p className="text-xs text-red-500 dark:text-red-400">Error</p>
+            ) : (
+              <div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">{providers.length}</div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">AI model providers</p>
+              </div>
+            )}
+          </div>
         </div>
+
 
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Recent Agents */}
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
-                  <CardTitle className="text-lg text-slate-900 dark:text-white">Recent Agents</CardTitle>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
+                  <Clock className="h-4 w-4 text-white" />
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
-                >
-                  <Link href="/dashboard/agents" className="gap-1">
-                    View All
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </Button>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Recent Agents</h3>
               </div>
-            </CardHeader>
-            <CardContent>
+              <Link
+                href="/dashboard/agents"
+                className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium flex items-center gap-1"
+              >
+                View All
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <div className="p-6">
               {agentsLoading && !agents.length ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
@@ -334,38 +332,38 @@ export default function OverviewPage() {
                 <p className="text-sm text-red-500 dark:text-red-400">Failed to load agents.</p>
               ) : agents.length === 0 ? (
                 <div className="text-center py-8">
-                  <Bot className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">No agents created yet</p>
-                  <Button
-                    size="sm"
-                    asChild
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                  <div className="h-12 w-12 mx-auto rounded-xl bg-emerald-500 flex items-center justify-center mb-4">
+                    <Bot className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">No agents created yet</p>
+                  <Link
+                    href="/dashboard/agents"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
                   >
-                    <Link href="/dashboard/agents">Create Your First Agent</Link>
-                  </Button>
+                    Create Your First Agent
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {agents.slice(0, 5).map((agent) => (
-                    <div
+                    <Link
                       key={agent.id}
-                      className="flex items-start justify-between gap-3 p-3 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                      href={`/dashboard/agents/${agent.id}`}
+                      className="flex items-start justify-between gap-3 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-emerald-500/30 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium text-sm truncate text-slate-900 dark:text-white">
                             {agent.name}
                           </span>
-                          <Badge
-                            variant={agent.isActive ? "default" : "outline"}
-                            className={
-                              agent.isActive
-                                ? "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500"
-                                : "border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400"
-                            }
+                          <span
+                            className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${agent.isActive
+                              ? "bg-emerald-500 text-white"
+                              : "bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+                              }`}
                           >
                             {agent.isActive ? "Active" : "Inactive"}
-                          </Badge>
+                          </span>
                         </div>
                         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                           <span>{agent.modelType || "No provider"}</span>
@@ -379,46 +377,43 @@ export default function OverviewPage() {
                           day: "numeric",
                         })}
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Outbound Campaigns */}
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Radio className="h-5 w-5 text-slate-400 dark:text-slate-500" />
-                  <CardTitle className="text-lg text-slate-900 dark:text-white">Outbound Campaigns</CardTitle>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shadow-sm shadow-violet-500/25">
+                  <Radio className="h-4 w-4 text-white" />
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
-                >
-                  <Link href="/dashboard/outbound" className="gap-1">
-                    View All
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </Button>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Outbound Campaigns</h3>
               </div>
-            </CardHeader>
-            <CardContent>
+              <Link
+                href="/dashboard/outbound"
+                className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium flex items-center gap-1"
+              >
+                View All
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <div className="p-6">
               {!primaryAgent ? (
                 <div className="text-center py-8">
-                  <Users className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Create an agent to start campaigns</p>
-                  <Button
-                    size="sm"
-                    asChild
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                  <div className="h-12 w-12 mx-auto rounded-xl bg-violet-500 flex items-center justify-center mb-4">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Create an agent to start campaigns</p>
+                  <Link
+                    href="/dashboard/agents"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
                   >
-                    <Link href="/dashboard/agents">Create Agent</Link>
-                  </Button>
+                    Create Agent
+                  </Link>
                 </div>
               ) : campaignsLoading && !campaigns.length ? (
                 <div className="space-y-3">
@@ -432,29 +427,28 @@ export default function OverviewPage() {
               ) : campaignsError ? (
                 <div className="space-y-3">
                   <p className="text-sm text-red-500 dark:text-red-400">Failed to load campaigns</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <button
                     onClick={() => refetchCampaigns()}
-                    className="border-slate-200 dark:border-white/10"
+                    className="px-4 py-2 rounded-full border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
                   >
                     Try Again
-                  </Button>
+                  </button>
                 </div>
               ) : campaigns.length === 0 ? (
                 <div className="text-center py-8">
-                  <Radio className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+                  <div className="h-12 w-12 mx-auto rounded-xl bg-violet-500 flex items-center justify-center mb-4">
+                    <Radio className="h-6 w-6 text-white" />
+                  </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">No campaigns yet</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
                     for agent "{primaryAgent.name}"
                   </p>
-                  <Button
-                    size="sm"
-                    asChild
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                  <Link
+                    href="/dashboard/outbound"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
                   >
-                    <Link href="/dashboard/outbound">Create Campaign</Link>
-                  </Button>
+                    Create Campaign
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -462,9 +456,9 @@ export default function OverviewPage() {
                   {statusCounts.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {statusCounts.map(([status, count]) => (
-                        <Badge key={status} variant="secondary" className={getStatusStyle(status)}>
+                        <span key={status} className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(status)}`}>
                           {status}: {count}
-                        </Badge>
+                        </span>
                       ))}
                     </div>
                   )}
@@ -477,46 +471,47 @@ export default function OverviewPage() {
                     {campaigns.slice(0, 4).map((c) => (
                       <div
                         key={c.id}
-                        className="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                        className="flex items-center justify-between gap-3 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-emerald-500/30 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
                       >
                         <span className="text-sm font-medium truncate flex-1 text-slate-900 dark:text-white">
                           {c.name}
                         </span>
-                        <Badge variant="outline" className={getStatusStyle(c.status)}>
+                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${getStatusStyle(c.status)}`}>
                           {c.status}
-                        </Badge>
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Configuration Overview */}
         {providers.length > 0 || memoryTypes.length > 0 ? (
-          <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-slate-400 dark:text-slate-500" />
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Configuration Overview</CardTitle>
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm shadow-amber-500/25">
+                  <Brain className="h-4 w-4 text-white" />
+                </div>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Configuration Overview</h3>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
+            </div>
+            <div className="p-6">
+              <div className="grid gap-6 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Model Providers</p>
+                  <p className="text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Model Providers</p>
                   <div className="flex flex-wrap gap-2">
                     {providers.length > 0 ? (
                       providers.map((p) => (
-                        <Badge
+                        <span
                           key={p}
-                          variant="secondary"
-                          className="bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10"
+                          className="inline-flex px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
                         >
                           {p}
-                        </Badge>
+                        </span>
                       ))
                     ) : (
                       <span className="text-sm text-slate-500 dark:text-slate-400">None configured</span>
@@ -524,17 +519,16 @@ export default function OverviewPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Memory Types</p>
+                  <p className="text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Memory Types</p>
                   <div className="flex flex-wrap gap-2">
                     {memoryTypes.length > 0 ? (
                       memoryTypes.map((m) => (
-                        <Badge
+                        <span
                           key={m}
-                          variant="secondary"
-                          className="bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10"
+                          className="inline-flex px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20"
                         >
                           {m}
-                        </Badge>
+                        </span>
                       ))
                     ) : (
                       <span className="text-sm text-slate-500 dark:text-slate-400">None configured</span>
@@ -542,8 +536,8 @@ export default function OverviewPage() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ) : null}
       </div>
     </div>
@@ -554,16 +548,16 @@ export default function OverviewPage() {
 function getStatusStyle(status: string): string {
   switch (status) {
     case "RUNNING":
-      return "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500"
+      return "bg-emerald-500 text-white"
     case "SCHEDULED":
-      return "bg-sky-500 hover:bg-sky-600 text-white border-sky-500"
+      return "bg-sky-500 text-white"
     case "COMPLETED":
-      return "bg-gray-500 hover:bg-gray-600 text-white border-gray-500"
+      return "bg-slate-500 text-white"
     case "CANCELLED":
-      return "bg-red-500 hover:bg-red-600 text-white border-red-500"
+      return "bg-red-500 text-white"
     case "DRAFT":
-      return "bg-slate-400 hover:bg-slate-500 text-white border-slate-400"
+      return "bg-slate-300 dark:bg-slate-600 text-slate-700 dark:text-slate-200"
     default:
-      return ""
+      return "bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300"
   }
 }

@@ -2,9 +2,9 @@
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs"
-import { 
-  CheckCircle, Shield, Zap, Users, BarChart3, MessageSquare, 
-  Clock, Lock, TrendingUp, Send, Brain, Calendar, UserPlus, 
+import {
+  CheckCircle, Shield, Zap, Users, BarChart3, MessageSquare,
+  Clock, Lock, TrendingUp, Send, Brain, Calendar, UserPlus,
   BookOpen, Infinity, ArrowRight, Star, Play, Globe, Sparkles,
   Bot, Target, Rocket, ChevronRight, Sun, Moon
 } from "lucide-react"
@@ -28,7 +28,7 @@ export default function Home() {
   // Save theme to localStorage and apply to document
   useEffect(() => {
     if (!mounted) return
-    
+
     localStorage.setItem("theme", isDark ? "dark" : "light")
     if (isDark) {
       document.documentElement.classList.add("dark")
@@ -166,8 +166,8 @@ function Hero() {
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto mb-10">
-            AI chatbot that <span className="text-slate-900 dark:text-white font-medium">captures leads</span>, 
-            <span className="text-slate-900 dark:text-white font-medium"> books appointments</span>, and 
+            AI chatbot that <span className="text-slate-900 dark:text-white font-medium">captures leads</span>,
+            <span className="text-slate-900 dark:text-white font-medium"> books appointments</span>, and
             <span className="text-slate-900 dark:text-white font-medium"> messages thousands</span> via CSV - all automatically.
             Setup in <span className="text-emerald-600 dark:text-emerald-400 font-semibold">2 minutes</span>. No API needed.
           </p>
@@ -237,36 +237,36 @@ function Hero() {
                 Active
               </div>
             </div>
-            
+
             {/* Chat Area */}
             <div className="p-6 space-y-4">
-              <ChatMessage 
+              <ChatMessage
                 sender="customer"
                 text="Hi! I saw your ad about marketing automation. What are your prices?"
                 time="10:42 AM"
               />
-              <ChatMessage 
+              <ChatMessage
                 sender="ai"
                 text="Hi there! 👋 Great question. Before I share pricing, let me ask: how many leads do you typically handle per month? This helps me recommend the right plan for you."
                 time="10:42 AM"
                 typing={false}
               />
-              <ChatMessage 
+              <ChatMessage
                 sender="customer"
                 text="Around 200-300 leads monthly"
                 time="10:43 AM"
               />
-              <ChatMessage 
+              <ChatMessage
                 sender="ai"
-                text="Perfect! For that volume, our Growth plan ($99/mo) would be ideal. It includes unlimited WhatsApp messages, AI chatbot, appointment booking, and full CRM integration. Would you like to see it in action? I can book you a 15-min demo with our team 📅"
+                text="Perfect! For that volume, our Growth plan ($20/mo) would be ideal. It includes unlimited WhatsApp messages, AI chatbot, appointment booking, and full CRM integration. Would you like to see it in action? I can book you a 15-min demo with our team 📅"
                 time="10:43 AM"
               />
-              <ChatMessage 
+              <ChatMessage
                 sender="customer"
                 text="Yes, tomorrow afternoon works"
                 time="10:44 AM"
               />
-              <ChatMessage 
+              <ChatMessage
                 sender="ai"
                 text="Done! ✅ I've booked you for tomorrow at 2:00 PM. You'll get a calendar invite shortly. Looking forward to showing you how we can automate your lead follow-up! Anything else I can help with?"
                 time="10:44 AM"
@@ -291,11 +291,10 @@ function ChatMessage({ sender, text, time, typing }: { sender: 'customer' | 'ai'
   return (
     <div className={`flex ${isAI ? 'justify-start' : 'justify-end'}`}>
       <div className={`max-w-[80%] ${isAI ? 'order-2' : ''}`}>
-        <div className={`rounded-2xl px-4 py-3 ${
-          isAI 
-            ? 'bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/20' 
+        <div className={`rounded-2xl px-4 py-3 ${isAI
+            ? 'bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/20'
             : 'bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10'
-        }`}>
+          }`}>
           {isAI && (
             <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1.5">
               <Bot className="h-3 w-3" />
@@ -379,17 +378,17 @@ function TwoMinuteSetup() {
           {/* Bot Builder Card */}
           <div className="relative rounded-3xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-500/10 dark:to-cyan-500/10 p-8 lg:p-10 overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
-            
+
             <div className="relative">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-6">
                 <Bot className="h-4 w-4" />
                 Zero Code Bot Builder
               </div>
-              
+
               <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4">
                 Create Your AI Bot in 2 Minutes
               </h3>
-              
+
               <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                 Scan a QR code, answer 2 questions, and your AI bot is live. No API applications, no verification process.
               </p>
@@ -403,7 +402,7 @@ function TwoMinuteSetup() {
                   </div>
                   <div className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">10 sec</div>
                 </div>
-                
+
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                   <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">2</div>
                   <div>
@@ -412,7 +411,7 @@ function TwoMinuteSetup() {
                   </div>
                   <div className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">30 sec</div>
                 </div>
-                
+
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                   <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">3</div>
                   <div>
@@ -435,17 +434,17 @@ function TwoMinuteSetup() {
           {/* CSV Bulk Messaging Card */}
           <div className="relative rounded-3xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-500/10 dark:to-purple-500/10 p-8 lg:p-10 overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/20 rounded-full blur-3xl" />
-            
+
             <div className="relative">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/20 text-xs font-bold text-violet-700 dark:text-violet-400 uppercase tracking-wider mb-6">
                 <Send className="h-4 w-4" />
                 Bulk Outbound Messaging
               </div>
-              
+
               <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4">
                 Send to Unlimited Contacts via CSV
               </h3>
-              
+
               <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                 Upload your contact list, write your message, and hit send. Reach thousands of customers in seconds.
               </p>
@@ -536,7 +535,7 @@ function AutomationShowcase() {
           {/* Lead Collection Card */}
           <div className="relative rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 lg:p-8 overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl" />
-            
+
             <div className="relative">
               <div className="flex items-center justify-between mb-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
@@ -548,7 +547,7 @@ function AutomationShowcase() {
                   Live Demo
                 </div>
               </div>
-              
+
               <h3 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-white mb-2">
                 Qualify & Capture Leads 24/7
               </h3>
@@ -567,44 +566,44 @@ function AutomationShowcase() {
                     <div className="text-emerald-200 text-xs">Online now</div>
                   </div>
                 </div>
-                
+
                 <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-white/10 rounded-2xl rounded-tl-md px-4 py-2 max-w-[80%] shadow-sm">
                       <p className="text-sm text-slate-700 dark:text-slate-200">Hi! 👋 I am interested in your marketing services</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <div className="bg-emerald-500 text-white rounded-2xl rounded-tr-md px-4 py-2 max-w-[80%]">
                       <p className="text-sm">Great to hear! I would love to help. What is your company name and what industry are you in?</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-white/10 rounded-2xl rounded-tl-md px-4 py-2 max-w-[80%] shadow-sm">
                       <p className="text-sm text-slate-700 dark:text-slate-200">TechStart Inc, we are a B2B SaaS company</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <div className="bg-emerald-500 text-white rounded-2xl rounded-tr-md px-4 py-2 max-w-[80%]">
                       <p className="text-sm">Perfect! What is your current monthly marketing budget, roughly?</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-white/10 rounded-2xl rounded-tl-md px-4 py-2 max-w-[80%] shadow-sm">
                       <p className="text-sm text-slate-700 dark:text-slate-200">Around $5,000-10,000/month</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <div className="bg-emerald-500 text-white rounded-2xl rounded-tr-md px-4 py-2 max-w-[80%]">
                       <p className="text-sm">Excellent! You are a great fit. Can I get your email to send our case studies? 📧</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-white/10 rounded-2xl rounded-tl-md px-4 py-2 max-w-[80%] shadow-sm">
                       <p className="text-sm text-slate-700 dark:text-slate-200">Sure, john@techstart.io</p>
@@ -653,7 +652,7 @@ function AutomationShowcase() {
           {/* Appointment Booking Card */}
           <div className="relative rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 lg:p-8 overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl" />
-            
+
             <div className="relative">
               <div className="flex items-center justify-between mb-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
@@ -665,7 +664,7 @@ function AutomationShowcase() {
                   Live Demo
                 </div>
               </div>
-              
+
               <h3 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-white mb-2">
                 Book Meetings Automatically
               </h3>
@@ -684,20 +683,20 @@ function AutomationShowcase() {
                     <div className="text-blue-200 text-xs">Online now</div>
                   </div>
                 </div>
-                
+
                 <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-white/10 rounded-2xl rounded-tl-md px-4 py-2 max-w-[80%] shadow-sm">
                       <p className="text-sm text-slate-700 dark:text-slate-200">I would like to schedule a demo call</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <div className="bg-blue-500 text-white rounded-2xl rounded-tr-md px-4 py-2 max-w-[80%]">
                       <p className="text-sm">I would be happy to help you book a demo! 📅 Here are available slots this week:</p>
                     </div>
                   </div>
-                  
+
                   {/* Time Slots */}
                   <div className="flex justify-end">
                     <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl px-4 py-3 max-w-[85%]">
@@ -717,13 +716,13 @@ function AutomationShowcase() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-white/10 rounded-2xl rounded-tl-md px-4 py-2 max-w-[80%] shadow-sm">
                       <p className="text-sm text-slate-700 dark:text-slate-200">2 PM tomorrow works!</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <div className="bg-blue-500 text-white rounded-2xl rounded-tr-md px-4 py-2 max-w-[80%]">
                       <p className="text-sm">Perfect! ✅ I have booked your demo for Tuesday, Dec 3 at 2:00 PM. You will receive a calendar invite shortly!</p>
@@ -1047,7 +1046,7 @@ function ROICalculator() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-8 lg:p-12 overflow-hidden relative shadow-lg dark:shadow-none">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
-          
+
           <div className="relative">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-6">
@@ -1064,25 +1063,25 @@ function ROICalculator() {
                 <div className="text-4xl lg:text-5xl font-bold text-red-500 dark:text-red-400 mb-2">$2,400</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400 mb-4">Monthly cost WITHOUT us</div>
                 <div className="text-xs text-slate-500 leading-relaxed">
-                  10,000 messages x $0.08 = $800<br/>
+                  10,000 messages x $0.08 = $800<br />
                   + Support staff: $1,600/mo
                 </div>
               </div>
 
               <div className="text-center p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                <div className="text-4xl lg:text-5xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">$99</div>
+                <div className="text-4xl lg:text-5xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">$20</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400 mb-4">Monthly cost WITH us</div>
                 <div className="text-xs text-slate-500 leading-relaxed">
-                  Unlimited messages: $0<br/>
+                  Unlimited messages: $0<br />
                   + AI handles 80% of chats
                 </div>
               </div>
 
               <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30">
-                <div className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2">$27,612</div>
+                <div className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2">$28,560</div>
                 <div className="text-sm text-emerald-600 dark:text-emerald-400 mb-4">Yearly Savings</div>
                 <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  + More leads converted<br/>
+                  + More leads converted<br />
                   + Faster response = more sales
                 </div>
               </div>
@@ -1195,7 +1194,7 @@ function Testimonials() {
       avatar: "MS"
     },
     {
-      quote: "The unlimited messaging is a game-changer. We used to pay $800/month just for messages. Now it's a flat $99 and we send even more.",
+      quote: "The unlimited messaging is a game-changer. We used to pay $800/month just for messages. Now it's a flat $20 and we send even more.",
       author: "David Chen",
       role: "E-commerce Director",
       company: "TechMart",

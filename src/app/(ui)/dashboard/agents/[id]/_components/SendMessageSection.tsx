@@ -30,37 +30,53 @@ export default function SendMessageSection({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
+      {/* Input Fields */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-3">
-        <Input
+        <input
           placeholder="+39349..."
           value={to}
           onChange={(e) => setTo(e.target.value)}
           disabled={disabled}
-          className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+          className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        <Input
+        <input
           placeholder="Message text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={disabled}
-          className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+          className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        <Button
+        <button
           onClick={onSend}
           disabled={disabled || send.isPending || !to || !text}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white"
+          className="px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {send.isPending ? "Sending…" : "Send"}
-        </Button>
+        </button>
       </div>
-      <div className="min-h-[20px]">
-        {res && <div className="text-sm text-emerald-600 dark:text-emerald-400">{res}</div>}
-        {err && <div className="text-sm text-red-500 dark:text-red-400">{err}</div>}
+
+      {/* Feedback Messages */}
+      <div className="min-h-[40px]">
+        {res && (
+          <div className="text-sm p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+            {res}
+          </div>
+        )}
+        {err && (
+          <div className="text-sm p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400">
+            {err}
+          </div>
+        )}
         {disabled && !err && !res && (
-          <div className="text-xs text-slate-500 dark:text-slate-400">Connect via QR or pairing to enable sending.</div>
+          <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-3">
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              Connect via QR or pairing to enable sending.
+            </p>
+          </div>
         )}
       </div>
     </div>
   )
 }
+

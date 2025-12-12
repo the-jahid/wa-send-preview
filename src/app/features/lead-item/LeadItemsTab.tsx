@@ -62,8 +62,8 @@ function SectionHeader({
 
 function Tip({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200 flex items-start gap-3">
-      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-200 dark:bg-green-800/50 flex items-center justify-center text-xs font-medium text-green-700 dark:text-green-200 mt-0.5">
+    <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 flex items-start gap-3">
+      <div className="flex-shrink-0 h-6 w-6 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-xs font-bold text-white mt-0.5 shadow-sm shadow-emerald-500/25">
         i
       </div>
       <div className="flex-1">{children}</div>
@@ -83,13 +83,13 @@ function EmptyState({
   icon?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 dark:border-white/10 p-12 bg-slate-50/50 dark:bg-white/5 text-center">
-      {icon && <div className="mb-4 text-slate-400 dark:text-slate-500">{icon}</div>}
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-500/30 p-12 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 text-center">
+      {icon && <div className="mb-4">{icon}</div>}
       <div className="mb-2">
-        <h3 className="font-medium text-slate-900 dark:text-white">{title}</h3>
-        {hint && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-md">{hint}</p>}
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
+        {hint && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">{hint}</p>}
       </div>
-      {action && <div className="mt-4">{action}</div>}
+      {action && <div className="mt-6">{action}</div>}
     </div>
   )
 }
@@ -311,155 +311,76 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
   )
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 bg-white dark:bg-[#0d1424]">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
-            <span className="text-green-600 dark:text-green-200 font-semibold text-sm">?</span>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-3">How Lead Management Works</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-medium flex items-center justify-center">
-                    1
-                  </span>
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-slate-200">Enable Lead Collection</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">Activate data collection for this agent</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-medium flex items-center justify-center">
-                    2
-                  </span>
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-slate-200">Configure Lead Fields</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Define what information to collect (name, email, phone, etc.)
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-medium flex items-center justify-center">
-                    3
-                  </span>
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-slate-200">Connect Channels</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">Set up WhatsApp, Website forms, or other sources</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-medium flex items-center justify-center">
-                    4
-                  </span>
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-slate-200">Review & Manage</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">Monitor captured leads and update their status</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 shadow-sm">
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Lead Collection Toggle */}
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center ${leadsActive ? "bg-green-100 dark:bg-green-900/30" : "bg-slate-100 dark:bg-white/10"
+              className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${leadsActive
+                ? "bg-emerald-500 shadow-lg shadow-emerald-500/25"
+                : "bg-slate-100 dark:bg-white/10"
                 }`}
             >
-              <span className={`text-xl ${leadsActive ? "text-green-600 dark:text-green-400" : "text-slate-400 dark:text-slate-500"}`}>
+              <span className={`text-xl ${leadsActive ? "text-white" : "text-slate-400 dark:text-slate-500"}`}>
                 {leadsActive ? "✓" : "○"}
               </span>
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-white">Lead Collection</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Lead Collection</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 {leadsActive
-                  ? "Your agent is actively collecting lead data from connected channels"
-                  : "Enable lead collection to start capturing visitor information"}
+                  ? "Collecting lead data from connected channels"
+                  : "Enable to start capturing visitor information"}
               </p>
             </div>
           </div>
           <button
             onClick={onToggleLeads}
-            className={`px-6 py-3 rounded-lg font-medium transition-all ${leadsActive
-              ? "bg-green-600 text-white hover:bg-green-700 shadow-sm"
-              : "bg-green-600 text-white hover:bg-green-700 shadow-sm"
+            className={`px-5 py-2.5 rounded-full font-semibold transition-all ${leadsActive
+              ? "bg-emerald-500 text-white hover:bg-emerald-600"
+              : "bg-emerald-500 text-white hover:bg-emerald-600"
               }`}
             disabled={agentQuery.isLoading || updateAgent.isPending}
-            aria-pressed={leadsActive}
           >
-            {updateAgent.isPending ? (
-              <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                Saving...
-              </span>
-            ) : leadsActive ? (
-              "Enabled"
-            ) : (
-              "Enable Now"
-            )}
+            {updateAgent.isPending ? "Saving..." : leadsActive ? "Enabled" : "Enable"}
           </button>
         </div>
       </div>
 
       {!leadsActive && (
-        <EmptyState
-          title="Lead collection is currently disabled"
-          hint="Enable lead collection above to start configuring fields and capturing visitor information through your agent."
-          icon={
-            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center">
-              <span className="text-2xl text-slate-400 dark:text-slate-500">📋</span>
-            </div>
-          }
-          action={
-            <button
-              onClick={onToggleLeads}
-              className="px-6 py-3 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
-              disabled={agentQuery.isLoading || updateAgent.isPending}
-            >
-              Enable Lead Collection
-            </button>
-          }
-        />
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/10 p-12 text-center bg-slate-50 dark:bg-white/5">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-emerald-500 flex items-center justify-center">
+            <span className="text-xl text-white">📋</span>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Lead collection is disabled</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+            Enable lead collection to start configuring fields and capturing visitor information.
+          </p>
+        </div>
       )}
 
       {leadsActive && (
-        <div className="space-y-12">
-          {/* =================== Lead Items (Configuration) =================== */}
-          <section className="space-y-6">
-            <SectionHeader
-              title="Lead Fields Configuration"
-              subtitle="Define the specific information your agent will collect from visitors. Start with essential fields like name and email, then add more as needed."
-              right={
-                <button
-                  onClick={() => setCreateOpen(true)}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <span>+</span>
-                  Add Field
-                </button>
-              }
-            />
+        <div className="space-y-6">
+          {/* Lead Fields Configuration */}
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+              <h3 className="font-semibold text-slate-900 dark:text-white">Lead Fields</h3>
+              <button
+                onClick={() => setCreateOpen(true)}
+                className="px-4 py-2 rounded-full bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors text-sm"
+              >
+                + Add Field
+              </button>
+            </div>
 
-            <Tip>
-              <strong>Pro tip:</strong> Keep it simple with 3-5 essential fields initially. You can always add more
-              specialized fields later as your needs evolve.
-            </Tip>
 
             <FilterSection title="Filter & Sort Options" defaultOpen={false}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Field Name</label>
                   <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder="Search by name..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -468,7 +389,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
                   <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder="Search description..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -477,7 +398,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
                   <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
                   >
@@ -490,7 +411,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
                   <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value as any)}
                   >
@@ -634,26 +555,21 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 submitting={update.isPending}
               />
             )}
-          </section>
+          </div>
 
-          {/* =================== Captured Leads (Review) =================== */}
-          <section className="space-y-6">
-            <SectionHeader
-              title="Captured Leads"
-              subtitle="Review and manage leads collected by your agent from various channels. Filter by status, source, and date range to find specific leads quickly."
-            />
+          {/* Captured Leads Section */}
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10">
+              <h3 className="font-semibold text-slate-900 dark:text-white">Captured Leads</h3>
+            </div>
 
-            <Tip>
-              <strong>Lead Management:</strong> Update lead status to "QUALIFIED" or your preferred classification to
-              prioritize follow-ups in your CRM system.
-            </Tip>
 
             <FilterSection title="Filter Captured Leads" defaultOpen={true}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
                   <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder='e.g. "NEW", "QUALIFIED"'
                     value={leadStatus}
                     onChange={(e) => setLeadStatus(e.target.value)}
@@ -662,7 +578,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Source</label>
                   <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
                     placeholder="e.g. WhatsApp, Website"
                     value={leadSource}
                     onChange={(e) => setLeadSource(e.target.value)}
@@ -672,7 +588,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">From Date</label>
                   <input
                     type="date"
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
                     value={leadCreatedAfter}
                     onChange={(e) => setLeadCreatedAfter(e.target.value)}
                   />
@@ -681,7 +597,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">To Date</label>
                   <input
                     type="date"
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
                     value={leadCreatedBefore}
                     onChange={(e) => setLeadCreatedBefore(e.target.value)}
                   />
@@ -689,7 +605,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
                   <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={leadSortBy}
                     onChange={(e) => setLeadSortBy(e.target.value as any)}
                   >
@@ -702,7 +618,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
                   <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
+                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
                     value={leadSortOrder}
                     onChange={(e) => setLeadSortOrder(e.target.value as any)}
                   >
@@ -831,7 +747,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
                 onNext={() => setLeadPage((p) => Math.min(leadsTotalPages, p + 1))}
               />
             )}
-          </section>
+          </div>
         </div>
       )}
     </div>

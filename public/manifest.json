@@ -1,0 +1,33 @@
+{
+    "name": "WA Send - WhatsApp Automation",
+    "short_name": "WA Send",
+    "description": "AI-Powered WhatsApp Automation Platform for businesses",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0f1a",
+    "theme_color": "#10b981",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "categories": [
+        "business",
+        "productivity"
+    ],
+    "lang": "en"
+}

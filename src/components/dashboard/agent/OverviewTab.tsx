@@ -107,53 +107,56 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-auto">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      {/* Search, Filter & New Agent Button */}
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-auto">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                className="w-full sm:w-64 pl-10 pr-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                placeholder="Search agents..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setPage(1)
+                }}
               />
-            </svg>
-            <input
-              className="w-full sm:w-64 pl-10 pr-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all"
-              placeholder="Search agents..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                setPage(1)
-              }}
-            />
+            </div>
+            <select
+              className="w-full sm:w-auto px-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              value={sort ?? ""}
+              onChange={(e) => setSort(e.target.value || "createdAt:desc")}
+            >
+              <option value="createdAt:desc">Newest First</option>
+              <option value="createdAt:asc">Oldest First</option>
+              <option value="name:asc">Name (A-Z)</option>
+              <option value="name:desc">Name (Z-A)</option>
+            </select>
           </div>
-          <select
-            className="w-full sm:w-auto px-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all"
-            value={sort ?? ""}
-            onChange={(e) => setSort(e.target.value || "createdAt:desc")}
-          >
-            <option value="createdAt:desc">Newest First</option>
-            <option value="createdAt:asc">Oldest First</option>
-            <option value="name:asc">Name (A-Z)</option>
-            <option value="name:desc">Name (Z-A)</option>
-          </select>
-        </div>
 
-        <button
-          onClick={() => setShowCreate(true)}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          New Agent
-        </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Agent
+          </button>
+        </div>
       </div>
 
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -189,9 +192,10 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
         {!isLoading && !error && agents.map((a) => <AgentCard key={a.id} agent={a} />)}
       </section>
 
+      {/* Pagination */}
       <div className="mt-8 flex items-center justify-center gap-3">
         <button
-          className="px-4 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-white/5 hover:border-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page <= 1}
         >
@@ -199,13 +203,13 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <div className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-white/10 text-sm font-medium">
-          <span className="text-slate-900 dark:text-white">{page}</span>
-          <span className="text-slate-400 dark:text-slate-500 mx-1">/</span>
-          <span className="text-slate-600 dark:text-slate-400">{totalPages}</span>
+        <div className="px-5 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-sm font-medium">
+          <span className="text-emerald-700 dark:text-emerald-400">{page}</span>
+          <span className="text-emerald-500/50 mx-1">/</span>
+          <span className="text-emerald-600 dark:text-emerald-400/70">{totalPages}</span>
         </div>
         <button
-          className="px-4 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-white/5 hover:border-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page >= totalPages}
         >
@@ -237,12 +241,12 @@ function AgentCard({ agent }: { agent: Agent }) {
   return (
     <Link
       href={`/dashboard/agents/${agent.id}`}
-      className="group relative h-52 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-left p-5 hover:border-slate-400 dark:hover:border-white/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+      className="group relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-left p-5 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 cursor-pointer"
     >
       <div className="relative h-full flex flex-col">
-        <div className="flex items-start gap-3 mb-4">
+        <div className="flex items-start gap-4 mb-4">
           <div className="relative">
-            <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -253,37 +257,45 @@ function AgentCard({ agent }: { agent: Agent }) {
               </svg>
             </div>
             {agent.isActive && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0d1424]" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0d1424] shadow-sm" />
             )}
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-slate-900 dark:text-white truncate mb-1 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+            <h3 className="font-semibold text-slate-900 dark:text-white truncate mb-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               {agent.name}
             </h3>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+              <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${agent.isActive
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400"
+                }`}>
+                {agent.isActive ? "Active" : "Inactive"}
+              </span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20">
                 {badge}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="space-y-2 flex-1">
+        <div className="space-y-3 flex-1 mt-2">
           <div className="flex items-center gap-2 text-xs">
-            <svg
-              className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-              />
-            </svg>
+            <div className="h-6 w-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center">
+              <svg
+                className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                />
+              </svg>
+            </div>
             <span className="text-slate-900 dark:text-white font-medium">{provider}</span>
             <span className="text-slate-300 dark:text-slate-600">•</span>
             <span className="text-slate-500 dark:text-slate-400 truncate" title={String(model)}>
@@ -292,14 +304,16 @@ function AgentCard({ agent }: { agent: Agent }) {
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <div className="h-6 w-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
             <span>{new Date(agent.createdAt).toLocaleDateString()}</span>
             <span className="text-slate-300 dark:text-slate-600">•</span>
             <span>History: {agent.historyLimit ?? 0}</span>
@@ -309,6 +323,7 @@ function AgentCard({ agent }: { agent: Agent }) {
     </Link>
   )
 }
+
 
 function CreateAgentModal({
   onClose,
@@ -383,32 +398,42 @@ function CreateAgentModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-[101] w-full max-w-4xl rounded-xl bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-50 dark:bg-white/5">
-          <div>
-            <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Create New Agent</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Configure your AI agent settings</p>
+      <div className="relative z-[101] w-full max-w-2xl rounded-2xl bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Modal Header */}
+        <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Create New Agent</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Configure your AI agent settings</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="h-8 w-8 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
-            aria-label="Close"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
 
         <form onSubmit={submit} className="p-6 space-y-5 overflow-y-auto">
           <label className="text-sm block">
             <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">Agent Name *</span>
             <input
-              className={`w-full border rounded-lg px-4 py-2.5 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 transition-all ${
-                errorMessage
-                  ? "border-red-500 dark:border-red-500 focus:ring-red-200 dark:focus:ring-red-900/30 focus:border-red-500"
-                  : "border-slate-200 dark:border-white/10 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30"
-              }`}
+              className={`w-full border rounded-xl px-4 py-3 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 transition-all ${errorMessage
+                ? "border-red-500 dark:border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                : "border-slate-200 dark:border-white/10 focus:ring-emerald-500/20 focus:border-emerald-500"
+                }`}
               placeholder="Enter agent name"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
@@ -432,18 +457,16 @@ function CreateAgentModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="text-sm block">
               <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">Status</span>
-              <div className="flex items-center gap-3 h-[42px]">
+              <div className="flex items-center gap-3 h-[48px] px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
                 <button
                   type="button"
                   onClick={() => update("isActive", !form.isActive)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    form.isActive ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
-                  }`}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.isActive ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+                    }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      form.isActive ? "translate-x-6" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.isActive ? "translate-x-6" : "translate-x-1"
+                      }`}
                   />
                 </button>
                 <span
@@ -459,7 +482,7 @@ function CreateAgentModal({
               <input
                 type="number"
                 min={0}
-                className="w-full border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all"
+                className="w-full border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 value={form.historyLimit}
                 onChange={(e) => update("historyLimit", Number.parseInt(e.target.value || "0", 10) || 0)}
               />
@@ -469,7 +492,7 @@ function CreateAgentModal({
           <label className="text-sm block">
             <span className="block mb-2 font-medium text-slate-700 dark:text-slate-300">System Prompt</span>
             <textarea
-              className="w-full border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-white/20 focus:border-slate-400 dark:focus:border-white/30 transition-all resize-none"
+              className="w-full border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none"
               rows={4}
               value={form.prompt}
               onChange={(e) => update("prompt", e.target.value)}
@@ -480,14 +503,14 @@ function CreateAgentModal({
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
-              className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+              className="px-6 py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
+              className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center gap-2"
               disabled={create.isPending}
             >
               {create.isPending ? (
@@ -517,3 +540,4 @@ function CreateAgentModal({
     </div>
   )
 }
+
