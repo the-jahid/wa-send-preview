@@ -116,61 +116,67 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
   const setError = setTplMut.isError ? safeMsg(setTplMut.error) : clearTplMut.isError ? safeMsg(clearTplMut.error) : undefined
 
   return (
-    <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 transition-colors">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-slate-900 dark:text-white">Templates</CardTitle>
-            <CardDescription className="text-slate-500 dark:text-slate-400">
-              Two-pane: list on the left, editor on the right
-            </CardDescription>
+    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden transition-colors">
+      {/* Header with gradient */}
+      <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+              <Plus className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Templates</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Two-pane: list on the left, editor on the right</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={() => {
                 list.refetch()
                 statusQ.refetch()
               }}
               title="Refresh"
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+              className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
             >
               <RefreshCcw className="h-4 w-4" />
-            </Button>
-            <Button
-              size="sm"
-              className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+            </button>
+            <button
+              className="h-10 px-5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center gap-2"
               onClick={() => setSelectedId("new")}
             >
               <Plus className="h-4 w-4" /> New template
-            </Button>
+            </button>
           </div>
         </div>
 
         {/* Topline selection indicator */}
-        {statusQ.isLoading ? (
-          <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">Loading broadcast selection…</div>
-        ) : selectedTemplateIdForBroadcast ? (
-          <div className="mt-2 text-xs text-emerald-700 dark:text-emerald-400">
-            <CheckCircle2 className="inline -mt-0.5 mr-1 h-3.5 w-3.5" />
-            Selected for broadcast
-          </div>
-        ) : (
-          <div className="mt-2 text-xs text-amber-700 dark:text-amber-400">No template selected for broadcast</div>
-        )}
-      </CardHeader>
+        <div className="relative mt-3">
+          {statusQ.isLoading ? (
+            <div className="text-xs text-slate-500 dark:text-slate-400">Loading broadcast selection…</div>
+          ) : selectedTemplateIdForBroadcast ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Selected for broadcast
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-medium">
+              No template selected for broadcast
+            </div>
+          )}
+        </div>
+      </div>
 
-      <CardContent>
+      <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-[320px_minmax(0,1fr)] gap-4">
           {/* LEFT: list & search */}
-          <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0f1a]">
-            <div className="p-3 border-b border-slate-200 dark:border-white/10">
+          <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0f1a] overflow-hidden">
+            <div className="p-3 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424]">
               <Input
                 placeholder="Search name/body…"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                className="h-9 text-sm border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="h-10 text-sm border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
               <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {list.isLoading ? "Loading…" : `Showing ${items.length} item(s)`}
@@ -203,11 +209,10 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
                     return (
                       <li key={tpl.id}>
                         <div
-                          className={`px-3 py-2 transition ${
-                            selectedId === tpl.id
-                              ? "bg-slate-100 dark:bg-white/10"
-                              : "hover:bg-slate-50 dark:hover:bg-white/5"
-                          }`}
+                          className={`px-3 py-2 transition ${selectedId === tpl.id
+                            ? "bg-slate-100 dark:bg-white/10"
+                            : "hover:bg-slate-50 dark:hover:bg-white/5"
+                            }`}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <button
@@ -336,8 +341,8 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
@@ -569,9 +574,9 @@ function EditTemplateInline({
     const variables = Array.isArray(v.variables)
       ? v.variables
       : varsCsv
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
     const payload: UpdateTemplateDto = { ...v, variables }
     await updateMut.mutateAsync({ id: tpl.id, data: payload })
     onChanged()

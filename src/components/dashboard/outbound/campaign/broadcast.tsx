@@ -2,14 +2,12 @@
 "use client"
 
 import React, { useEffect, useMemo, useState } from "react"
-import { ExternalLink, Copy, Loader2 } from "lucide-react"
+import { Loader2, Radio } from "lucide-react"
 
 /* ----------------- shadcn/ui ----------------- */
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 
 /* ----------------- Outbound Broadcast feature ----------------- */
 import {
@@ -18,19 +16,17 @@ import {
   usePauseBroadcast,
   useResumeBroadcast,
   useUpdateBroadcastSettings,
-  useCronRunOnce,
   isBroadcastRunning,
   canStart,
 } from "@/app/features/outbound-broadcast"
 import type { CampaignStatusResponse } from "@/app/features/outbound-broadcast"
 
 /* =============================================================================
- * Broadcast Settings Panel (updated for single message gap)
+ * Broadcast Settings Panel (simplified - message gap moved to Leads page)
  * ========================================================================== */
 
 type FormState = {
   startAt: string // datetime-local
-  messageGapSeconds: string // seconds between messages
   selectedTemplateId: string
 }
 
@@ -46,12 +42,10 @@ export default function BroadcastSettingsPanel({
   const pause = usePauseBroadcast(agentId, campaignId)
   const resume = useResumeBroadcast(agentId, campaignId)
   const update = useUpdateBroadcastSettings(agentId, campaignId)
-  const cron = useCronRunOnce()
 
   // local form state (no isEnabled / isPaused here; they are controlled by buttons)
   const [form, setForm] = useState<FormState>({
     startAt: "",
-    messageGapSeconds: "",
     selectedTemplateId: "",
   })
 
@@ -61,7 +55,6 @@ export default function BroadcastSettingsPanel({
     if (!b) return
     setForm({
       startAt: b.startAt ? toLocalDatetimeInput(b.startAt) : "",
-      messageGapSeconds: String(b.messageGapSeconds ?? ""),
       selectedTemplateId: b.selectedTemplateId ?? "",
     })
   }, [data?.broadcast?.id])
@@ -89,9 +82,6 @@ export default function BroadcastSettingsPanel({
       out.startAt = form.startAt ? new Date(form.startAt).toISOString() : null
     }
 
-    // messageGapSeconds
-    maybeAddNumberDiff(out, "messageGapSeconds", form.messageGapSeconds, b.messageGapSeconds)
-
     // NEVER include status/isEnabled/isPaused here.
     return out
   }, [data?.broadcast, form])
@@ -102,265 +92,156 @@ export default function BroadcastSettingsPanel({
     await refetch()
   }
 
-  const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "http://localhost:3000").replace(/\/$/, "")
-  const getUrl = `${baseUrl}/outbound-broadcast/campaigns/${campaignId}/status`
-
-  const rawJson = JSON.stringify(data ?? {}, null, 2)
-
-  const copyJson = async () => {
-    try {
-      await navigator.clipboard.writeText(rawJson)
-    } catch {}
-  }
-
   return (
-    <Card className="bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10 transition-colors">
-      <CardHeader className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-slate-900 dark:text-white">Broadcast Settings</CardTitle>
-          {data?.broadcast?.status ? (
-            <Badge className={broadcastStatusClass(data.broadcast.status)}>{data.broadcast.status}</Badge>
-          ) : (
-            <Badge
-              variant="outline"
-              className="border-slate-300 dark:border-white/20 text-slate-500 dark:text-slate-400"
-            >
-              —
-            </Badge>
-          )}
-        </div>
-        <CardDescription className="text-slate-500 dark:text-slate-400">
-          Configure the message gap and template for bulk WhatsApp sending.
-          <span className="ml-1 text-slate-400 dark:text-slate-500">
-            Saving these fields won't change status. Use <strong className="text-slate-600 dark:text-slate-300">Start</strong>,{" "}
-            <strong className="text-slate-600 dark:text-slate-300">Pause</strong>, or{" "}
-            <strong className="text-slate-600 dark:text-slate-300">Resume</strong> to control state.
-          </span>
-        </CardDescription>
-      </CardHeader>
+    <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 overflow-hidden transition-colors">
+      {/* Decorative blur effect */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <CardContent className="space-y-6">
-        {/* Stats row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-          <InfoBox label="Campaign Status" value={data?.campaign.status ?? "—"} />
-          <InfoBox label="Broadcast Status" value={data?.broadcast?.status ?? "—"} />
-          <InfoBox
-            label="Counters"
-            value={`Queued: ${data?.counters.queued ?? 0} • Retry: ${data?.counters.retry ?? 0} • In prog: ${data?.counters.inprog ?? 0}`}
-          />
-          <InfoBox label="Template ID" value={shortId(data?.broadcast?.selectedTemplateId || "") || "—"} />
-        </div>
-
-        {/* Totals + IDs row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-          <InfoBox label="Total Sent" value={data?.broadcast?.totalSent ?? 0} />
-          <InfoBox label="Total Failed" value={data?.broadcast?.totalFailed ?? 0} />
-          <InfoBox label="Message Gap" value={formatGap(data?.broadcast?.messageGapSeconds)} />
-          <InfoBox label="Campaign ID" value={shortId(campaignId)} />
-          <InfoBox label="Broadcast ID" value={shortId(data?.broadcast?.id || "") || "—"} />
-        </div>
-
-        {/* Actions (state control) */}
-        <div className="flex flex-wrap gap-2">
-          <Button
-            size="sm"
-            disabled={!canStartNow || start.isPending || isLoading}
-            onClick={() => start.mutate()}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
-          >
-            {start.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-1" /> Starting…
-              </>
-            ) : (
-              "Start (enable + run)"
-            )}
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={pause.isPending || isLoading}
-            onClick={() => pause.mutate()}
-            className="bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/20 disabled:opacity-50"
-          >
-            {pause.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-1" /> Pausing…
-              </>
-            ) : (
-              "Pause"
-            )}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={resume.isPending || isLoading}
-            onClick={() => resume.mutate()}
-            className="border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50"
-          >
-            {resume.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-1" /> Resuming…
-              </>
-            ) : (
-              "Resume"
-            )}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={cron.isPending}
-            onClick={() => cron.mutate()}
-            className="border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50"
-          >
-            {cron.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-1" /> Running…
-              </>
-            ) : (
-              "Run Cron Once"
-            )}
-          </Button>
-        </div>
-
-        {/* Form – ONLY data fields, no status/toggles */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* template */}
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="tpl" className="text-slate-700 dark:text-slate-300">
-              Selected Template ID
-            </Label>
-            <Input
-              id="tpl"
-              placeholder="UUID or empty to clear"
-              value={form.selectedTemplateId}
-              onChange={(e) => onChange("selectedTemplateId", e.target.value)}
-              className="h-10 text-sm border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
+      <div className="relative p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+              <Radio className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Broadcast</h2>
+                {data?.broadcast?.status ? (
+                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${broadcastStatusClass(data.broadcast.status)}`}>
+                    {data.broadcast.status}
+                  </span>
+                ) : (
+                  <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10">
+                    Not Started
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Send bulk WhatsApp messages to your campaign leads.
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* startAt */}
-          <div className="space-y-2">
-            <Label htmlFor="startAt" className="text-slate-700 dark:text-slate-300">
-              Start at
+        {/* Stats Grid - Simplified */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <InfoBox label="Total Sent" value={data?.broadcast?.totalSent ?? 0} highlight="success" />
+          <InfoBox label="Total Failed" value={data?.broadcast?.totalFailed ?? 0} highlight="danger" />
+          <InfoBox label="Message Gap" value={formatGap(data?.broadcast?.messageGapSeconds)} />
+          <InfoBox label="Status" value={data?.campaign.status ?? "—"} />
+        </div>
+
+        {/* Controls */}
+        <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              disabled={!canStartNow || start.isPending || isLoading}
+              onClick={() => start.mutate()}
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:shadow-none rounded-full px-6 h-10 transition-all"
+            >
+              {start.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Starting…
+                </>
+              ) : (
+                "▶ Start Broadcast"
+              )}
+            </Button>
+            <Button
+              disabled={pause.isPending || isLoading}
+              onClick={() => pause.mutate()}
+              className="bg-amber-500 hover:bg-amber-600 text-white disabled:opacity-50 rounded-full px-6 h-10 transition-all"
+            >
+              {pause.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Pausing…
+                </>
+              ) : (
+                "⏸ Pause"
+              )}
+            </Button>
+            <Button
+              disabled={resume.isPending || isLoading}
+              onClick={() => resume.mutate()}
+              className="bg-white dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/20 hover:border-emerald-500/30 disabled:opacity-50 rounded-full px-6 h-10 transition-all"
+            >
+              {resume.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Resuming…
+                </>
+              ) : (
+                "↻ Resume"
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Schedule Settings */}
+        <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-5">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Schedule</h3>
+          {/* Schedule Time */}
+          <div className="space-y-2 max-w-md">
+            <Label htmlFor="startAt" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Schedule Start Time
             </Label>
             <Input
               id="startAt"
               type="datetime-local"
               value={form.startAt}
               onChange={(e) => onChange("startAt", e.target.value)}
-              className="h-10 text-sm border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent [color-scheme:light] dark:[color-scheme:dark]"
+              className="h-11 text-sm border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all [color-scheme:light] dark:[color-scheme:dark]"
             />
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              If set in the future and enabled → READY (scheduled). Otherwise → RUNNING.
+              Leave empty to start immediately when you click Start.
             </p>
           </div>
 
-          {/* message gap (seconds) */}
-          <NumberField
-            id="messageGapSeconds"
-            label="Message gap (sec)"
-            placeholder="120"
-            value={form.messageGapSeconds}
-            onChange={(v) => onChange("messageGapSeconds", v)}
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            onClick={save}
-            disabled={update.isPending || isLoading || Object.keys(payload).length === 0}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
-          >
-            {update.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-1" /> Saving…
-              </>
-            ) : (
-              "Save Settings"
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => refetch()}
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
-          >
-            Refresh
-          </Button>
-          <a href={getUrl} target="_blank" rel="noreferrer">
+          {/* Save Button */}
+          <div className="mt-5 pt-4 border-t border-slate-200 dark:border-white/10">
             <Button
-              type="button"
-              variant="outline"
-              className="gap-2 border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10"
+              onClick={save}
+              disabled={update.isPending || isLoading || Object.keys(payload).length === 0}
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:shadow-none rounded-full px-6 transition-all"
             >
-              Open GET endpoint <ExternalLink className="h-4 w-4" />
-            </Button>
-          </a>
-        </div>
-
-        {/* Raw status viewer (GET response) */}
-        <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424]">
-            <div className="text-xs font-medium text-slate-700 dark:text-slate-300">Raw status (GET)</div>
-            <Button
-              onClick={copyJson}
-              size="sm"
-              variant="ghost"
-              className="gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
-            >
-              <Copy className="h-4 w-4" /> Copy JSON
+              {update.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving…
+                </>
+              ) : (
+                "Save Schedule"
+              )}
             </Button>
           </div>
-          <pre className="max-h-[360px] overflow-auto p-3 text-xs text-slate-700 dark:text-slate-300 font-mono">
-            {rawJson}
-          </pre>
         </div>
 
-        {/* Info line */}
+        {/* Status Indicator */}
         <SaveFootnote running={running} status={data} />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
 /* --------------------- Small UI helpers --------------------- */
 
-function InfoBox({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3">
-      <div className="text-xs text-slate-500 dark:text-slate-400">{label}</div>
-      <div className="font-medium break-words text-slate-900 dark:text-white">{value}</div>
-    </div>
-  )
-}
+function InfoBox({ label, value, highlight }: { label: string; value: React.ReactNode; highlight?: "success" | "danger" }) {
+  const getHighlightClasses = () => {
+    if (highlight === "success") return "border-emerald-500/20 bg-emerald-500/5"
+    if (highlight === "danger") return "border-rose-500/20 bg-rose-500/5"
+    return "border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5"
+  }
 
-function NumberField({
-  id,
-  label,
-  placeholder,
-  value,
-  onChange,
-}: {
-  id: string
-  label: string
-  placeholder?: string
-  value: string
-  onChange: (v: string) => void
-}) {
+  const getValueClasses = () => {
+    if (highlight === "success") return "text-emerald-600 dark:text-emerald-400"
+    if (highlight === "danger") return "text-rose-600 dark:text-rose-400"
+    return "text-slate-900 dark:text-white"
+  }
+
   return (
-    <div className="space-y-2">
-      <Label htmlFor={id} className="text-slate-700 dark:text-slate-300">
-        {label}
-      </Label>
-      <Input
-        id={id}
-        type="number"
-        inputMode="numeric"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-10 text-sm border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-      />
+    <div className={`rounded-xl border p-3 transition-all ${getHighlightClasses()}`}>
+      <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{label}</div>
+      <div className={`font-semibold break-words ${getValueClasses()}`}>{value}</div>
     </div>
   )
 }
@@ -370,33 +251,24 @@ function SaveFootnote({ running, status }: { running: boolean; status?: Campaign
   const label = formatGap(gap)
   if (running) {
     return (
-      <p className="text-xs text-emerald-600 dark:text-emerald-400">Running… sending one message every {label}.</p>
+      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+          Running… sending one message every {label}.
+        </p>
+      </div>
     )
   }
   return (
-    <p className="text-xs text-slate-500 dark:text-slate-400">
-      Not running. Use <strong className="text-slate-700 dark:text-slate-300">Start</strong>,{" "}
-      <strong className="text-slate-700 dark:text-slate-300">Pause</strong>, or{" "}
-      <strong className="text-slate-700 dark:text-slate-300">Resume</strong> to change status.
-    </p>
+    <div className="px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        Not running. Click <strong className="text-emerald-600 dark:text-emerald-400">Start Broadcast</strong> to begin sending messages.
+      </p>
+    </div>
   )
 }
 
 /* --------------------- utils --------------------- */
-
-function maybeAddNumberDiff(
-  out: Record<string, any>,
-  key: string,
-  formVal: string,
-  currentVal: number | null | undefined
-) {
-  const parsed = formVal === "" ? undefined : Number(formVal)
-  const current = typeof currentVal === "number" ? currentVal : undefined
-  if (parsed !== current) {
-    if (parsed === undefined || Number.isNaN(parsed)) return
-    out[key] = parsed
-  }
-}
 
 function toLocalDatetimeInput(iso: string) {
   const d = new Date(iso)
@@ -407,11 +279,6 @@ function toLocalDatetimeInput(iso: string) {
   const hh = pad(d.getHours())
   const mi = pad(d.getMinutes())
   return `${yyyy}-${mm}-${dd}T${hh}:${mi}`
-}
-
-function shortId(id?: string) {
-  if (!id) return ""
-  return id.length > 12 ? `${id.slice(0, 6)}…${id.slice(-4)}` : id
 }
 
 function formatGap(seconds?: number | null) {

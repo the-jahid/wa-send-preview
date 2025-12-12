@@ -273,210 +273,220 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
       <aside
         className="
           fixed right-0 top-0 z-50 h-[100dvh] w-full sm:w-[85%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[45%]
-          bg-background border-l shadow-2xl flex flex-col
+          bg-slate-50 dark:bg-[#0a0f1a] border-l border-slate-200 dark:border-white/10 shadow-2xl flex flex-col
           animate-in slide-in-from-right duration-300
         "
         role="dialog"
         aria-modal="true"
         aria-label="Knowledgebase panel"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b bg-gradient-to-r from-background to-muted/20 px-4 sm:px-6 py-4">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-              <BookOpen className="h-5 w-5 text-primary" />
+        {/* Header with Landing Page Theme */}
+        <div className="relative border-b border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 px-4 sm:px-6 py-5 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 shrink-0">
+                <BookOpen className="h-7 w-7 text-white" />
+              </div>
+              <div className="flex flex-col truncate">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate">Knowledgebase</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 truncate flex items-center gap-2">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  {agent ? agent.name : "Loading agent…"}
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col truncate">
-              <h2 className="font-semibold text-lg truncate">Knowledgebase</h2>
-              <p className="text-xs text-muted-foreground truncate">{agent ? agent.name : "Loading agent…"}</p>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={refreshAll}
+                title="Refresh all data"
+                disabled={busy}
+                className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-emerald-500/30 transition-all flex items-center justify-center disabled:opacity-50"
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin text-emerald-500" /> : <RefreshCcw className="h-4 w-4 text-slate-600 dark:text-slate-400" />}
+              </button>
+              <button
+                onClick={onClose}
+                aria-label="Close panel"
+                className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-500/30 transition-all flex items-center justify-center"
+              >
+                <X className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              </button>
             </div>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={refreshAll}
-              title="Refresh all data"
-              disabled={busy}
-              className="h-9 w-9"
-            >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel" className="h-9 w-9">
-              <X className="h-5 w-5" />
-            </Button>
           </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6">
           {(agentError || kbError || docsError) && (
-            <Card className="border-destructive/50 bg-destructive/5">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-destructive text-sm font-medium flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-                  Error Loading Data
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-destructive/90">
+            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+                <span className="text-sm font-medium text-rose-700 dark:text-rose-400">Error Loading Data</span>
+              </div>
+              <p className="text-sm text-rose-600 dark:text-rose-300">
                 {String(agentError || kbError || docsError)}
-              </CardContent>
-            </Card>
+              </p>
+            </div>
           )}
 
           {/* Create Documents Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Create Documents</h3>
+            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Create Documents</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* New Text Doc */}
-              <Card className="border-2 hover:border-primary/50 transition-colors">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10">
-                      <Plus className="h-4 w-4 text-primary" />
+              <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-5 overflow-hidden hover:border-emerald-500/40 transition-all">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                      <Plus className="h-6 w-6 text-white" />
                     </div>
-                    <span>Text Document</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newTitle" className="text-sm font-medium">
-                      Title
-                    </Label>
-                    <Input
-                      id="newTitle"
-                      placeholder="Enter document title"
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      className="h-10"
-                    />
+                    <span className="text-lg font-semibold text-slate-900 dark:text-white">Text Document</span>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="newTags" className="text-sm font-medium flex items-center gap-1.5">
-                      <Tag className="h-3.5 w-3.5" />
-                      Tags
-                    </Label>
-                    <Input
-                      id="newTags"
-                      placeholder="pricing, onboarding, faq"
-                      value={newTags}
-                      onChange={(e) => setNewTags(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="newContent" className="text-sm font-medium">
-                      Content
-                    </Label>
-                    <Textarea
-                      id="newContent"
-                      rows={5}
-                      placeholder="Paste or write your content here…"
-                      value={newContent}
-                      onChange={(e) => setNewContent(e.target.value)}
-                      className="resize-none"
-                    />
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      onClick={onCreateText}
-                      disabled={createText.isPending || !newTitle.trim() || !newContent.trim()}
-                      className="flex-1"
-                    >
-                      {createText.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Create Document
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setNewTitle("")
-                        setNewTags("")
-                        setNewContent("")
-                      }}
-                      disabled={createText.isPending}
-                    >
-                      Clear
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Upload + Embed */}
-              <Card className="border-2 hover:border-primary/50 transition-colors">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10">
-                      <Upload className="h-4 w-4 text-primary" />
-                    </div>
-                    <span>Upload File</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Select File</Label>
-                    <div className="relative">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="newTitle" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Title
+                      </Label>
                       <Input
-                        type="file"
-                        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                        disabled={fileBusy || uploadFileAndEmbed.isPending}
-                        className="h-10 cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20"
+                        id="newTitle"
+                        placeholder="Enter document title"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-emerald-500 focus:ring-emerald-500/20"
                       />
                     </div>
-                    {file && (
-                      <div className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm">
-                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="truncate flex-1">{file.name}</span>
-                        <span className="text-xs text-muted-foreground shrink-0">{prettyBytes(file.size)}</span>
+                    <div className="space-y-2">
+                      <Label htmlFor="newTags" className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Tag className="h-3.5 w-3.5" />
+                        Tags
+                      </Label>
+                      <Input
+                        id="newTags"
+                        placeholder="pricing, onboarding, faq"
+                        value={newTags}
+                        onChange={(e) => setNewTags(e.target.value)}
+                        className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-emerald-500 focus:ring-emerald-500/20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="newContent" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Content
+                      </Label>
+                      <Textarea
+                        id="newContent"
+                        rows={5}
+                        placeholder="Paste or write your content here…"
+                        value={newContent}
+                        onChange={(e) => setNewContent(e.target.value)}
+                        className="resize-none rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-emerald-500 focus:ring-emerald-500/20"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={onCreateText}
+                        disabled={createText.isPending || !newTitle.trim() || !newContent.trim()}
+                        className="flex-1 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25"
+                      >
+                        {createText.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Create Document
+                      </Button>
+                      <button
+                        onClick={() => {
+                          setNewTitle("")
+                          setNewTags("")
+                          setNewContent("")
+                        }}
+                        disabled={createText.isPending}
+                        className="h-10 px-4 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-white/10 hover:border-emerald-500/30 transition-all disabled:opacity-50"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Upload + Embed */}
+              <div className="relative rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-white dark:via-[#0d1424] to-blue-500/10 p-5 overflow-hidden hover:border-cyan-500/40 transition-all">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+                      <Upload className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="text-lg font-semibold text-slate-900 dark:text-white">Upload File</span>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select File</Label>
+                      <div className="relative">
+                        <Input
+                          type="file"
+                          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                          disabled={fileBusy || uploadFileAndEmbed.isPending}
+                          className="h-10 rounded-xl cursor-pointer border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-500 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-cyan-600"
+                        />
                       </div>
-                    )}
-                  </div>
+                      {file && (
+                        <div className="flex items-center gap-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 px-3 py-2 text-sm">
+                          <FileText className="h-4 w-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                          <span className="truncate flex-1 text-slate-700 dark:text-slate-300">{file.name}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{prettyBytes(file.size)}</span>
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="uploadTitle" className="text-sm font-medium">
-                      Title (optional)
-                    </Label>
-                    <Input
-                      id="uploadTitle"
-                      placeholder="Defaults to filename"
-                      value={uploadTitle}
-                      onChange={(e) => setUploadTitle(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="uploadTitle" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Title (optional)
+                      </Label>
+                      <Input
+                        id="uploadTitle"
+                        placeholder="Defaults to filename"
+                        value={uploadTitle}
+                        onChange={(e) => setUploadTitle(e.target.value)}
+                        className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-cyan-500 focus:ring-cyan-500/20"
+                      />
+                    </div>
 
-                  <div className="rounded-lg bg-muted/30 border border-dashed p-3">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Uploads file, extracts text, chunks content, generates embeddings, and stores vectors in Pinecone
-                      automatically.
-                    </p>
-                  </div>
+                    <div className="rounded-xl bg-cyan-500/10 border border-cyan-500/20 p-3">
+                      <p className="text-xs text-cyan-700 dark:text-cyan-400 leading-relaxed">
+                        Uploads file, extracts text, chunks content, generates embeddings, and stores vectors in Pinecone
+                        automatically.
+                      </p>
+                    </div>
 
-                  <Button
-                    onClick={onUploadFile}
-                    disabled={!file || fileBusy || uploadFileAndEmbed.isPending}
-                    className="w-full"
-                  >
-                    {(fileBusy || uploadFileAndEmbed.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Upload & Embed
-                  </Button>
-                </CardContent>
-              </Card>
+                    <Button
+                      onClick={onUploadFile}
+                      disabled={!file || fileBusy || uploadFileAndEmbed.isPending}
+                      className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25"
+                    >
+                      {(fileBusy || uploadFileAndEmbed.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Upload & Embed
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Documents Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Documents</h3>
+              <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Documents</h3>
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2">
-                  <Label htmlFor="limit" className="text-xs text-muted-foreground whitespace-nowrap">
+                  <Label htmlFor="limit" className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                     Per page
                   </Label>
                   <Input
                     id="limit"
                     type="number"
-                    className="h-8 w-16 text-sm"
+                    className="h-8 w-16 text-sm rounded-lg border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5"
                     min={5}
                     max={50}
                     value={limit}
@@ -486,248 +496,255 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
               </div>
             </div>
 
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search by title or tags…"
-                      value={q}
-                      onChange={(e) => setQ(e.target.value)}
-                      className="pl-9 h-10"
-                    />
-                  </div>
-                  {q && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setQ("")
-                        setPage(1)
-                      }}
-                    >
-                      Clear
-                    </Button>
-                  )}
+            <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5">
+              <div className="flex gap-2 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
+                  <Input
+                    placeholder="Search by title or tags…"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    className="pl-10 h-10 rounded-xl border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 focus:border-emerald-500 focus:ring-emerald-500/20"
+                  />
                 </div>
-
-                {docsLoading ? (
-                  <div className="flex flex-col items-center justify-center py-12 gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading documents…</p>
-                  </div>
-                ) : docsPage && docsPage.data.length > 0 ? (
-                  <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                      {docsPage.data.map((d) => (
-                        <button
-                          key={d.id}
-                          onClick={() => openModalFor(d)}
-                          className="
-                            group text-left rounded-lg border-2 p-4
-                            hover:border-primary/50 hover:bg-accent/50
-                            focus:border-primary focus:bg-accent/50
-                            transition-all duration-200 shadow-sm hover:shadow-md
-                            focus:outline-none focus:ring-2 focus:ring-primary/20
-                          "
-                        >
-                          <div className="flex items-start gap-3 mb-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 shrink-0 group-hover:bg-primary/20 transition-colors">
-                              <FileText className="h-4 w-4 text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium line-clamp-2 text-sm leading-snug mb-1">{d.title}</h4>
-                              <div className="flex items-center gap-1.5">
-                                <span
-                                  className={`
-                                    inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
-                                    ${
-                                      String(d.status) === "ready"
-                                        ? "bg-green-500/10 text-green-700 dark:text-green-400"
-                                        : String(d.status) === "processing"
-                                          ? "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
-                                          : "bg-gray-500/10 text-gray-700 dark:text-gray-400"
-                                    }
-                                  `}
-                                >
-                                  {d.status}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Database className="h-3 w-3" />
-                              {d.vectorCount} vectors
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {new Date(d.updatedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t">
-                      <p className="text-xs text-muted-foreground">
-                        Showing page <span className="font-medium">{docsPage.page}</span> of{" "}
-                        <span className="font-medium">{docsPage.totalPages}</span> ·{" "}
-                        <span className="font-medium">{docsPage.total}</span> total documents
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={page <= 1}
-                          onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        >
-                          <ChevronLeft className="h-4 w-4 mr-1" />
-                          Previous
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={page >= totalPages}
-                          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        >
-                          Next
-                          <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-12 gap-3">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                      <FileText className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                    <div className="text-center">
-                      <p className="font-medium text-sm">No documents found</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {q ? "Try adjusting your search" : "Create your first document to get started"}
-                      </p>
-                    </div>
-                  </div>
+                {q && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setQ("")
+                      setPage(1)
+                    }}
+                    className="rounded-xl border-slate-200 dark:border-white/10"
+                  >
+                    Clear
+                  </Button>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+
+              {docsLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Loading documents…</p>
+                </div>
+              ) : docsPage && docsPage.data.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                    {docsPage.data.map((d) => (
+                      <button
+                        key={d.id}
+                        onClick={() => openModalFor(d)}
+                        className="
+                          group text-left rounded-xl border border-slate-200 dark:border-white/10 p-4
+                          bg-slate-50 dark:bg-white/5
+                          hover:border-emerald-500/50 hover:bg-emerald-500/5
+                          focus:border-emerald-500 focus:bg-emerald-500/5
+                          transition-all duration-200 shadow-sm hover:shadow-md
+                          focus:outline-none focus:ring-2 focus:ring-emerald-500/20
+                        "
+                      >
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 shrink-0 group-hover:bg-emerald-500/20 transition-colors">
+                            <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium line-clamp-2 text-sm leading-snug mb-1 text-slate-900 dark:text-white">{d.title}</h4>
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`
+                                  inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
+                                  ${String(d.status) === "ready"
+                                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                    : String(d.status) === "processing"
+                                      ? "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                                      : "bg-slate-500/10 text-slate-700 dark:text-slate-400"
+                                  }
+                                `}
+                              >
+                                {d.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                          <span className="flex items-center gap-1">
+                            <Database className="h-3 w-3" />
+                            {d.vectorCount} vectors
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(d.updatedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 mt-4 border-t border-slate-200 dark:border-white/10">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Showing page <span className="font-medium text-slate-700 dark:text-slate-300">{docsPage.page}</span> of{" "}
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{docsPage.totalPages}</span> ·{" "}
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{docsPage.total}</span> total documents
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={page <= 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        className="rounded-full border-slate-200 dark:border-white/10"
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={page >= totalPages}
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        className="rounded-full border-slate-200 dark:border-white/10"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/10">
+                    <FileText className="h-8 w-8 text-slate-400 dark:text-slate-500" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-medium text-sm text-slate-900 dark:text-white">No documents found</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      {q ? "Try adjusting your search" : "Create your first document to get started"}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Semantic Search Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
+            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-purple-500" />
               Semantic Search
             </h3>
-            <Card className="border-2">
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                  <div className="sm:col-span-9">
-                    <Label htmlFor="searchQ" className="text-sm font-medium mb-2 block">
-                      Search Query
-                    </Label>
-                    <Input
-                      id="searchQ"
-                      placeholder="Ask your knowledgebase anything…"
-                      value={searchQ}
-                      onChange={(e) => setSearchQ(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && onSearch()}
-                      className="h-10"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Label htmlFor="topK" className="text-sm font-medium mb-2 block">
-                      Results
-                    </Label>
-                    <Input
-                      id="topK"
-                      type="number"
-                      min={1}
-                      max={50}
-                      value={topK}
-                      onChange={(e) =>
-                        setTopK(() => {
-                          const n = Number(e.target.value)
-                          return Number.isFinite(n) ? Math.max(1, Math.min(50, n)) : 8
-                        })
-                      }
-                      className="h-10"
-                    />
-                  </div>
-                  <div className="sm:col-span-1 flex items-end">
-                    <Button onClick={onSearch} className="w-full h-10" disabled={kbSearch.isPending || !searchQ.trim()}>
-                      {kbSearch.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Search className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+            <div className="rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-white dark:via-[#0d1424] to-pink-500/5 p-5 overflow-hidden">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div className="sm:col-span-9">
+                  <Label htmlFor="searchQ" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                    Search Query
+                  </Label>
+                  <Input
+                    id="searchQ"
+                    placeholder="Ask your knowledgebase anything…"
+                    value={searchQ}
+                    onChange={(e) => setSearchQ(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && onSearch()}
+                    className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-purple-500 focus:ring-purple-500/20"
+                  />
                 </div>
-
-                {kbSearch.data && (
-                  <div className="space-y-3 pt-2">
-                    {kbSearch.data.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-8 gap-2">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                          <Search className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <p className="text-sm text-muted-foreground">No matches found</p>
-                      </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="topK" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                    Results
+                  </Label>
+                  <Input
+                    id="topK"
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={topK}
+                    onChange={(e) =>
+                      setTopK(() => {
+                        const n = Number(e.target.value)
+                        return Number.isFinite(n) ? Math.max(1, Math.min(50, n)) : 8
+                      })
+                    }
+                    className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-purple-500 focus:ring-purple-500/20"
+                  />
+                </div>
+                <div className="sm:col-span-1 flex items-end">
+                  <Button
+                    onClick={onSearch}
+                    className="w-full h-10 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25"
+                    disabled={kbSearch.isPending || !searchQ.trim()}
+                  >
+                    {kbSearch.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <>
-                        <div className="flex items-center justify-between pb-2 border-b">
-                          <p className="text-sm font-medium">
-                            Found {kbSearch.data.length} result{kbSearch.data.length !== 1 ? "s" : ""}
-                          </p>
-                        </div>
-                        {kbSearch.data.map((m, idx) => (
-                          <div
-                            key={`${m.id}-${m.chunkIndex ?? 0}`}
-                            className="rounded-lg border bg-card p-4 space-y-2 hover:bg-accent/30 transition-colors"
-                          >
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                              <span className="font-medium">#{idx + 1}</span>
-                              <span className="flex items-center gap-1">
-                                Score: {m.score !== undefined ? m.score.toFixed(3) : "-"}
-                              </span>
-                              <span>Chunk: {m.chunkIndex ?? "-"}</span>
-                              <span className="truncate">Doc: {m.documentId ?? "-"}</span>
-                            </div>
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.text}</p>
-                            {m.metadata && (
-                              <details className="text-xs">
-                                <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                                  View metadata
-                                </summary>
-                                <pre className="mt-2 rounded bg-muted p-2 overflow-x-auto">
-                                  {JSON.stringify(m.metadata, null, 2)}
-                                </pre>
-                              </details>
-                            )}
-                          </div>
-                        ))}
-                      </>
+                      <Search className="h-4 w-4" />
                     )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </Button>
+                </div>
+              </div>
+
+              {kbSearch.data && (
+                <div className="space-y-3 pt-4 mt-4 border-t border-purple-500/20">
+                  {kbSearch.data.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 gap-2">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10">
+                        <Search className="h-6 w-6 text-slate-400 dark:text-slate-500" />
+                      </div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">No matches found</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between pb-2">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
+                          Found {kbSearch.data.length} result{kbSearch.data.length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      {kbSearch.data.map((m, idx) => (
+                        <div
+                          key={`${m.id}-${m.chunkIndex ?? 0}`}
+                          className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 space-y-2 hover:border-purple-500/30 transition-colors"
+                        >
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="font-semibold text-purple-600 dark:text-purple-400">#{idx + 1}</span>
+                            <span className="flex items-center gap-1">
+                              Score: <span className="font-medium text-slate-700 dark:text-slate-300">{m.score !== undefined ? m.score.toFixed(3) : "-"}</span>
+                            </span>
+                            <span>Chunk: {m.chunkIndex ?? "-"}</span>
+                            <span className="truncate">Doc: {m.documentId ?? "-"}</span>
+                          </div>
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-300">{m.text}</p>
+                          {m.metadata && (
+                            <details className="text-xs">
+                              <summary className="cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300">
+                                View metadata
+                              </summary>
+                              <pre className="mt-2 rounded-lg bg-slate-100 dark:bg-white/5 p-2 overflow-x-auto text-slate-600 dark:text-slate-400">
+                                {JSON.stringify(m.metadata, null, 2)}
+                              </pre>
+                            </details>
+                          )}
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t bg-muted/30 px-4 sm:px-6 py-3 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{docsPage ? `${docsPage.total} documents` : "Loading…"}</p>
-          <Button variant="secondary" onClick={onClose}>
+        <div className="border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] px-4 sm:px-6 py-3 flex items-center justify-between">
+          <p className="text-xs text-slate-500 dark:text-slate-400">{docsPage ? `${docsPage.total} documents` : "Loading…"}</p>
+          <Button
+            onClick={onClose}
+            className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25"
+          >
             Close Panel
           </Button>
         </div>
-      </aside>
+      </aside >
 
       {/* Document Details Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(o) => (o ? setIsModalOpen(true) : closeModal())}>
+      < Dialog open={isModalOpen} onOpenChange={(o) => (o ? setIsModalOpen(true) : closeModal())
+      }>
         <DialogContent
           className="
             w-[100vw] h-[100dvh] max-w-none rounded-none
@@ -767,7 +784,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
             </DialogFooter>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog >
     </>
   )
 }
@@ -860,12 +877,11 @@ function DocumentDetailsModal({
             <span
               className={`
                 inline-flex items-center rounded-full px-2 py-1 font-medium text-xs
-                ${
-                  String(doc.status) === "ready"
-                    ? "bg-green-500/10 text-green-700 dark:text-green-400"
-                    : String(doc.status) === "processing"
-                      ? "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
-                      : "bg-gray-500/10 text-gray-700 dark:text-gray-400"
+                ${String(doc.status) === "ready"
+                  ? "bg-green-500/10 text-green-700 dark:text-green-400"
+                  : String(doc.status) === "processing"
+                    ? "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
+                    : "bg-gray-500/10 text-gray-700 dark:text-gray-400"
                 }
               `}
             >

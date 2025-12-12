@@ -17,7 +17,7 @@ import {
 import type { QueryOutboundLeadsInput } from "@/app/features/outbound-campaign-lead"
 import { CreateOutboundLeadSchema, UpdateOutboundLeadSchema } from "@/app/features/outbound-campaign-lead"
 import { getLead } from "@/app/features/outbound-campaign-lead/apis"
-import { useBroadcastStatus } from "@/app/features/outbound-broadcast"
+import { useBroadcastStatus, useUpdateBroadcastSettings } from "@/app/features/outbound-broadcast"
 
 /* ---------- helpers / small UI ---------- */
 const STATUS_OPTIONS = [
@@ -114,8 +114,26 @@ function guessPhoneHeader(headers: string[]) {
 export default function LeadsTab({ campaignId, agentId }: { campaignId: string; agentId?: string }) {
   const router = useRouter()
 
-  const { data: status } = useBroadcastStatus(campaignId)
+  const { data: status, refetch: refetchStatus } = useBroadcastStatus(campaignId)
   const selectedTemplateId = status?.broadcast?.selectedTemplateId ?? null
+
+  // Message delay state
+  const [messageGapSeconds, setMessageGapSeconds] = useState("")
+  const { mutateAsync: updateBroadcast, isPending: updatingBroadcast } = useUpdateBroadcastSettings(agentId ?? "", campaignId)
+
+  // Seed message gap from server
+  useEffect(() => {
+    if (status?.broadcast?.messageGapSeconds !== undefined) {
+      setMessageGapSeconds(String(status.broadcast.messageGapSeconds ?? ""))
+    }
+  }, [status?.broadcast?.messageGapSeconds])
+
+  const saveMessageGap = async () => {
+    const parsed = messageGapSeconds === "" ? undefined : Number(messageGapSeconds)
+    if (parsed === undefined || Number.isNaN(parsed)) return
+    await updateBroadcast({ messageGapSeconds: parsed })
+    await refetchStatus()
+  }
 
   const [q, setQ] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined)
@@ -148,7 +166,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
   const { mutateAsync: delLead, isPending: deleting } = useDeleteLead()
   const { mutateAsync: recordAttempt, isPending: recording } = useRecordLeadAttempt()
   const { mutateAsync: setLeadStatus, isPending: setting } = useSetLeadStatus()
-  const busy = isLoading || isFetching || creating || updating || deleting || recording || setting
+  const busy = isLoading || isFetching || creating || updating || deleting || recording || setting || updatingBroadcast
 
   type CreateForm = z.infer<typeof CreateOutboundLeadSchema>
   const [showCreate, setShowCreate] = useState(false)
@@ -378,11 +396,12 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1a] p-6 transition-colors duration-300">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white dark:bg-[#0d1424] rounded-3xl shadow-sm border border-slate-200 dark:border-white/10 p-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center">
+          <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 p-8 overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="text-center space-y-4 relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/25">
                 <svg
-                  className="w-8 h-8 text-emerald-600 dark:text-emerald-400"
+                  className="w-8 h-8 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -402,7 +421,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
               <div className="pt-4">
                 <Link
                   href={toTemplates}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 px-6 py-3 text-white font-medium shadow-sm hover:shadow-md transition-all"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 px-6 py-3 text-white font-medium shadow-lg shadow-emerald-500/25 transition-all"
                 >
                   Select a Template
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,108 +439,150 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
   /* ------------------------------ UI ------------------------------ */
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
-      {/* Sticky Header */}
-      <div className="flex-shrink-0 sticky top-0 z-40 bg-white/95 dark:bg-[#0d1424]/95 backdrop-blur-sm border-b border-slate-200 dark:border-white/10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-3 md:px-4 py-2.5">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
-            <div>
-              <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Leads Manager</h1>
-              <p className="text-slate-600 dark:text-slate-400 text-xs flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                  Total Leads:
-                </span>
-                <span className="font-semibold text-slate-900 dark:text-white">{total}</span>
-              </p>
-            </div>
+      {/* Header with Landing Page Theme */}
+      <div className="flex-shrink-0 sticky top-0 z-40">
+        <div className="relative border-b border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                onClick={() => setShowCreate((s) => !s)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 text-white text-xs font-medium shadow-sm transition-all"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                {showCreate ? "Close" : "Add Lead"}
-              </button>
+          <div className="relative max-w-7xl mx-auto px-3 md:px-4 py-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Leads Manager</h1>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      Total Leads:
+                    </span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{total}</span>
+                  </p>
+                </div>
+              </div>
 
-              <button
-                onClick={() => setShowImport((s) => !s)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-3 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all"
-                title="Upload .xlsx, .xls, or .csv"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-                {showImport ? "Close" : "Import"}
-              </button>
-
-              <button
-                onClick={() => refetch()}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-3 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={busy}
-                title="Refresh"
-              >
-                <svg
-                  className={classNames("w-3.5 h-3.5", busy && "animate-spin")}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setShowCreate((s) => !s)}
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 px-4 py-2 text-white text-sm font-medium shadow-lg shadow-emerald-500/25 transition-all"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  {showCreate ? "Close" : "Add Lead"}
+                </button>
 
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="relative">
-              <svg
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search by name or phone..."
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all outline-none"
-              />
+                <button
+                  onClick={() => setShowImport((s) => !s)}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-emerald-500/30 px-4 py-2 text-slate-700 dark:text-slate-300 text-sm font-medium transition-all"
+                  title="Upload .xlsx, .xls, or .csv"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  {showImport ? "Close" : "Import"}
+                </button>
+
+                <button
+                  onClick={() => refetch()}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-emerald-500/30 px-4 py-2 text-slate-700 dark:text-slate-300 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={busy}
+                  title="Refresh"
+                >
+                  <svg
+                    className={classNames("w-4 h-4", busy && "animate-spin")}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-            <select
-              value={statusFilter || ""}
-              onChange={(e) => setStatusFilter(e.target.value || undefined)}
-              className="px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all outline-none"
-            >
-              <option value="" className="bg-white dark:bg-[#0d1424]">
-                All Statuses
-              </option>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s} className="bg-white dark:bg-[#0d1424]">
-                  {s}
-                </option>
-              ))}
-            </select>
+
+            {/* Message Delay Setting */}
+            <div className="mt-4 flex flex-wrap items-end gap-4">
+              <div className="flex-1 min-w-[200px] max-w-xs">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Delay Between Messages (sec)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="120"
+                    value={messageGapSeconds}
+                    onChange={(e) => setMessageGapSeconds(e.target.value)}
+                    className="flex-1 px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none"
+                  />
+                  <button
+                    onClick={saveMessageGap}
+                    disabled={updatingBroadcast || !agentId}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 px-4 py-2 text-white text-sm font-medium shadow-sm transition-all disabled:opacity-50"
+                  >
+                    {updatingBroadcast ? "Saving..." : "Save"}
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Recommended: 60-180 seconds to avoid rate limits.
+                </p>
+              </div>
+
+              {/* Search and Filter */}
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="relative">
+                  <svg
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search by name or phone..."
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none"
+                  />
+                </div>
+                <select
+                  value={statusFilter || ""}
+                  onChange={(e) => setStatusFilter(e.target.value || undefined)}
+                  className="px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none"
+                >
+                  <option value="" className="bg-white dark:bg-[#0d1424]">
+                    All Statuses
+                  </option>
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s} className="bg-white dark:bg-[#0d1424]">
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -530,7 +591,7 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
         <div className="max-w-7xl mx-auto px-3 md:px-4 py-3">
           <div className="space-y-2">
             {showCreate && (
-              <div className="bg-white dark:bg-[#0d1424] rounded-lg shadow-sm border border-slate-200 dark:border-white/10 p-4">
+              <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 p-4 overflow-hidden">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Add New Lead</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                   <LabeledInput
@@ -575,13 +636,13 @@ export default function LeadsTab({ campaignId, agentId }: { campaignId: string; 
                   <button
                     onClick={onCreate}
                     disabled={creating}
-                    className="rounded-lg bg-emerald-500 hover:bg-emerald-600 px-4 py-1.5 text-white text-xs font-medium shadow-sm transition-all disabled:opacity-50"
+                    className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 px-5 py-2 text-white text-sm font-medium shadow-lg shadow-emerald-500/25 transition-all disabled:opacity-50"
                   >
-                    {creating ? "Creating..." : "Create"}
+                    {creating ? "Creating..." : "Create Lead"}
                   </button>
                   <button
                     onClick={() => setShowCreate(false)}
-                    className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-4 py-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all"
+                    className="rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 px-5 py-2 text-slate-700 dark:text-slate-300 text-sm font-medium transition-all"
                   >
                     Cancel
                   </button>
