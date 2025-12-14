@@ -13,11 +13,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 /* ----------------- Panels ----------------- */
 import TemplatesPanel from "@/components/dashboard/outbound/campaign/template"
 import Overview from "@/components/dashboard/outbound/campaign/overView"
-import LeadsTab from "@/components/dashboard/outbound/campaign/leads"
-import BroadcastSettingsPanel from "@/components/dashboard/outbound/campaign/broadcast"
+import BroadcastTab from "@/components/dashboard/outbound/campaign/broadcast"
+import BroadcastSettingsPanel from "@/components/dashboard/outbound/campaign/broadcast-settings"
 
 /* ----------------- Outbound Broadcast feature ----------------- */
-import { useBroadcastStatus } from "@/app/features/outbound-broadcast"
+import { useBroadcastStatus } from "@/app/features/outbound-broadcast-settings"
 import MessagesTab from "@/components/dashboard/outbound/campaign/messages"
 
 export default function CampaignPage() {
@@ -185,10 +185,7 @@ export default function CampaignPage() {
               </button>
 
               {/* Backend info - hidden on mobile, compact on desktop */}
-              <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-white/5 px-3 py-2 rounded-full border border-slate-200 dark:border-white/10">
-                <Server className="h-3 w-3" />
-                <code className="text-[11px]">{process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "localhost:3000"}</code>
-              </div>
+
             </div>
           </div>
         </div>
@@ -213,14 +210,14 @@ export default function CampaignPage() {
                 value="broadcastSettings"
                 className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25"
               >
-                Broadcast
+                Broadcast Settings
               </TabsTrigger>
               <TabsTrigger
                 value="leads"
                 disabled={!campaignId}
                 className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 disabled:opacity-50"
               >
-                Leads
+                Broadcast
               </TabsTrigger>
               <TabsTrigger
                 value="messages"
@@ -264,7 +261,7 @@ export default function CampaignPage() {
 
           <TabsContent value="leads" className="mt-4">
             {campaignId ? (
-              <LeadsTab campaignId={campaignId} agentId={agentId} />
+              <BroadcastTab campaignId={campaignId} agentId={agentId} />
             ) : (
               <div className="rounded-2xl border border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 p-6">
                 <h3 className="font-semibold text-rose-800 dark:text-rose-300 mb-2">Missing parameters</h3>

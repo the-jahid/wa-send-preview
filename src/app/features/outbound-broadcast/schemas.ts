@@ -1,89 +1,119 @@
 // src/app/features/outbound-broadcast/schemas.ts
 import { z } from 'zod';
+import type {
+  OutboundLeadStatus,
+  OutboundLeadSortBy,
+  SortOrder,
+  IOutboundLead,
+  QueryOutboundLeadsInput,
+} from './types';
 
-/* -----------------------------------------------------------------------------
- * Status enum (mirrors server)
- * ---------------------------------------------------------------------------*/
-export const BroadcastStatusEnum = z.enum([
-  'DRAFT',
-  'READY',
-  'RUNNING',
-  'PAUSED',
-  'COMPLETED',
-  'CANCELLED',
-]);
-export type BroadcastStatus = z.infer<typeof BroadcastStatusEnum>;
+// ----------------- Helpers -----------------
+export const UUID_ANY = z
+  .string()
+  .trim()
+  // accetta qualsiasi versione UUID
+  .regex(
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    'Invalid UUID',
+  );
 
-/* -----------------------------------------------------------------------------
- * Update settings payload (frontend -> backend)
- * - Coerce numbers so UI string inputs won't 400 the API.
- * - startAt supports ISO string, Date, or null (clear).
- * - Uses single gap control: messageGapSeconds (0..86400), default 120 on server.
- * ---------------------------------------------------------------------------*/
-export const UpdateOutboundBroadcastSettingsSchema = z
-  .object({
-    // toggles
-    isEnabled: z.boolean().optional(),
-    isPaused: z.boolean().optional(),
+export const Phone = z
+  .string()
+  .trim()
+  .min(6, 'phoneNumber is too short')
+  .max(20, 'phoneNumber is too long')
+  .regex(/^\+?[0-9]{6,20}$/, 'phoneNumber must be digits with optional leading +');
 
-    // scheduling
-    startAt: z.union([z.string(), z.date(), z.null()]).optional(),
+export const FirstName = z.string().trim().min(1).max(120);
 
-    // single-message cadence (seconds)
-    messageGapSeconds: z.coerce.number().int().min(0).max(86_400).optional(),
-
-    // template
-    selectedTemplateId: z.string().uuid().nullable().optional(),
-
-    // manual status override (server rejects COMPLETED here)
-    status: BroadcastStatusEnum.optional(),
-  })
-  .strict();
-
-export type UpdateOutboundBroadcastSettingsInput = z.infer<
-  typeof UpdateOutboundBroadcastSettingsSchema
->;
-
-/* -----------------------------------------------------------------------------
- * GET /outbound-broadcast/campaigns/:campaignId/status response
- * ---------------------------------------------------------------------------*/
-export const CampaignSchema = z.object({
-  id: z.string().uuid(),
-  agentId: z.string().uuid(),
-  status: z.enum(['DRAFT', 'SCHEDULED', 'RUNNING', 'COMPLETED', 'CANCELLED']),
+// ----------------- Request Schemas -----------------
+export const CreateOutboundLeadSchema = z.object({
+  phoneNumber: Phone,
+  firstName: FirstName,
+  timeZone: z.string().trim().min(1).max(64).optional(),
+  status: z.string().optional() as unknown as z.ZodType<OutboundLeadStatus | undefined>,
+  maxAttempts: z.coerce.number().int().min(1).max(10).optional(),
+  // FIX: z.record richiede keySchema + valueSchema
+  customFields: z.record(z.string(), z.any()).optional(),
 });
+export type CreateOutboundLeadInput = z.infer<typeof CreateOutboundLeadSchema>;
 
-export const BroadcastSnapshotSchema = z.object({
-  id: z.string().uuid(),
-  isEnabled: z.boolean(),
-  isPaused: z.boolean(),
-  status: BroadcastStatusEnum,
+export const UpdateOutboundLeadSchema = z.object({
+  phoneNumber: Phone.optional(),
+  firstName: FirstName.optional(),
+  timeZone: z.string().trim().min(1).max(64).optional(),
+  status: z.string().optional() as unknown as z.ZodType<OutboundLeadStatus | undefined>,
+  maxAttempts: z.coerce.number().int().min(1).max(10).optional(),
+  // FIX: usa record(key, value) anche nel union
+  customFields: z.union([z.record(z.string(), z.any()), z.null()]).optional(),
+});
+export type UpdateOutboundLeadInput = z.infer<typeof UpdateOutboundLeadSchema>;
 
-  // single-gap field (seconds)
-  messageGapSeconds: z.number().int().min(0).max(86_400).nullable().optional(),
+export const SetLeadStatusSchema = z.object({
+  status: z.string() as unknown as z.ZodType<OutboundLeadStatus>,
+});
+export type SetLeadStatusInput = z.infer<typeof SetLeadStatusSchema>;
 
-  // template + metrics
-  selectedTemplateId: z.string().uuid().nullable().optional(),
-  totalQueued: z.number().nullable().optional(),
-  totalSent: z.number().nullable().optional(),
-  totalFailed: z.number().nullable().optional(),
+export const RecordAttemptSchema = z.object({
+  attemptsIncrement: z.coerce.number().int().min(1).max(10).default(1).optional(),
+  lastAttemptAt: z.coerce.date().optional(),
+});
+export type RecordAttemptInput = z.infer<typeof RecordAttemptSchema>;
 
-  // scheduling & timestamps
-  startAt: z.string().datetime().nullable(),
+export const UpsertCustomFieldsSchema = z.object({
+  mode: z.enum(['merge', 'replace']).default('merge').optional(),
+  // FIX: record(key, value)
+  data: z.record(z.string(), z.any()),
+});
+export type UpsertCustomFieldsInput = z.infer<typeof UpsertCustomFieldsSchema>;
+
+// ----------------- Query Schema -----------------
+const StatusOneOrMany = z.union([z.string(), z.array(z.string()).nonempty()]).optional();
+
+export const QueryOutboundLeadsSchema = z
+  .object({
+    page: z.coerce.number().int().min(1).default(1).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(20).optional(),
+    status: StatusOneOrMany,
+    q: z.string().trim().min(1).max(120).optional(),
+    createdFrom: z.coerce.date().optional(),
+    createdTo: z.coerce.date().optional(),
+    lastAttemptFrom: z.coerce.date().optional(),
+    lastAttemptTo: z.coerce.date().optional(),
+    sortBy: z
+      .enum(['createdAt', 'lastAttemptAt', 'status', 'phoneNumber', 'firstName'] as [
+        OutboundLeadSortBy,
+        ...OutboundLeadSortBy[],
+      ])
+      .default('createdAt')
+      .optional(),
+    sortOrder: z.enum(['asc', 'desc'] as [SortOrder, SortOrder]).default('desc').optional(),
+  })
+  .refine((d) => !(d.createdFrom && d.createdTo) || d.createdFrom <= d.createdTo, {
+    message: 'createdFrom must be <= createdTo',
+    path: ['createdFrom'],
+  })
+  .refine((d) => !(d.lastAttemptFrom && d.lastAttemptTo) || d.lastAttemptFrom <= d.lastAttemptTo, {
+    message: 'lastAttemptFrom must be <= lastAttemptTo',
+    path: ['lastAttemptFrom'],
+  });
+
+export type SafeQueryOutboundLeadsInput = z.infer<typeof QueryOutboundLeadsSchema>;
+
+// ----------------- Response Schema (facoltativo) -----------------
+export const OutboundLeadResponseSchema: z.ZodType<IOutboundLead> = z.object({
+  id: UUID_ANY,
+  phoneNumber: Phone,
+  firstName: z.string().nullable(),
+  timeZone: z.string(),
+  status: z.string(),
+  attemptsMade: z.number().int(),
+  maxAttempts: z.number().int(),
+  lastAttemptAt: z.string().datetime().nullable(),
+  outboundCampaignId: UUID_ANY,
+  // FIX: record(key, value)
+  customFields: z.record(z.string(), z.any()).nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
-
-export const CountersSchema = z.object({
-  queued: z.number(),
-  retry: z.number(),
-  inprog: z.number(),
-});
-
-export const CampaignStatusResponseSchema = z.object({
-  campaign: CampaignSchema,
-  broadcast: BroadcastSnapshotSchema.nullable().optional(),
-  counters: CountersSchema,
-});
-
-export type CampaignStatusResponse = z.infer<typeof CampaignStatusResponseSchema>;

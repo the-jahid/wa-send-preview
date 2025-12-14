@@ -32,7 +32,7 @@ import {
   useBroadcastStatus,
   useSetBroadcastTemplate,
   useClearBroadcastTemplate,
-} from "@/app/features/outbound-broadcast"
+} from "@/app/features/outbound-broadcast-settings"
 
 import {
   CreateTemplateSchema,

@@ -1,180 +1,185 @@
 // src/app/features/outbound-broadcast/apis.ts
-import type {
-  CampaignStatusResponse,
-  PauseCampaignResponse,
-  ResumeCampaignResponse,
-  StartCampaignResponse,
-  UpdateBroadcastSettingsBody,
-  UpdateBroadcastSettingsResponse,
-} from './types';
-import type { TokenGetter } from '@/lib/api-token-provider';
+import { z } from 'zod';
+import type { IOutboundLead, Paginated, QueryOutboundLeadsInput } from './types';
+import {
+  CreateOutboundLeadSchema,
+  UpdateOutboundLeadSchema,
+  SetLeadStatusSchema,
+  RecordAttemptSchema,
+  UpsertCustomFieldsSchema,
+  QueryOutboundLeadsSchema,
+  OutboundLeadResponseSchema,
+} from './schemas';
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_API_URL?.replace(/\/$/, '') ??
-  'http://localhost:3000';
+// --- BASE: include /api if your Nest has a global prefix ---
+const RAW_BASE = process.env.NEXT_PUBLIC_BACKEND_API_URL ?? '';
+const BASE = RAW_BASE.replace(/\/+$/, ''); // strip trailing slashes
 
-/* ------------------------------ fetch helper ------------------------------ */
+type FetchOpts = {
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  token?: string | null;
+  body?: unknown;
+  query?: Record<string, any>;
+};
 
-async function authFetch<T = any>(
-  getToken: TokenGetter,
-  input: RequestInfo | URL,
-  init: RequestInit = {}
-): Promise<T> {
-  // get Clerk token; may be null
-  let token: string | null = null;
-  try {
-    token = await getToken();
-  } catch {
-    token = null;
+function buildQS(query?: Record<string, any>) {
+  if (!query) return '';
+  const qs = new URLSearchParams();
+  const append = (k: string, v: any) => {
+    if (v === undefined || v === null || v === '') return;
+    if (Array.isArray(v)) v.forEach((item) => append(k, item));
+    else if (v instanceof Date) qs.append(k, v.toISOString());
+    else qs.append(k, String(v));
+  };
+  Object.entries(query).forEach(([k, v]) => append(k, v));
+  const s = qs.toString();
+  return s ? `?${s}` : '';
+}
+
+async function apiFetch<T>(path: string, opts: FetchOpts = {}): Promise<T> {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const url = `${BASE}${cleanPath}${buildQS(opts.query)}`;
+
+  const headers: Record<string, string> = { Accept: 'application/json' };
+  if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+  if (opts.token) headers['Authorization'] = `Bearer ${opts.token}`;
+
+  const res = await fetch(url, {
+    method: opts.method ?? 'GET',
+    headers,
+    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+    credentials: 'include',
+  });
+
+  const ct = res.headers.get('content-type') ?? '';
+  const isJson = ct.includes('application/json');
+  const text = await res.text();
+
+  let json: any = undefined;
+  if (isJson && text) {
+    try {
+      json = JSON.parse(text);
+    } catch {
+      // if server lies about content-type, fall back to text
+      json = undefined;
+    }
   }
-
-  const headers = new Headers(init.headers || {});
-  headers.set('Accept', 'application/json');
-  if (init.body && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-  if (token) headers.set('Authorization', `Bearer ${token}`);
-
-  const res = await fetch(input, { ...init, headers });
 
   if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    try {
-      // Try JSON error first
-      const data = await res.json();
-      msg =
-        (Array.isArray(data?.message)
-          ? data.message.join(', ')
-          : data?.message) ||
-        data?.error ||
-        msg;
-    } catch {
-      // Fallback to text body
-      try {
-        const text = await res.text();
-        if (text) msg = text;
-      } catch {
-        /* ignore */
-      }
-    }
-    throw new Error(msg);
+    // Prefer JSON message when possible; otherwise, show a short HTML snippet
+    const msg =
+      (json && (json.message || json.error || json.msg)) ||
+      (text?.startsWith('<') ? `HTTP ${res.status} ${res.statusText} — non-JSON response` : text) ||
+      `HTTP ${res.status} ${res.statusText}`;
+
+    // Extra hint when HTML came back (e.g., wrong base URL/prefix)
+    const hint = text?.startsWith('<')
+      ? 'Tip: check NEXT_PUBLIC_API_BASE_URL (and /api prefix). The endpoint likely returned an HTML 404.'
+      : '';
+
+    throw new Error(hint ? `${msg}. ${hint}` : msg);
   }
 
-  if (res.status === 204) return null as T;
-
-  const ct = res.headers.get('content-type') || '';
-  return (ct.includes('application/json') ? res.json() : res.text()) as Promise<T>;
-}
-
-/* -------------------------- small payload normalizer -------------------------- */
-/** Preserve explicit null for startAt (so BE can clear it), and ISO-ify Date */
-function normalizeUpdatePayload(body: UpdateBroadcastSettingsBody) {
-  const out: Record<string, unknown> = { ...body };
-  if (Object.prototype.hasOwnProperty.call(body, 'startAt')) {
-    const v = body.startAt;
-    out.startAt =
-      v === null ? null : v instanceof Date ? v.toISOString() : v;
+  if (!isJson) {
+    throw new Error('Server returned non-JSON payload for a JSON endpoint.');
   }
-  return out;
+
+  return json as T;
 }
 
-/* -------------------------------- Endpoints -------------------------------- */
+// ----------------- API calls (unchanged below) -----------------
 
-export async function apiStartBroadcast(
-  getToken: TokenGetter,
-  agentId: string,
-  campaignId: string
-): Promise<StartCampaignResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}/start`;
-  return authFetch(getToken, url, { method: 'POST' });
-}
-
-export async function apiPauseBroadcast(
-  getToken: TokenGetter,
-  agentId: string,
-  campaignId: string
-): Promise<PauseCampaignResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}/pause`;
-  return authFetch(getToken, url, { method: 'POST' });
-}
-
-export async function apiResumeBroadcast(
-  getToken: TokenGetter,
-  agentId: string,
-  campaignId: string
-): Promise<ResumeCampaignResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}/resume`;
-  return authFetch(getToken, url, { method: 'POST' });
-}
-
-export async function apiUpdateBroadcastSettings(
-  getToken: TokenGetter,
-  agentId: string,
+export async function listOutboundCampaignLeads(
   campaignId: string,
-  body: UpdateBroadcastSettingsBody
-): Promise<UpdateBroadcastSettingsResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}/settings`;
-  const normalized = normalizeUpdatePayload(body);
-  return authFetch(getToken, url, {
+  input: QueryOutboundLeadsInput,
+  token?: string | null,
+): Promise<Paginated<IOutboundLead>> {
+  const safe = QueryOutboundLeadsSchema.parse(input);
+  const payload = await apiFetch<Paginated<IOutboundLead>>(
+    `/outbound-campaigns/${campaignId}/leads`,
+    { method: 'GET', token, query: safe as any },
+  );
+  if (Array.isArray(payload?.data) && payload.data[0]) {
+    OutboundLeadResponseSchema.parse(payload.data[0]);
+  }
+  return payload;
+}
+
+export async function createOutboundLead(
+  campaignId: string,
+  body: z.infer<typeof CreateOutboundLeadSchema>,
+  token?: string | null,
+): Promise<IOutboundLead> {
+  const dto = CreateOutboundLeadSchema.parse(body);
+  const payload = await apiFetch<IOutboundLead>(
+    `/outbound-campaigns/${campaignId}/leads`,
+    { method: 'POST', token, body: dto },
+  );
+  return OutboundLeadResponseSchema.parse(payload);
+}
+
+export async function getLead(id: string, token?: string | null): Promise<IOutboundLead> {
+  const payload = await apiFetch<IOutboundLead>(`/leads/${id}`, { method: 'GET', token });
+  return OutboundLeadResponseSchema.parse(payload);
+}
+
+export async function updateLead(
+  id: string,
+  body: z.infer<typeof UpdateOutboundLeadSchema>,
+  token?: string | null,
+): Promise<IOutboundLead> {
+  const dto = UpdateOutboundLeadSchema.parse(body);
+  const payload = await apiFetch<IOutboundLead>(`/leads/${id}`, {
     method: 'PATCH',
-    body: JSON.stringify(normalized),
+    token,
+    body: dto,
   });
+  return OutboundLeadResponseSchema.parse(payload);
 }
 
-/** GET status (agent-agnostic route) */
-export async function apiGetBroadcastStatus(
-  getToken: TokenGetter,
-  campaignId: string
-): Promise<CampaignStatusResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/campaigns/${campaignId}/status`;
-  return authFetch(getToken, url, { method: 'GET' });
+export async function deleteLead(id: string, token?: string | null): Promise<IOutboundLead> {
+  const payload = await apiFetch<IOutboundLead>(`/leads/${id}`, { method: 'DELETE', token });
+  return OutboundLeadResponseSchema.parse(payload);
 }
 
-/** GET campaign overview with agent path (alias of status, validates path params) */
-export async function apiGetCampaignOverview(
-  getToken: TokenGetter,
-  agentId: string,
-  campaignId: string
-): Promise<CampaignStatusResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}`;
-  return authFetch(getToken, url, { method: 'GET' });
+export async function setLeadStatus(
+  id: string,
+  body: z.infer<typeof SetLeadStatusSchema>,
+  token?: string | null,
+): Promise<IOutboundLead> {
+  const dto = SetLeadStatusSchema.parse(body);
+  const payload = await apiFetch<IOutboundLead>(`/leads/${id}/status`, {
+    method: 'PATCH',
+    token,
+    body: dto,
+  });
+  return OutboundLeadResponseSchema.parse(payload);
 }
 
-/** One-off cron trigger (useful in Postman/testing) */
-export async function apiRunCronOnce(
-  getToken: TokenGetter
-): Promise<{ ok: true }> {
-  const url = `${BASE_URL}/outbound-broadcast/cron/run-once`;
-  return authFetch(getToken, url, { method: 'POST' });
+export async function recordLeadAttempt(
+  id: string,
+  body: z.infer<typeof RecordAttemptSchema>,
+  token?: string | null,
+): Promise<IOutboundLead> {
+  const dto = RecordAttemptSchema.parse(body);
+  const payload = await apiFetch<IOutboundLead>(`/leads/${id}/record-attempt`, {
+    method: 'PATCH',
+    token,
+    body: dto,
+  });
+  return OutboundLeadResponseSchema.parse(payload);
 }
 
-/* ------------------------- Template convenience APIs ------------------------ */
-/** Use the dedicated endpoints we added in the controller for template picking. */
-
-export async function apiSetBroadcastTemplate(
-  getToken: TokenGetter,
-  agentId: string,
-  campaignId: string,
-  templateId: string
-): Promise<UpdateBroadcastSettingsResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}/template/${templateId}`;
-  return authFetch(getToken, url, { method: 'PUT' });
-}
-
-export async function apiClearBroadcastTemplate(
-  getToken: TokenGetter,
-  agentId: string,
-  campaignId: string
-): Promise<UpdateBroadcastSettingsResponse> {
-  const url = `${BASE_URL}/outbound-broadcast/agents/${agentId}/campaigns/${campaignId}/template`;
-  return authFetch(getToken, url, { method: 'DELETE' });
-}
-
-/* --------------------------------- Health ---------------------------------- */
-
-export async function apiOutboundBroadcastHealth(
-  getToken: TokenGetter
-): Promise<{ ok: boolean; service: string }> {
-  const url = `${BASE_URL}/outbound-broadcast/health`;
-  return authFetch(getToken, url, { method: 'GET' });
+export async function upsertLeadCustomFields(
+  id: string,
+  body: z.infer<typeof UpsertCustomFieldsSchema>,
+  token?: string | null,
+): Promise<IOutboundLead> {
+  const dto = UpsertCustomFieldsSchema.parse(body);
+  const payload = await apiFetch<IOutboundLead>(`/leads/${id}/custom-fields`, {
+    method: 'PATCH',
+    token,
+    body: dto,
+  });
+  return OutboundLeadResponseSchema.parse(payload);
 }
