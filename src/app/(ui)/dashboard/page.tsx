@@ -168,22 +168,19 @@ export default function OverviewPage() {
 
   /* -------------------------- UI -------------------------- */
   return (
-    <div className="h-full overflow-auto bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="h-full overflow-auto bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300 relative">
+      {/* Background Decoration - Right Middle Circle */}
+      <div className="fixed top-1/2 right-0 translate-x-1/3 -translate-y-1/2 w-[300px] h-[300px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none z-0" />
+
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 relative z-10">
         {/* Header - Landing Page Style */}
-        <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-6 overflow-hidden">
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <Bot className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Monitor your agents and campaigns at a glance
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Monitor your agents and campaigns at a glance
+              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -202,7 +199,7 @@ export default function OverviewPage() {
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all disabled:opacity-50"
+                className="px-5 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300 disabled:opacity-50"
               >
                 {isRefreshing ? "Refreshing…" : "Refresh"}
               </button>
@@ -213,7 +210,7 @@ export default function OverviewPage() {
         {/* Stats Cards - Landing Page Style */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Total Agents */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-5 hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Agents</span>
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
@@ -233,7 +230,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Active Status */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-5 hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Active Status</span>
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-sm shadow-cyan-500/25">
@@ -256,7 +253,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Campaigns */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-5 hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Campaigns</span>
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shadow-sm shadow-violet-500/25">
@@ -278,7 +275,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Providers */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-5 hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Providers</span>
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm shadow-amber-500/25">
@@ -302,7 +299,7 @@ export default function OverviewPage() {
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Recent Agents */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
@@ -338,7 +335,7 @@ export default function OverviewPage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">No agents created yet</p>
                   <Link
                     href="/dashboard/agents"
-                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300"
                   >
                     Create Your First Agent
                   </Link>
@@ -385,7 +382,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Outbound Campaigns */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shadow-sm shadow-violet-500/25">
@@ -410,7 +407,7 @@ export default function OverviewPage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Create an agent to start campaigns</p>
                   <Link
                     href="/dashboard/agents"
-                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300"
                   >
                     Create Agent
                   </Link>
@@ -445,7 +442,7 @@ export default function OverviewPage() {
                   </p>
                   <Link
                     href="/dashboard/outbound"
-                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300"
                   >
                     Create Campaign
                   </Link>
@@ -490,7 +487,7 @@ export default function OverviewPage() {
 
         {/* Configuration Overview */}
         {providers.length > 0 || memoryTypes.length > 0 ? (
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm shadow-amber-500/25">

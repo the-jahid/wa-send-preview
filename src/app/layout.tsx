@@ -124,7 +124,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="dark">
+      <body>
         <ClerkProvider>
           <ApiTokenProvider>
             {/* No dehydration state yet; add later if you do server prefetch */}

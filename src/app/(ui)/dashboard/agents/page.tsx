@@ -72,25 +72,19 @@ export default function AgentsTabsPage() {
     <QueryClientProvider client={qc}>
       <main className="mx-auto max-w-7xl p-6 bg-slate-50 dark:bg-[#0a0f1a] min-h-screen transition-colors duration-300">
         {/* Header - Landing Page Style */}
-        <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 mb-6 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 mb-6 overflow-hidden">
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <Bot className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Agents</h1>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Manage and configure your AI agents
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Agents</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Manage and configure your AI agents
+              </p>
             </div>
 
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+              className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all"
             >
               {isDark ? (
                 <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
@@ -104,7 +98,7 @@ export default function AgentsTabsPage() {
         <OverviewTab />
       </main>
       <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    </QueryClientProvider >
   )
 }
 

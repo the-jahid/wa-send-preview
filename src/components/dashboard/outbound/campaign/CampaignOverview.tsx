@@ -89,8 +89,8 @@ export default function Overview({ agentId, campaignId }: OverviewProps) {
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden transition-colors">
       {/* Header with gradient */}
-      <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
+      <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 dark:via-[#0d1424]">
+
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">

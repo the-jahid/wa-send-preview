@@ -99,3 +99,27 @@ export function useDeleteLead(
     ...opts?.mutation,
   });
 }
+
+/** -------- MUTATION: Create lead -------- */
+import { createLead, type CreateLeadPayload } from './apis';
+
+export function useCreateLead(
+  opts?: WithToken & {
+    mutation?: UseMutationOptions<Lead, Error, CreateLeadPayload>;
+  }
+) {
+  const qc = useQueryClient();
+
+  return useMutation<Lead, Error, CreateLeadPayload>({
+    mutationFn: (payload) => createLead(payload, { token: opts?.token }),
+    onSuccess: (created) => {
+      // Invalidate lists
+      qc.invalidateQueries({ queryKey: leadKeys.lists() });
+      if (created.agentId) {
+        qc.invalidateQueries({ queryKey: leadKeys.byAgent(created.agentId) });
+      }
+    },
+    ...opts?.mutation,
+  });
+}
+

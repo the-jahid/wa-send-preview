@@ -149,7 +149,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
 
           <button
             onClick={() => setShowCreate(true)}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 inline-flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -241,83 +241,69 @@ function AgentCard({ agent }: { agent: Agent }) {
   return (
     <Link
       href={`/dashboard/agents/${agent.id}`}
-      className="group relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] text-left p-5 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 cursor-pointer"
+      className="group relative rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 p-5 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 cursor-pointer shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-none"
     >
-      <div className="relative h-full flex flex-col">
-        <div className="flex items-start gap-4 mb-4">
-          <div className="relative">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            {agent.isActive && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0d1424] shadow-sm" />
-            )}
-          </div>
+      {/* Green shadow decoration */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-slate-900 dark:text-white truncate mb-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-              {agent.name}
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${agent.isActive
-                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
-                : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400"
-                }`}>
-                {agent.isActive ? "Active" : "Inactive"}
-              </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20">
-                {badge}
-              </span>
-            </div>
-          </div>
+      <div className="relative h-full flex flex-col gap-4">
+        {/* Agent Name */}
+        <h3 className="font-semibold text-lg text-slate-900 dark:text-white truncate">
+          {agent.name}
+        </h3>
+
+        {/* Status Badges */}
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${agent.isActive
+            ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+            : "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+            }`}>
+            {agent.isActive ? "Active" : "Inactive"}
+          </span>
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            {badge}
+          </span>
         </div>
 
-        <div className="space-y-3 flex-1 mt-2">
-          <div className="flex items-center gap-2 text-xs">
-            <div className="h-6 w-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center">
-              <svg
-                className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                />
-              </svg>
-            </div>
-            <span className="text-slate-900 dark:text-white font-medium">{provider}</span>
-            <span className="text-slate-300 dark:text-slate-600">•</span>
-            <span className="text-slate-500 dark:text-slate-400 truncate" title={String(model)}>
-              {model}
-            </span>
+        {/* Provider Info */}
+        <div className="flex items-center gap-2 text-sm">
+          <div className="h-5 w-5 rounded flex items-center justify-center">
+            <svg
+              className="w-4 h-4 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+              />
+            </svg>
           </div>
+          <span className="text-slate-200 font-medium">{provider}</span>
+          <span className="text-slate-600">•</span>
+          <span className="text-slate-500 truncate" title={String(model)}>
+            {model}
+          </span>
+        </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <div className="h-6 w-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <span>{new Date(agent.createdAt).toLocaleDateString()}</span>
-            <span className="text-slate-300 dark:text-slate-600">•</span>
-            <span>History: {agent.historyLimit ?? 0}</span>
+        {/* Date and History */}
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="h-4 w-4 rounded flex items-center justify-center">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
           </div>
+          <span>{new Date(agent.createdAt).toLocaleDateString()}</span>
+          <span className="text-slate-600">•</span>
+          <span>History: {agent.historyLimit ?? 0}</span>
         </div>
       </div>
     </Link>
@@ -401,7 +387,6 @@ function CreateAgentModal({
       <div className="relative z-[101] w-full max-w-2xl rounded-2xl bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Modal Header */}
         <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
@@ -510,9 +495,17 @@ function CreateAgentModal({
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center gap-2"
+              className="px-6 py-2.5 rounded-xl backdrop-blur-2xl text-white dark:text-slate-100 font-semibold shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] hover:shadow-[0_8px_40px_0_rgba(0,0,0,0.2)] transition-all duration-500 ease-out group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={create.isPending}
+              style={{
+                background: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                border: "1px solid rgba(16, 185, 129, 0.25)",
+                boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)"
+              }}
             >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               {create.isPending ? (
                 <>
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

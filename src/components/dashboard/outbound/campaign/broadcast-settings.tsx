@@ -93,18 +93,14 @@ export default function BroadcastSettingsPanel({
   }
 
   return (
-    <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 overflow-hidden transition-colors">
+    <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden transition-colors">
       {/* Decorative blur effect */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <Radio className="h-6 w-6 text-white" />
-            </div>
+
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">Broadcast</h2>
@@ -139,7 +135,7 @@ export default function BroadcastSettingsPanel({
             <Button
               disabled={!canStartNow || start.isPending || isLoading}
               onClick={() => start.mutate()}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:shadow-none rounded-full px-6 h-10 transition-all"
+              className="bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 disabled:opacity-50 disabled:shadow-none rounded-full px-6 h-10 transition-all"
             >
               {start.isPending ? (
                 <>
@@ -203,7 +199,7 @@ export default function BroadcastSettingsPanel({
             <Button
               onClick={save}
               disabled={update.isPending || isLoading || Object.keys(payload).length === 0}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:shadow-none rounded-full px-6 transition-all"
+              className="bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 disabled:opacity-50 disabled:shadow-none rounded-full px-6 transition-all"
             >
               {update.isPending ? (
                 <>

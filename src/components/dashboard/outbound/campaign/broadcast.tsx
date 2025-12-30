@@ -451,8 +451,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1a] p-6 transition-colors duration-300">
         <div className="max-w-2xl mx-auto">
-          <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 p-8 overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-8 overflow-hidden">
             <div className="text-center space-y-4 relative">
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/25">
                 <svg
@@ -513,11 +512,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
             {/* Top Row: Title & Actions */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
+
                 <div>
                   <h1 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Leads Manager</h1>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -557,7 +552,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
 
                 <button
                   onClick={() => setShowCreate((s) => !s)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 px-2.5 py-1.5 text-white text-xs font-medium shadow-sm transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-md px-2.5 py-1.5 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/30 text-xs font-semibold shadow-sm transition-all"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -610,7 +605,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                 <button
                   onClick={saveMessageGap}
                   disabled={updatingBroadcast || !effectiveAgentId}
-                  className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:underline disabled:opacity-50 disabled:no-underline"
+                  className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:underline disabled:opacity-50 disabled:no-underline px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all"
                 >
                   Save
                 </button>
@@ -620,7 +615,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                 <button
                   onClick={bulkDelete}
                   disabled={isDeletingBulk}
-                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 px-3 py-1.5 text-white text-xs font-medium shadow-sm transition-all animate-in fade-in zoom-in duration-200 disabled:opacity-50"
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 backdrop-blur-md px-3 py-1.5 text-rose-700 dark:text-rose-400 border border-rose-500/20 hover:border-rose-500/30 text-xs font-semibold shadow-sm transition-all animate-in fade-in zoom-in duration-200 disabled:opacity-50"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

@@ -5,6 +5,7 @@ export const LeadSchema = z.object({
   id: z.string().uuid(),
   status: z.string(),                 // backend enforces enum
   source: z.string().nullable(),
+  senderPhone: z.string().nullable(),
   // FIX: provide both key & value schemas
   data: z.record(z.string(), z.any()).nullable(),
   agentId: z.string().uuid(),

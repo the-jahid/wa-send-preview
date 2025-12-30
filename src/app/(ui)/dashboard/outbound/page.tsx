@@ -281,7 +281,9 @@ export default function OutboundListPage() {
     )
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+    <div className="flex flex-col h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300 relative overflow-hidden">
+      {/* Page Background Decoration */}
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none translate-x-1/3 -translate-y-1/4 z-20" />
       {/* Toast Notification */}
       {toast && (
         <div
@@ -296,8 +298,8 @@ export default function OutboundListPage() {
       <div className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0f1a]/95 backdrop-blur-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4">
           {/* Main Header Card */}
-          <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 mb-4 overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 mb-4 overflow-hidden">
+
             <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
@@ -313,6 +315,7 @@ export default function OutboundListPage() {
 
               <div className="flex items-center gap-3">
                 {/* Agent Selector */}
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Select Agent</span>
                 {agentsLoading ? (
                   <div className="h-10 w-52 bg-slate-200 dark:bg-white/10 animate-pulse rounded-xl" />
                 ) : (
@@ -369,7 +372,7 @@ export default function OutboundListPage() {
               </div>
               <button
                 onClick={() => setOpenCreate(true)}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm border border-emerald-500/50 hover:border-emerald-400 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-semibold transition-all flex items-center justify-center gap-2"
               >
                 <Plus className="h-4 w-4" />
                 New Campaign
@@ -441,7 +444,7 @@ export default function OutboundListPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {/* Create Campaign Card */}
             <div
-              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/20 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[180px] group bg-white dark:bg-[#0d1424]"
+              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700/50 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[180px] group bg-white dark:bg-slate-800/30 backdrop-blur-sm"
               onClick={() => setOpenCreate(true)}
             >
               <div className="p-6 flex flex-col items-center justify-center">
@@ -473,7 +476,7 @@ export default function OutboundListPage() {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get started by creating your first campaign</p>
                 <button
                   onClick={() => setOpenCreate(true)}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 inline-flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm border border-emerald-500/50 hover:border-emerald-400 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold transition-all inline-flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   Create Campaign
@@ -666,13 +669,13 @@ function CampaignCard({
     if ((e.target as HTMLElement).closest("button") || (e.target as HTMLElement).closest("a[href]")) {
       return
     }
-    router.push(`/dashboard/outbound/${campaign.id}/campaign${agentId ? `?agentId=${agentId}` : ""}`)
+    router.push(`/dashboard/outbound/${campaign.id}/campaign?tab=leads${agentId ? `&agentId=${agentId}` : ""}`)
   }
 
   return (
     <div
       onClick={handleCardClick}
-      className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-200 min-h-[180px] relative group cursor-pointer"
+      className="rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 backdrop-blur-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 min-h-[180px] relative group cursor-pointer shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-none overflow-hidden"
     >
       <div className="p-5">
         <div className="flex justify-between items-start gap-2 mb-4">
@@ -693,7 +696,7 @@ function CampaignCard({
             {menuOpen && (
               <div className="absolute right-0 top-9 w-44 bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl dark:shadow-2xl z-20 py-1 overflow-hidden">
                 <Link
-                  href={{ pathname: `/dashboard/outbound/${campaign.id}/campaign`, query: { agentId } }}
+                  href={{ pathname: `/dashboard/outbound/${campaign.id}/campaign`, query: { tab: 'leads', agentId } }}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 no-underline transition-colors"
                   onClick={(e) => {
                     e.stopPropagation()
