@@ -8,8 +8,8 @@ import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "WA Send - AI-Powered WhatsApp Automation Platform",
-    template: "%s | WA Send"
+    default: "Wapzen - AI-Powered WhatsApp Automation Platform",
+    template: "%s | Wapzen"
   },
   description: "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, lead capture, CRM integration, and unlimited messaging for just $20/month. Increase conversions by 300%.",
   keywords: [
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     "customer engagement",
     "marketing automation"
   ],
-  authors: [{ name: "WA Send Team" }],
-  creator: "WA Send",
-  publisher: "WA Send",
+  authors: [{ name: "Wapzen Team" }],
+  creator: "Wapzen",
+  publisher: "Wapzen",
   robots: {
     index: true,
     follow: true,
@@ -44,28 +44,28 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://wasend.com",
-    siteName: "WA Send",
-    title: "WA Send - AI-Powered WhatsApp Automation Platform",
+    url: "https://wapzen.io",
+    siteName: "Wapzen",
+    title: "Wapzen - AI-Powered WhatsApp Automation Platform",
     description: "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, lead capture, and CRM integration. Start for just $20/month.",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://i.ibb.co.com/7dhtvq1m/wapzen-title-edited.png",
         width: 1200,
         height: 630,
-        alt: "WA Send - WhatsApp Automation Platform",
+        alt: "Wapzen - WhatsApp Automation Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "WA Send - AI-Powered WhatsApp Automation",
+    title: "Wapzen - AI-Powered WhatsApp Automation",
     description: "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, and lead capture.",
-    images: ["/twitter-image.png"],
-    creator: "@wasend",
+    images: ["https://i.ibb.co.com/7dhtvq1m/wapzen-title-edited.png"],
+    creator: "@wapzen",
   },
   alternates: {
-    canonical: "https://wasend.com",
+    canonical: "https://wapzen.io",
   },
   category: "Technology",
   classification: "Business Software",
@@ -96,7 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              name: "WA Send",
+              name: "Wapzen",
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
               description: "AI-Powered WhatsApp Automation Platform for businesses. Automate customer communication, booking, and lead capture.",

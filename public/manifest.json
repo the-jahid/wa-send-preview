@@ -1,6 +1,6 @@
 {
-    "name": "WA Send - WhatsApp Automation",
-    "short_name": "WA Send",
+    "name": "Wapzen - WhatsApp Automation",
+    "short_name": "Wapzen",
     "description": "AI-Powered WhatsApp Automation Platform for businesses",
     "start_url": "/",
     "display": "standalone",
