@@ -371,47 +371,6 @@ export default function ConversationPage() {
                                     </div>
                                 ))}
                             </div>
-
-                            {/* Message Input */}
-                            <div className="p-3 md:p-4 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 shrink-0">
-                                <div className="flex items-center gap-2 md:gap-3">
-                                    <div className="flex-1 relative">
-                                        <input
-                                            type="text"
-                                            value={messageInput}
-                                            onChange={(e) => setMessageInput(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && !e.shiftKey) {
-                                                    e.preventDefault()
-                                                    handleSendMessage()
-                                                }
-                                            }}
-                                            placeholder="Type a message..."
-                                            className="w-full px-4 py-2 md:py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 text-sm md:text-base"
-                                        />
-                                        <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                                            <Smile className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                    <button
-                                        onClick={handleSendMessage}
-                                        disabled={!messageInput.trim() || sendMessage.isPending}
-                                        className={`p-3 rounded-full transition-all shadow-lg ${messageInput.trim() && !sendMessage.isPending
-                                            ? "bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-emerald-500/10 hover:shadow-emerald-500/20"
-                                            : "bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 cursor-not-allowed"
-                                            }`}
-                                    >
-                                        {sendMessage.isPending ? (
-                                            <RefreshCw className="h-5 w-5 animate-spin" />
-                                        ) : (
-                                            <Send className="h-5 w-5" />
-                                        )}
-                                    </button>
-                                </div>
-                                <p className="text-xs text-center text-slate-400 mt-2">
-                                    Press Enter to send • Messages are sent via WhatsApp
-                                </p>
-                            </div>
                         </>
                     )}
                 </div>

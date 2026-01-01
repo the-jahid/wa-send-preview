@@ -292,8 +292,8 @@ function ChatMessage({ sender, text, time, typing }: { sender: 'customer' | 'ai'
     <div className={`flex ${isAI ? 'justify-start' : 'justify-end'}`}>
       <div className={`max-w-[80%] ${isAI ? 'order-2' : ''}`}>
         <div className={`rounded-2xl px-4 py-3 ${isAI
-            ? 'bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/20'
-            : 'bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10'
+          ? 'bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/20'
+          : 'bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10'
           }`}>
           {isAI && (
             <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1.5">
@@ -319,41 +319,7 @@ function Stat({ label, value, highlight }: { label: string; value: string; highl
 }
 
 function SocialProof() {
-  const logos = ["AWS", "OpenAI", "Anthropic", "Google Cloud", "HubSpot", "Zapier"]
-  const stats = [
-    { value: "2M+", label: "Messages Sent" },
-    { value: "500+", label: "Active Businesses" },
-    { value: "45%", label: "Avg Conversion Lift" },
-    { value: "24/7", label: "Automated Support" },
-  ]
-
-  return (
-    <section className="py-16 border-y border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-[#0d1424]/50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-slate-500">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Partner Logos */}
-        <p className="text-center text-xs font-medium text-slate-500 dark:text-slate-600 mb-6 uppercase tracking-wider">
-          Powered by industry leaders
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
-          {logos.map((name) => (
-            <div key={name} className="text-slate-500 dark:text-slate-600 font-semibold text-sm hover:text-slate-700 dark:hover:text-slate-400 transition-colors">
-              {name}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+  return null
 }
 
 function TwoMinuteSetup() {
