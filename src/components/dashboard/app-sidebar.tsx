@@ -50,7 +50,7 @@ export function AppSidebar({
 
     return (
         <aside className={cn(
-            "hidden border-r border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0d1424] md:flex md:flex-col relative transition-all duration-300",
+            "hidden border-r border-slate-200 dark:border-white/10 bg-slate-200 dark:bg-[#0d1424] md:flex md:flex-col relative transition-all duration-300 shadow-lg shadow-slate-300/50 dark:shadow-none",
             collapsed ? "w-[72px]" : "w-[260px]"
         )}>
             {/* Brand Header */}

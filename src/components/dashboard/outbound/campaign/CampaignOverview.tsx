@@ -6,11 +6,12 @@ import { useUser } from "@clerk/nextjs"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Save, Trash2, FileText, Calendar, Hash, Bot } from "lucide-react"
+import { Loader2, Save, Trash2, FileText, Calendar, Hash, Bot, Send, XCircle } from "lucide-react"
 
 import { useCampaign, useDeleteCampaign, useUpdateCampaign } from "@/app/features/outbound_campaign/query"
 import { UpdateOutboundCampaignBodySchema } from "@/app/features/outbound_campaign/schemas"
 import type { OutboundCampaignStatus } from "@/app/features/outbound_campaign/types"
+import { useBroadcastStatus } from "@/app/features/outbound-broadcast-settings"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -66,6 +67,9 @@ export default function Overview({ agentId, campaignId }: OverviewProps) {
   } = useCampaign(cid, aid, {
     enabled: isLoaded && !!user && !!campaignId && !!agentId,
   })
+
+  // Fetch broadcast stats for Total Sent / Total Failed
+  const { data: broadcastData } = useBroadcastStatus(cid)
 
   const updateMut = useUpdateCampaign(cid, aid)
   const deleteMut = useDeleteCampaign(cid, aid)
@@ -133,6 +137,29 @@ export default function Overview({ agentId, campaignId }: OverviewProps) {
           <div className="text-slate-500 dark:text-slate-400">Not found.</div>
         ) : (
           <div className="grid gap-6">
+            {/* Broadcast Stats - Total Sent & Total Failed */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-6 w-6 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+                    <Send className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Sent</span>
+                </div>
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{broadcastData?.broadcast?.totalSent ?? 0}</p>
+              </div>
+
+              <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-6 w-6 rounded-lg bg-rose-100 dark:bg-rose-500/20 flex items-center justify-center">
+                    <XCircle className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Failed</span>
+                </div>
+                <p className="text-2xl font-bold text-rose-600 dark:text-rose-400">{broadcastData?.broadcast?.totalFailed ?? 0}</p>
+              </div>
+            </div>
+
             {/* Meta Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* ID Card */}

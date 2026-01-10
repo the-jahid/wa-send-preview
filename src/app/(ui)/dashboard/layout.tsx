@@ -43,7 +43,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     if (savedTheme) {
       setIsDark(savedTheme === "dark")
     } else {
-      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+      // Default to dark mode for first-time users
+      setIsDark(true)
     }
 
     if (savedSidebar) {
@@ -86,7 +87,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   // Prevent flash of wrong theme
   if (!mounted) {
     return (
-      <div className="h-dvh flex items-center justify-center bg-slate-50 dark:bg-[#0a0f1a]">
+      <div className="h-dvh flex items-center justify-center bg-slate-200 dark:bg-[#0a0f1a]">
         <div className="animate-pulse flex flex-col items-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
             <Zap className="h-6 w-6 text-white" />
@@ -98,7 +99,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="h-dvh bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+    <div className="h-dvh bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300">
       <AgentSelectionModal
         isOpen={!!modalMode}
         onClose={() => setModalMode(null)}
@@ -139,7 +140,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     variant="ghost"
                     size="icon"
                     aria-label="Open menu"
-                    className="hover:bg-slate-100 dark:hover:bg-white/10"
+                    className="hover:bg-slate-200 dark:hover:bg-white/10"
                   >
                     <Menu className="h-5 w-5 text-slate-700 dark:text-slate-300" />
                   </Button>
@@ -201,7 +202,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full justify-start border-slate-200 dark:border-white/10 bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
+                          className="w-full justify-start border-slate-200 dark:border-white/10 bg-transparent hover:bg-slate-200 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
                           asChild
                         >
                           <Link href="/">
@@ -229,7 +230,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
-                  className="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10"
+                  className="text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
                 >
                   {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 </Button>
@@ -238,7 +239,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
           </header>
 
-          <main className="flex-1 overflow-auto bg-slate-50 dark:bg-[#0a0f1a]">{children}</main>
+          <main className="flex-1 overflow-auto bg-slate-200 dark:bg-[#0a0f1a]">{children}</main>
         </div>
       </div>
     </div>

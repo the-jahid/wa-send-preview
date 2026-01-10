@@ -161,10 +161,10 @@ export default function ConversationPage() {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-slate-50 dark:bg-[#0a0f1a] relative overflow-hidden">
+        <div className="flex flex-col h-screen bg-slate-200 dark:bg-[#0a0f1a] relative overflow-hidden">
             {/* Background Decoration Circles */}
-            <div className="fixed bottom-0 right-0 w-[300px] h-[300px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none translate-x-1/3 translate-y-1/4 z-0" />
-            <div className="fixed bottom-0 left-0 w-[300px] h-[300px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none -translate-x-1/3 translate-y-1/4 z-0" />
+            <div className="fixed bottom-0 right-0 w-[300px] h-[300px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none translate-x-1/3 translate-y-1/4 z-0" />
+            <div className="fixed bottom-0 left-0 w-[300px] h-[300px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none -translate-x-1/3 translate-y-1/4 z-0" />
 
             {/* Header */}
             <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] shrink-0">

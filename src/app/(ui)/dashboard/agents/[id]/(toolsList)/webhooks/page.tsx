@@ -126,7 +126,7 @@ export default function WebhooksPage({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div className="h-full overflow-auto bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300 relative min-h-screen">
+        <div className="h-full overflow-auto bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300 relative min-h-screen">
             {/* Background Decoration */}
             <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[60px] pointer-events-none z-0" />
 

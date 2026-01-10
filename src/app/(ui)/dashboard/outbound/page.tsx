@@ -86,7 +86,8 @@ export default function OutboundListPage() {
     if (savedTheme) {
       setIsDark(savedTheme === "dark")
     } else {
-      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+      // Default to dark mode for first-time users
+      setIsDark(true)
     }
   }, [])
 
@@ -259,7 +260,7 @@ export default function OutboundListPage() {
   // Prevent flash of wrong theme
   if (!mounted) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0a0f1a]">
+      <div className="h-screen flex items-center justify-center bg-slate-200 dark:bg-[#0a0f1a]">
         <div className="animate-pulse">
           <TrendingUp className="h-12 w-12 text-emerald-500" />
         </div>
@@ -269,21 +270,21 @@ export default function OutboundListPage() {
 
   if (!isLoaded)
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+      <div className="flex items-center justify-center h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300">
         <div className="text-slate-500 dark:text-slate-400">Loading…</div>
       </div>
     )
   if (!user)
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+      <div className="flex items-center justify-center h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300">
         <div className="text-slate-500 dark:text-slate-400">Please sign in.</div>
       </div>
     )
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300 relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300 relative overflow-hidden">
       {/* Page Background Decoration */}
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none translate-x-1/3 -translate-y-1/4 z-20" />
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none translate-x-1/3 -translate-y-1/4 z-20" />
       {/* Toast Notification */}
       {toast && (
         <div
@@ -295,10 +296,10 @@ export default function OutboundListPage() {
       )}
 
       {/* Header - Landing Page Style */}
-      <div className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0f1a]/95 backdrop-blur-sm transition-colors duration-300">
+      <div className="sticky top-0 z-10 bg-slate-200/95 dark:bg-[#0a0f1a]/95 backdrop-blur-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4">
           {/* Main Header Card */}
-          <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 mb-4 overflow-hidden">
+          <div className="relative rounded-2xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] p-6 mb-4 overflow-hidden">
 
             <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
@@ -336,24 +337,12 @@ export default function OutboundListPage() {
                     ))}
                   </select>
                 )}
-
-                {/* Theme Toggle */}
-                <button
-                  onClick={toggleTheme}
-                  className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
-                >
-                  {isDark ? (
-                    <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  ) : (
-                    <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  )}
-                </button>
               </div>
             </div>
           </div>
 
           {/* Search & Actions Bar */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 mb-4">
+          <div className="rounded-2xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] p-4 mb-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="relative w-full sm:w-auto">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
@@ -444,7 +433,7 @@ export default function OutboundListPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {/* Create Campaign Card */}
             <div
-              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700/50 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[180px] group bg-white dark:bg-slate-800/30 backdrop-blur-sm"
+              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700/50 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-100/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[180px] group bg-slate-100 dark:bg-slate-800/30 backdrop-blur-sm"
               onClick={() => setOpenCreate(true)}
             >
               <div className="p-6 flex flex-col items-center justify-center">
@@ -675,7 +664,7 @@ function CampaignCard({
   return (
     <div
       onClick={handleCardClick}
-      className="rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 backdrop-blur-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 min-h-[180px] relative group cursor-pointer shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-none overflow-hidden"
+      className="rounded-2xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm hover:border-slate-400 dark:hover:border-slate-600 transition-all duration-300 min-h-[180px] relative group cursor-pointer shadow-md shadow-slate-300/30 dark:shadow-none hover:shadow-lg hover:shadow-slate-400/30 dark:hover:shadow-none overflow-hidden"
     >
       <div className="p-5">
         <div className="flex justify-between items-start gap-2 mb-4">

@@ -70,14 +70,14 @@ const AGENT_TABS: TabItem[] = [
 
 // Shared Tailwind class strings
 const STYLES = {
-  page: "mx-auto max-w-7xl p-6 min-h-screen bg-slate-50 dark:bg-[#0a0f1a]",
+  page: "mx-auto max-w-7xl p-6 min-h-screen bg-slate-200 dark:bg-[#0a0f1a]",
   card: "bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10",
   cardTitle: "text-slate-900 dark:text-white",
   tabsTrigger: `
     justify-start gap-2
     text-slate-600 dark:text-slate-400
     data-[state=active]:text-slate-900 dark:data-[state=active]:text-white
-    data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-white/10
+    data-[state=active]:bg-slate-200 dark:data-[state=active]:bg-white/10
   `.trim(),
   separator: "bg-slate-200 dark:bg-white/10",
 } as const

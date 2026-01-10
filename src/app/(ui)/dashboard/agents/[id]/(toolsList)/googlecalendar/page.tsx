@@ -1,7 +1,7 @@
 // app/(ui)/dashboard/agents/[id]/googlecalendar/page.tsx
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, use } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, Link as LinkIcon, Check, ChevronsUpDown, Search } from "lucide-react";
 
@@ -75,8 +75,8 @@ const getAllTimeZones = (): string[] =>
             "America/Sao_Paulo",
         ];
 
-export default function GoogleCalendarPage({ params }: { params: { id: string } }) {
-    const agentId = params.id;
+export default function GoogleCalendarPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: agentId } = use(params);
     const [page, setPage] = useState(1);
     const pageSize = 10;
 
@@ -88,9 +88,9 @@ export default function GoogleCalendarPage({ params }: { params: { id: string } 
     } = useConnections(page, pageSize);
 
     return (
-        <div className="h-full overflow-auto bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300 relative">
+        <div className="h-full overflow-auto bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300 relative">
             {/* Background Decoration - Centered Circle */}
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none z-0" />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none z-0" />
 
             <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 relative z-10">
                 {/* Bento Grid Layout */}

@@ -255,12 +255,12 @@ function AgentCard({ agent }: { agent: Agent }) {
         {/* Status Badges */}
         <div className="flex items-center gap-2">
           <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${agent.isActive
-            ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
-            : "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+            : "bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30"
             }`}>
             {agent.isActive ? "Active" : "Inactive"}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30">
             {badge}
           </span>
         </div>
