@@ -29,19 +29,6 @@ export default function DashboardBlogPage() {
         }
     };
 
-    const getStatusColor = (status: Blog["status"]) => {
-        switch (status) {
-            case "PUBLISHED":
-                return "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400";
-            case "DRAFT":
-                return "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400";
-            case "ARCHIVED":
-                return "bg-slate-100 dark:bg-slate-500/20 text-slate-600 dark:text-slate-400";
-            default:
-                return "bg-slate-100 dark:bg-slate-500/20 text-slate-600 dark:text-slate-400";
-        }
-    };
-
     return (
         <div className="min-h-screen">
             {/* Header */}
@@ -66,7 +53,6 @@ export default function DashboardBlogPage() {
                 <BlogFilters
                     onFilterChange={handleFilterChange}
                     initialFilters={filters}
-                    showStatusFilter
                 />
             </div>
 
@@ -128,13 +114,8 @@ export default function DashboardBlogPage() {
                                                 <div className="font-medium text-slate-900 dark:text-white line-clamp-1">
                                                     {blog.title}
                                                 </div>
-                                                <div className="text-xs text-slate-500 dark:text-slate-500">/blog/{blog.slug}</div>
+                                                <div className="text-xs text-slate-500 dark:text-slate-500">/blog/{blog.id}</div>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(blog.status)}`}>
-                                                {blog.status}
-                                            </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
@@ -147,16 +128,14 @@ export default function DashboardBlogPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-end gap-2">
-                                                {blog.status === "PUBLISHED" && (
-                                                    <Link
-                                                        href={`/blog/${blog.slug}`}
-                                                        target="_blank"
-                                                        className="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                                                        title="View"
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Link>
-                                                )}
+                                                <Link
+                                                    href={`/blog/${blog.id}`}
+                                                    target="_blank"
+                                                    className="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                                                    title="View"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
                                                 <button
                                                     onClick={() => handleDelete(blog.id)}
                                                     disabled={deletingId === blog.id}
