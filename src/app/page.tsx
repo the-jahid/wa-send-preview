@@ -7,7 +7,7 @@ import SocialProof from "@/components/landing/SocialProof"
 import TwoMinuteSetup from "@/components/landing/TwoMinuteSetup"
 import AutomationShowcase from "@/components/landing/AutomationShowcase"
 import PainPoints from "@/components/landing/PainPoints"
-import CoreFeatures from "@/components/landing/CoreFeatures"
+import DiamondFeatures from "@/components/landing/DiamondFeatures"
 import HowItWorks from "@/components/landing/HowItWorks"
 import ROICalculator from "@/components/landing/ROICalculator"
 import UseCases from "@/components/landing/UseCases"
@@ -59,7 +59,7 @@ export default function Home() {
       <TwoMinuteSetup />
       <AutomationShowcase />
       <PainPoints />
-      <CoreFeatures />
+      <DiamondFeatures />
       <HowItWorks />
       <ROICalculator />
       <UseCases />
