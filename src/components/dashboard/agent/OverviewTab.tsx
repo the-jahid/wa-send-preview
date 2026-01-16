@@ -4,7 +4,11 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState, useMemo } from "react"
-import { useAgents as useAgentsList, useCreateAgent, type Agent, type ModelOption } from "@/app/features/agent"
+import { useQueryClient } from "@tanstack/react-query"
+import { useAuth } from "@clerk/nextjs"
+import { useAgents as useAgentsList, useCreateAgent, deleteAgent, type Agent, type ModelOption } from "@/app/features/agent"
+import { HoverEffect, Card } from "@/components/ui/card-hover-effect"
+import { TypewriterEffect } from "@/components/ui/typewriter-effect"
 
 // Local provider/model lists (unchanged from your code)
 type Provider = "CHATGPT" | "GEMINI" | "CLAUDE"
@@ -89,13 +93,17 @@ type Props = {
 }
 
 export default function OverviewTab({ onConnectWhatsapp }: Props) {
+  const queryClient = useQueryClient()
+  const { getToken } = useAuth()
   const [page, setPage] = useState(1)
   const [limit] = useState(24)
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<string>("createdAt:desc")
   const [showCreate, setShowCreate] = useState(false)
+  const [deleteModalAgent, setDeleteModalAgent] = useState<Agent | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  const { data, isLoading, error } = useAgentsList({
+  const { data, isLoading, error, refetch } = useAgentsList({
     page,
     limit,
     sort,
@@ -105,13 +113,50 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
   const agents = data?.data ?? []
   const totalPages = data?.meta?.totalPages ?? 1
 
+  const handleDeleteClick = (agentId: string) => {
+    const agent = agents.find(a => a.id === agentId)
+    if (agent) {
+      setDeleteModalAgent(agent)
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModalAgent) return
+
+    setIsDeleting(true)
+    try {
+      const token = await getToken()
+      await deleteAgent(deleteModalAgent.id, { token: token ?? undefined })
+      // Refetch the agents list after deletion
+      await refetch()
+      queryClient.invalidateQueries({ queryKey: ["agents"] })
+      setDeleteModalAgent(null)
+    } catch (err) {
+      console.error("Failed to delete agent:", err)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <>
-      {/* Search, Filter & New Agent Button */}
+      {/* Header & Controls Bar */}
       <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 mb-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-            <div className="relative w-full sm:w-auto">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+
+          {/* Title & Description */}
+          <div className="flex-shrink-0">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              Agents
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium border border-emerald-500/20">
+                {agents.length}
+              </span>
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Manage and configure your AI agents</p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-64">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500"
                 fill="none"
@@ -126,7 +171,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
                 />
               </svg>
               <input
-                className="w-full sm:w-64 pl-10 pr-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 placeholder="Search agents..."
                 value={search}
                 onChange={(e) => {
@@ -136,7 +181,7 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
               />
             </div>
             <select
-              className="w-full sm:w-auto px-4 py-2.5 text-sm border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full sm:w-auto px-4 py-2 text-sm border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
               value={sort ?? ""}
               onChange={(e) => setSort(e.target.value || "createdAt:desc")}
             >
@@ -145,52 +190,105 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
               <option value="name:asc">Name (A-Z)</option>
               <option value="name:desc">Name (Z-A)</option>
             </select>
-          </div>
 
-          <button
-            onClick={() => setShowCreate(true)}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 inline-flex items-center justify-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Agent
-          </button>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Agent
+            </button>
+          </div>
         </div>
       </div>
 
-      <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {isLoading &&
-          Array.from({ length: 8 }).map((_, i) => (
+      {/* Agent Cards with Hover Effect */}
+      {isLoading && (
+        <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={`skeleton-${i}`}
               className="h-52 rounded-xl border border-slate-200 dark:border-white/10 animate-pulse bg-slate-100 dark:bg-white/5"
             />
           ))}
+        </section>
+      )}
 
-        {error && !isLoading && (
-          <div className="col-span-full p-6 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30">
-            <div className="flex items-center gap-3">
-              <svg
-                className="w-5 h-5 text-red-600 dark:text-red-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+      {error && !isLoading && (
+        <div className="p-6 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30">
+          <div className="flex items-center gap-3">
+            <svg
+              className="w-5 h-5 text-red-600 dark:text-red-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="text-red-600 dark:text-red-400 font-medium">{(error as Error).message}</span>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !error && agents.length === 0 && (
+        <div className="relative flex flex-col items-center justify-center py-20 px-4 min-h-[500px] text-center rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 overflow-hidden">
+          {/* Background Gradients */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent opacity-50 blur-3xl pointer-events-none" />
+
+          {/* Icon */}
+          <div className="relative z-10 mb-8 p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 transform transition-transform hover:scale-105 duration-500">
+            <svg className="w-12 h-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+
+          <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+            <TypewriterEffect
+              words={[
+                { text: "Launch" },
+                { text: "your" },
+                { text: "first" },
+                { text: "intelligent" },
+                { text: "Agent", className: "text-emerald-500 dark:text-emerald-500" },
+              ]}
+              className="text-2xl md:text-3xl lg:text-4xl"
+              cursorClassName="bg-emerald-500"
+            />
+
+            <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto text-sm md:text-base leading-relaxed">
+              Create, configure, and deploy autonomous AI agents that work for you 24/7.
+            </p>
+
+            <div className="pt-4">
+              <button
+                onClick={() => setShowCreate(true)}
+                className="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white transition-all duration-200 bg-emerald-600 rounded-full hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="text-red-600 dark:text-red-400 font-medium">{(error as Error).message}</span>
+                <span className="mr-2">Create Agent</span>
+                <svg className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {!isLoading && !error && agents.map((a) => <AgentCard key={a.id} agent={a} />)}
-      </section>
+      {!isLoading && !error && agents.length > 0 && (
+        <HoverEffect
+          items={agents.map((agent) => ({
+            id: agent.id,
+            content: <AgentCard agent={agent} onDelete={handleDeleteClick} />,
+          }))}
+        />
+      )}
 
       {/* Pagination */}
       <div className="mt-8 flex items-center justify-center gap-3">
@@ -228,84 +326,117 @@ export default function OverviewTab({ onConnectWhatsapp }: Props) {
           }}
         />
       )}
+
+      {deleteModalAgent && (
+        <DeleteAgentModal
+          agent={deleteModalAgent}
+          isDeleting={isDeleting}
+          onClose={() => setDeleteModalAgent(null)}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
     </>
   )
 }
 
-function AgentCard({ agent }: { agent: Agent }) {
+function AgentCard({ agent, onDelete }: { agent: Agent; onDelete?: (id: string) => void }) {
   const badge = agent.memoryType === "BUFFER" || agent.memoryType === "NONE" ? "Simple" : "Advanced"
 
   const provider = agent.modelType || "—"
   const model = agent.openAIModel || agent.geminiModel || agent.claudeModel || "—"
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onDelete?.(agent.id)
+  }
+
   return (
     <Link
       href={`/dashboard/agents/${agent.id}`}
-      className="group relative rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 p-5 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 cursor-pointer shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-none"
+      className="block h-full w-full"
     >
-      {/* Green shadow decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <Card className="h-full">
+        {/* Green shadow decoration */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative h-full flex flex-col gap-4">
-        {/* Agent Name */}
-        <h3 className="font-semibold text-lg text-slate-900 dark:text-white truncate">
-          {agent.name}
-        </h3>
-
-        {/* Status Badges */}
-        <div className="flex items-center gap-2">
-          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${agent.isActive
-            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-            : "bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30"
-            }`}>
-            {agent.isActive ? "Active" : "Inactive"}
-          </span>
-          <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30">
-            {badge}
-          </span>
-        </div>
-
-        {/* Provider Info */}
-        <div className="flex items-center gap-2 text-sm">
-          <div className="h-5 w-5 rounded flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-slate-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+        {/* Delete Button */}
+        {onDelete && (
+          <button
+            onClick={handleDelete}
+            className="absolute top-3 right-3 z-10 h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+            title="Delete agent"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
               />
             </svg>
-          </div>
-          <span className="text-slate-200 font-medium">{provider}</span>
-          <span className="text-slate-600">•</span>
-          <span className="text-slate-500 truncate" title={String(model)}>
-            {model}
-          </span>
-        </div>
+          </button>
+        )}
 
-        {/* Date and History */}
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <div className="h-4 w-4 rounded flex items-center justify-center">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+        <div className="relative h-full flex flex-col gap-4">
+          {/* Agent Name */}
+          <h3 className="font-semibold text-lg text-slate-900 dark:text-white truncate pr-8">
+            {agent.name}
+          </h3>
+
+          {/* Status Badges */}
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${agent.isActive
+              ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+              : "bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30"
+              }`}>
+              {agent.isActive ? "Active" : "Inactive"}
+            </span>
+            <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30">
+              {badge}
+            </span>
           </div>
-          <span>{new Date(agent.createdAt).toLocaleDateString()}</span>
-          <span className="text-slate-600">•</span>
-          <span>History: {agent.historyLimit ?? 0}</span>
+
+          {/* Provider Info */}
+          <div className="flex items-center gap-2 text-sm">
+            <div className="h-5 w-5 rounded flex items-center justify-center">
+              <svg
+                className="w-4 h-4 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                />
+              </svg>
+            </div>
+            <span className="text-slate-500 truncate" title={String(model)}>
+              {model}
+            </span>
+          </div>
+
+          {/* Date and History */}
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <div className="h-4 w-4 rounded flex items-center justify-center">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <span>{new Date(agent.createdAt).toLocaleDateString()}</span>
+            <span className="text-slate-600">•</span>
+            <span>History: {agent.historyLimit ?? 0}</span>
+          </div>
         </div>
-      </div>
+      </Card>
     </Link>
   )
 }
@@ -488,24 +619,16 @@ function CreateAgentModal({
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
-              className="px-6 py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
+              className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl backdrop-blur-2xl text-white dark:text-slate-100 font-semibold shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] hover:shadow-[0_8px_40px_0_rgba(0,0,0,0.2)] transition-all duration-500 ease-out group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              disabled={create.isPending}
-              style={{
-                background: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
-                backdropFilter: "blur(20px) saturate(180%)",
-                WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                border: "1px solid rgba(16, 185, 129, 0.25)",
-                boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)"
-              }}
+              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!form.name.trim() || create.isPending}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               {create.isPending ? (
                 <>
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -534,3 +657,98 @@ function CreateAgentModal({
   )
 }
 
+export function DeleteAgentModal({
+  agent,
+  isDeleting,
+  onClose,
+  onConfirm,
+}: {
+  agent: Agent
+  isDeleting: boolean
+  onClose: () => void
+  onConfirm: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-[101] w-full max-w-md rounded-2xl bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden">
+        {/* Modal Header */}
+        <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-gradient-to-br from-red-500/10 via-white dark:via-[#0d1424] to-orange-500/10">
+          <div className="relative flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/25">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Delete Agent</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">This action cannot be undone</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6">
+          <p className="text-slate-600 dark:text-slate-300 mb-2">
+            Are you sure you want to delete the agent:
+          </p>
+          <div className="p-3 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 mb-4">
+            <span className="font-semibold text-slate-900 dark:text-white">{agent.name}</span>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            All agent data, configurations, and chat history will be permanently removed.
+          </p>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+          <button
+            type="button"
+            className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
+            onClick={onClose}
+            disabled={isDeleting}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="px-5 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold shadow-lg shadow-red-500/20 hover:shadow-red-500/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={onConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Deleting...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Delete Agent
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

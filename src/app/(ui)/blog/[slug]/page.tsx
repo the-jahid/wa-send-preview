@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, Eye, Clock } from "lucide-react";
 import { useBlogById, BlogsPublicAPI } from "@/app/features/blog/api";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import { TracingBeam } from "@/components/ui/tracing-beam";
 
 export default function BlogDetailPage() {
     const params = useParams();
@@ -99,7 +100,7 @@ export default function BlogDetailPage() {
             <Navbar toggleTheme={toggleTheme} isDark={isDark} />
 
             <main className="pt-24 pb-16">
-                <article className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                     {/* Back Link */}
                     <Link
                         href="/blog"
@@ -109,49 +110,54 @@ export default function BlogDetailPage() {
                         Back to Blog
                     </Link>
 
-                    {/* Cover Image */}
-                    {blog.hasImage && (
-                        <div className="mb-8 rounded-2xl overflow-hidden">
-                            <img
-                                src={BlogsPublicAPI.getImageUrl(blog.id)}
-                                alt={blog.title}
-                                className="w-full h-auto object-cover"
-                            />
-                        </div>
-                    )}
+                    {/* Tracing Beam Wrapper */}
+                    <TracingBeam className="px-6">
+                        <article>
+                            {/* Cover Image */}
+                            {blog.hasImage && (
+                                <div className="mb-8 rounded-2xl overflow-hidden">
+                                    <img
+                                        src={BlogsPublicAPI.getImageUrl(blog.id)}
+                                        alt={blog.title}
+                                        className="w-full h-auto object-cover"
+                                    />
+                                </div>
+                            )}
 
-                    {/* Header */}
-                    <header className="mb-8">
-                        {/* Title */}
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
-                            {blog.title}
-                        </h1>
+                            {/* Header */}
+                            <header className="mb-8">
+                                {/* Title */}
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
+                                    {blog.title}
+                                </h1>
 
-                        {/* Meta Info */}
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
-                            <div className="flex items-center gap-1.5">
-                                <Calendar className="h-4 w-4" />
-                                <span>{formattedDate}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <Clock className="h-4 w-4" />
-                                <span>{readingTime} min read</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <Eye className="h-4 w-4" />
-                                <span>{blog.viewCount} views</span>
-                            </div>
-                        </div>
-                    </header>
+                                {/* Meta Info */}
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
+                                    <div className="flex items-center gap-1.5">
+                                        <Calendar className="h-4 w-4" />
+                                        <span>{formattedDate}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <Clock className="h-4 w-4" />
+                                        <span>{readingTime} min read</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <Eye className="h-4 w-4" />
+                                        <span>{blog.viewCount} views</span>
+                                    </div>
+                                </div>
+                            </header>
 
-                    {/* Content */}
-                    <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-a:text-emerald-600 dark:prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-pre:bg-slate-900 dark:prose-pre:bg-slate-800">
-                        {/* Render content as paragraphs */}
-                        {blog.content.split("\n\n").map((paragraph: string, i: number) => (
-                            <p key={i}>{paragraph}</p>
-                        ))}
-                    </div>
-                </article>
+                            {/* Content */}
+                            <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-a:text-emerald-600 dark:prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-pre:bg-slate-900 dark:prose-pre:bg-slate-800">
+                                {/* Render content as paragraphs */}
+                                {blog.content.split("\n\n").map((paragraph: string, i: number) => (
+                                    <p key={i}>{paragraph}</p>
+                                ))}
+                            </div>
+                        </article>
+                    </TracingBeam>
+                </div>
             </main>
 
             <Footer />

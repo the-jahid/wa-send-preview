@@ -295,77 +295,78 @@ export default function OutboundListPage() {
         </div>
       )}
 
-      {/* Header - Landing Page Style */}
+      {/* Header - Landing Page Style - Merged Compact Version */}
       <div className="sticky top-0 z-10 bg-slate-200/95 dark:bg-[#0a0f1a]/95 backdrop-blur-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          {/* Main Header Card */}
-          <div className="relative rounded-2xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] p-6 mb-4 overflow-hidden">
+          <div className="rounded-2xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] p-4 mb-4 shadow-sm">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
 
-            <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                  <TrendingUp className="h-7 w-7 text-white" />
+              {/* Left Side: Title & Agent Selector */}
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 flex-shrink-0">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Campaigns</h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Manage outbound campaigns</p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Campaigns</h1>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Manage outbound campaigns for your agents
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-3">
+                {/* Divider (Hidden on mobile) */}
+                <div className="hidden md:block h-8 w-px bg-slate-300 dark:bg-slate-700/50" />
+
                 {/* Agent Selector */}
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Select Agent</span>
-                {agentsLoading ? (
-                  <div className="h-10 w-52 bg-slate-200 dark:bg-white/10 animate-pulse rounded-xl" />
-                ) : (
-                  <select
-                    value={agentId ?? ""}
-                    onChange={(e) => {
-                      const next = e.target.value || null
-                      setAgentId(next)
-                      setPage(1)
-                      setStatusFilter(undefined)
-                    }}
-                    className="h-10 px-4 py-2 text-sm font-medium border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-white/5 text-slate-900 dark:text-white hover:border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                  >
-                    {agents.map((a) => (
-                      <option key={a.id} value={a.id} className="bg-white dark:bg-[#0d1424]">
-                        {a.name ?? a.id}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <div className="flex items-center gap-2 w-full md:w-auto bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10">
+                  <div className="pl-2 pr-1 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agent</div>
+                  {agentsLoading ? (
+                    <div className="h-8 w-32 bg-slate-200 dark:bg-white/10 animate-pulse rounded-lg" />
+                  ) : (
+                    <select
+                      value={agentId ?? ""}
+                      onChange={(e) => {
+                        const next = e.target.value || null
+                        setAgentId(next)
+                        setPage(1)
+                        setStatusFilter(undefined)
+                      }}
+                      className="h-8 pl-2 pr-8 text-sm font-medium border-0 bg-transparent text-slate-900 dark:text-white focus:ring-0 cursor-pointer min-w-[140px]"
+                    >
+                      {agents.map((a) => (
+                        <option key={a.id} value={a.id} className="bg-white dark:bg-[#0d1424]">
+                          {a.name ?? a.id}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Search & Actions Bar */}
-          <div className="rounded-2xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] p-4 mb-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="relative w-full sm:w-auto">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
-                <Input
-                  placeholder="Search campaigns..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setPage(1)
-                      refetch()
-                    }
-                  }}
-                  className="pl-9 w-full sm:w-80 h-10 text-sm border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                />
+              {/* Right Side: Search & Actions */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
+                  <Input
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setPage(1)
+                        refetch()
+                      }
+                    }}
+                    className="pl-9 w-full h-10 text-sm border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
+                </div>
+                <button
+                  onClick={() => setOpenCreate(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Campaign
+                </button>
               </div>
-              <button
-                onClick={() => setOpenCreate(true)}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm border border-emerald-500/50 hover:border-emerald-400 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-semibold transition-all flex items-center justify-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Campaign
-              </button>
             </div>
           </div>
 

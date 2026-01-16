@@ -72,18 +72,6 @@ export default function AgentsTabsPage() {
   return (
     <QueryClientProvider client={qc}>
       <main className="mx-auto max-w-7xl p-6 bg-slate-200 dark:bg-[#0a0f1a] min-h-screen transition-colors duration-300">
-        {/* Header - Landing Page Style */}
-        <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 mb-6 overflow-hidden">
-          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Agents</h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Manage and configure your AI agents
-              </p>
-            </div>
-          </div>
-        </div>
-
         <OverviewTab />
       </main>
       <ReactQueryDevtools initialIsOpen={false} />

@@ -3,10 +3,10 @@
 import type { ReactNode } from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import {
   Menu,
-  Zap,
   Home,
   Sun,
   Moon,
@@ -25,30 +25,23 @@ import { AppSidebar, NAV_MAIN, NavList, SidebarActionButton } from "@/components
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  // ... existing code ...
   const router = useRouter()
   const { user } = useUser()
 
   const [isDark, setIsDark] = useState(true)
   const [mounted, setMounted] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [modalMode, setModalMode] = useState<"booking" | "enabling_leads" | null>(null)
 
   // Load theme from localStorage on mount
   useEffect(() => {
     setMounted(true)
     const savedTheme = localStorage.getItem("theme")
-    const savedSidebar = localStorage.getItem("sidebarCollapsed")
 
     if (savedTheme) {
       setIsDark(savedTheme === "dark")
     } else {
       // Default to dark mode for first-time users
       setIsDark(true)
-    }
-
-    if (savedSidebar) {
-      setSidebarCollapsed(savedSidebar === "true")
     }
   }, [])
 
@@ -64,12 +57,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
   }, [isDark, mounted])
 
-  // Save sidebar state
-  useEffect(() => {
-    if (!mounted) return
-    localStorage.setItem("sidebarCollapsed", String(sidebarCollapsed))
-  }, [sidebarCollapsed, mounted])
-
   // Listen for changes from other tabs/windows
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -82,15 +69,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleTheme = () => setIsDark(!isDark)
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed)
 
   // Prevent flash of wrong theme
   if (!mounted) {
     return (
       <div className="h-dvh flex items-center justify-center bg-slate-200 dark:bg-[#0a0f1a]">
         <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-white" />
+          <div className="h-12 w-12 flex items-center justify-center">
+            <Image
+              src="/WapZen Logo.png"
+              alt="WapZen Logo"
+              width={48}
+              height={48}
+              className="object-contain"
+            />
           </div>
           <div className="h-2 w-24 bg-slate-200 dark:bg-white/10 rounded-full" />
         </div>
@@ -112,24 +104,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             : undefined
         }
       />
-      <div
-        className={cn(
-          "grid h-dvh transition-all duration-300",
-          sidebarCollapsed ? "md:grid-cols-[72px_1fr]" : "md:grid-cols-[260px_1fr]"
-        )}
-      >
-        {/* Desktop Sidebar */}
+
+      <div className="flex h-dvh w-full">
+        {/* Desktop Sidebar - Aceternity UI with hover expand */}
         <AppSidebar
-          collapsed={sidebarCollapsed}
           isDark={isDark}
-          onToggleCollapse={toggleSidebar}
           onToggleTheme={toggleTheme}
           onOpenBooking={() => setModalMode("booking")}
           onOpenLeads={() => setModalMode("enabling_leads")}
         />
 
         {/* Main column */}
-        <div className="flex h-dvh flex-col overflow-hidden">
+        <div className="flex h-dvh flex-col overflow-hidden flex-1">
           {/* Mobile Header - only visible on mobile */}
           <header className="flex-shrink-0 h-14 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] md:hidden">
             <div className="flex h-full items-center gap-3 px-4">
@@ -150,23 +136,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   className="w-72 p-0 bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10"
                 >
                   <div className="h-full flex flex-col">
-                    {/* Reuse AppSidebar structure slightly modified for mobile sheet if needed, or keeping simplified mobile view for now. 
-                        Ideally mobile view should also use AppSidebar but with collapsed=false always. 
-                        For now, I'll keep the existing mobile header logic to avoid breaking it, but cleans it up. 
-                        Wait, the user wants "industry standard". Mobile menu usually just replicates the sidebar.
-                        I will keep the existing manual internal mobile implementation for safety in this step, but maybe simplify imports?
-                        Actually, let's keep the exact mobile implementation logic but cleaned up.
-                    */}
                     {/* Mobile Brand */}
                     <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-200 dark:border-white/10">
-                      <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <Zap className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 dark:text-white">Wapzen</span>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                          Dashboard
-                        </span>
+                      <div className="flex items-center h-9">
+                        <Image
+                          src="/WapZen Logo-06.png"
+                          alt="WapZen Logo"
+                          width={140}
+                          height={36}
+                          className="object-contain h-full w-auto"
+                        />
                       </div>
                     </div>
 
@@ -217,11 +196,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </Sheet>
 
               {/* Mobile Brand */}
-              <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-                  <Zap className="h-4 w-4 text-white" />
-                </div>
-                <span className="font-bold text-slate-900 dark:text-white">Wapzen</span>
+              <div className="flex items-center">
+                <Image
+                  src="/WapZen Logo-06.png"
+                  alt="WapZen Logo"
+                  width={120}
+                  height={28}
+                  className="object-contain h-7 w-auto"
+                />
               </div>
 
               {/* Right Actions */}
@@ -245,4 +227,3 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     </div>
   )
 }
-

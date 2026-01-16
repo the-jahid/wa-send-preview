@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export default function Footer() {
     return (
@@ -6,14 +7,14 @@ export default function Footer() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
                     <div className="col-span-2">
-                        <Link href="/" className="flex items-center gap-3 mb-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-white font-black text-sm shadow-lg shadow-emerald-500/25">
-                                WA
-                            </div>
-                            <div>
-                                <div className="font-semibold text-slate-900 dark:text-white leading-tight">WhatsApp AI</div>
-                                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium tracking-wide uppercase">Automation Platform</div>
-                            </div>
+                        <Link href="/" className="flex items-center mb-4">
+                            <Image
+                                src="/WapZen Logo-06.png"
+                                alt="WapZen Logo"
+                                width={160}
+                                height={45}
+                                className="object-contain h-10 w-auto"
+                            />
                         </Link>
                         <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
                             Turn WhatsApp into your 24/7 sales machine. Unlimited messages, AI conversations, automatic appointments.
@@ -63,7 +64,7 @@ export default function Footer() {
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-slate-200 dark:border-white/5">
                     <div className="text-sm text-slate-500 dark:text-slate-600">
-                        © {new Date().getFullYear()} WhatsApp AI Platform. All rights reserved.
+                        © {new Date().getFullYear()} WapZen. All rights reserved.
                     </div>
 
                     <div className="flex items-center gap-4">

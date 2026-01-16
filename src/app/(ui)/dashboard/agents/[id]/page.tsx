@@ -37,6 +37,7 @@ import {
 
 // Dashboard Components
 import Knowledgebase from "@/components/dashboard/agent/knowledgebase"
+import { DeleteAgentModal } from "@/components/dashboard/agent/OverviewTab"
 import {
   AgentEditForm,
   WhatsAppCard,
@@ -70,7 +71,7 @@ const AGENT_TABS: TabItem[] = [
 
 // Shared Tailwind class strings
 const STYLES = {
-  page: "mx-auto max-w-7xl p-6 min-h-screen bg-slate-200 dark:bg-[#0a0f1a]",
+  page: "mx-auto max-w-7xl px-3 py-4 sm:p-6 min-h-screen bg-slate-200 dark:bg-[#0a0f1a]",
   card: "bg-white dark:bg-[#0d1424] border-slate-200 dark:border-white/10",
   cardTitle: "text-slate-900 dark:text-white",
   tabsTrigger: `
@@ -129,6 +130,7 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
   // Local State
   // ─────────────────────────────────────────────────────────────────────────
   const [isKnowledgebaseOpen, setIsKnowledgebaseOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   // ─────────────────────────────────────────────────────────────────────────
   // Handlers
@@ -144,10 +146,13 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
     refetch()
   }
 
-  const handleDelete = async () => {
-    const confirmMessage = `Delete agent "${agent?.name}"? This cannot be undone.`
-    if (!confirm(confirmMessage)) return
+  const handleDelete = () => {
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
     await deleteAgent.mutateAsync()
+    setIsDeleteModalOpen(false)
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -184,8 +189,7 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <main className={`${STYLES.page} space-y-6`}>
-      {/* Back Navigation */}
-      <BackButton />
+      {/* Page Header */}
 
       {/* Page Header */}
       <PageHeader
@@ -231,6 +235,16 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
         onClose={() => setIsKnowledgebaseOpen(false)}
         agentId={agentId}
       />
+
+      {/* Delete Agent Modal */}
+      {isDeleteModalOpen && (
+        <DeleteAgentModal
+          agent={agent}
+          isDeleting={deleteAgent.isPending}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
     </main>
   )
 }
@@ -239,20 +253,7 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
 // SUB-COMPONENTS
 // ============================================================================
 
-/** Back navigation button */
-function BackButton() {
-  return (
-    <Link href="/dashboard/agents">
-      <Button
-        variant="ghost"
-        className="gap-2 -ml-2 rounded-full border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-100/50 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all h-10 px-4"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to agents
-      </Button>
-    </Link>
-  )
-}
+
 
 /** Page header with agent name and action buttons */
 function PageHeader({
@@ -267,32 +268,45 @@ function PageHeader({
   isDeleting: boolean
 }) {
   return (
-    <div className="flex items-center justify-between">
-      {/* Agent Info */}
-      <div className="min-w-0">
-        <h1 className="text-xl font-semibold truncate text-slate-900 dark:text-white">
-          {agent.name}
-        </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-          ID: <span className="font-mono">{agent.id}</span>
-        </p>
+    <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+      {/* Agent Info & Back Nav */}
+      <div className="flex items-start gap-4">
+        <Link
+          href="/dashboard/agents"
+          className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <div className="min-w-0 flex-1 space-y-1">
+          <h1 className="text-xl sm:text-2xl font-bold truncate text-slate-900 dark:text-white">
+            {agent.name}
+          </h1>
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${agent.isActive
+              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20'
+              : 'bg-slate-50 dark:bg-slate-500/10 text-slate-700 dark:text-slate-400 ring-slate-600/20'
+              }`}>
+              {agent.isActive ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
         <Button
-          variant="default"
-          className="gap-2 bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
+          variant="outline"
           onClick={onOpenKnowledgebase}
+          className="flex-1 sm:flex-none border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
         >
-          <BookOpen className="h-4 w-4" />
+          <BookOpen className="h-4 w-4 mr-2 text-emerald-500" />
           Knowledgebase
         </Button>
         <Button
           variant="destructive"
           onClick={onDelete}
           disabled={isDeleting}
-          className="bg-red-500 hover:bg-red-600 text-white"
+          className="flex-1 sm:flex-none"
         >
           Delete
         </Button>
@@ -304,16 +318,16 @@ function PageHeader({
 /** Tabs navigation bar */
 function TabsNavigation() {
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-2">
-      <TabsList className="w-full bg-slate-100 dark:bg-white/5 border-0 p-1 rounded-xl">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-1.5 sm:p-2 overflow-x-auto">
+      <TabsList className="w-full min-w-max sm:min-w-0 bg-slate-100 dark:bg-white/5 border-0 p-1 rounded-xl flex">
         {AGENT_TABS.map(({ value, label, icon: Icon }) => (
           <TabsTrigger
             key={value}
             value={value}
-            className="flex items-center gap-2 text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
           >
-            <Icon className="h-4 w-4" />
-            {label}
+            <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+            <span className="hidden xs:inline sm:inline">{label}</span>
           </TabsTrigger>
         ))}
       </TabsList>
