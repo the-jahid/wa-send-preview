@@ -7,6 +7,7 @@ export type Lead = {
   id: string;
   status: LeadStatus;
   source: string | null;
+  senderPhone: string | null;
   data: Record<string, any> | null;
   agentId: string;
   createdAt: string; // ISO-8601

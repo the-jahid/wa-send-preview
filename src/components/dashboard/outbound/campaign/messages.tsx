@@ -69,8 +69,7 @@ export default function MessagesTab({ agentId, campaignId }: MessagesTabProps) {
 
   if (isSentLoading) {
     return (
-      <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 p-8 overflow-hidden min-h-[200px] flex items-center justify-center">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-8 overflow-hidden min-h-[200px] flex items-center justify-center">
         <div className="flex items-center gap-3 relative">
           <svg className="w-6 h-6 animate-spin text-emerald-500" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -101,22 +100,11 @@ export default function MessagesTab({ agentId, campaignId }: MessagesTabProps) {
   return (
     <div className="space-y-6">
       {/* Header with Landing Page Theme */}
-      <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 p-6 overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-6 overflow-hidden">
 
         <div className="relative flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-            </div>
+
             <div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Messages</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
@@ -168,8 +156,8 @@ export default function MessagesTab({ agentId, campaignId }: MessagesTabProps) {
                   <tr
                     key={num}
                     className={`text-slate-900 dark:text-white cursor-pointer transition-all ${selectedNumber === num
-                        ? "bg-emerald-50 dark:bg-emerald-500/20 border-l-4 border-l-emerald-500"
-                        : "hover:bg-slate-50 dark:hover:bg-white/5 border-l-4 border-l-transparent"
+                      ? "bg-emerald-50 dark:bg-emerald-500/20 border-l-4 border-l-emerald-500"
+                      : "hover:bg-slate-50 dark:hover:bg-white/5 border-l-4 border-l-transparent"
                       }`}
                     onClick={() => setSelectedNumber(num)}
                   >

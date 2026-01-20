@@ -25,16 +25,42 @@ import type {
   CreateFileUploadInput, // ← one-shot upload DTO (non-binary fields)
 } from './types';
 
-const API_BASE = (
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ??
-  'http://localhost:3001'
-).replace(/\/+$/, '');
+
+/** Resolve base URL safely for browser & server */
+function resolveBase(): string {
+  const env =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+    '';
+
+  if (env) return env.replace(/\/$/, '');
+
+  // Browser fallback: same origin (like agent/apis.ts)
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.host}`;
+  }
+
+  // Last resort
+  return 'http://localhost:3001';
+}
+
+const API_BASE = resolveBase();
 
 /* --------------------------------
  * Helpers
  * -------------------------------- */
 type FetchOpts = RequestInit & WithAuth;
+
+export class KBError extends Error implements APIError {
+  status: number;
+  details?: unknown;
+  constructor(status: number, message: string, details?: unknown) {
+    super(message);
+    this.name = 'KBError';
+    this.status = status;
+    this.details = details;
+  }
+}
 
 function authHeaders(authToken?: string | null): Record<string, string> {
   return authToken ? { Authorization: `Bearer ${authToken}` } : {};
@@ -89,6 +115,8 @@ async function fetchJSON<T>(path: string, opts: FetchOpts = {}): Promise<T> {
   const res = await fetch(url, {
     ...opts,
     headers,
+    // Add credentials just in case (like agent/apis.ts)
+    credentials: 'include',
     cache: 'no-store',
   });
 
@@ -97,12 +125,8 @@ async function fetchJSON<T>(path: string, opts: FetchOpts = {}): Promise<T> {
   const data = isJson ? await res.json() : await res.text();
 
   if (!res.ok) {
-    const err: APIError = {
-      status: res.status,
-      message: (isJson && (data as any)?.message) || res.statusText,
-      details: data,
-    };
-    throw err;
+    const message = (isJson && (data as any)?.message) || (data as any)?.error || res.statusText;
+    throw new KBError(res.status, message, data);
   }
 
   return data as T;

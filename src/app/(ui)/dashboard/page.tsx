@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { type Agent, useAgents } from "@/app/features/agent"
 import { Skeleton } from "@/components/ui/skeleton"
+import { WobbleCard } from "@/components/ui/wobble-card"
 
 const DUMMY_AGENT_ID = "00000000-0000-0000-0000-000000000000"
 
@@ -31,7 +32,8 @@ export default function OverviewPage() {
     if (savedTheme) {
       setIsDark(savedTheme === "dark")
     } else {
-      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+      // Default to dark mode for first-time users
+      setIsDark(true)
     }
   }, [])
 
@@ -158,7 +160,7 @@ export default function OverviewPage() {
   // Prevent flash of wrong theme
   if (!mounted) {
     return (
-      <div className="h-full flex items-center justify-center bg-slate-50 dark:bg-[#0a0f1a]">
+      <div className="h-full flex items-center justify-center bg-slate-200 dark:bg-[#0a0f1a]">
         <div className="animate-pulse">
           <Bot className="h-12 w-12 text-emerald-500" />
         </div>
@@ -168,41 +170,26 @@ export default function OverviewPage() {
 
   /* -------------------------- UI -------------------------- */
   return (
-    <div className="h-full overflow-auto bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="h-full overflow-auto bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300 relative">
+      {/* Background Decoration - Right Middle Circle */}
+      <div className="fixed top-1/2 right-0 translate-x-1/3 -translate-y-1/2 w-[300px] h-[300px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none z-0" />
+
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 relative z-10">
         {/* Header - Landing Page Style */}
-        <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-4 sm:p-6 overflow-hidden">
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <Bot className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Monitor your agents and campaigns at a glance
-                </p>
-              </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Monitor your agents and campaigns at a glance
+              </p>
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
-              >
-                {isDark ? (
-                  <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                ) : (
-                  <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                )}
-              </button>
-
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all disabled:opacity-50"
+                className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300 disabled:opacity-50"
               >
                 {isRefreshing ? "Refreshing…" : "Refresh"}
               </button>
@@ -210,100 +197,139 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        {/* Stats Cards - Landing Page Style */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Total Agents */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Agents</span>
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
-                <Bot className="h-5 w-5 text-white" />
-              </div>
+        {/* Mobile Empty State */}
+        {!agentsLoading && !agentsError && agents.length === 0 && (
+          <div className="sm:hidden flex flex-col items-center justify-center py-12 px-4 text-center rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl">
+            <div className="h-16 w-16 mb-6 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+              <Bot className="h-8 w-8 text-emerald-500" />
             </div>
-            {agentsLoading && !agents.length ? (
-              <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
-            ) : agentsError ? (
-              <p className="text-xs text-red-500 dark:text-red-400">Failed to load</p>
-            ) : (
-              <div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalAgents}</div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">All configured agents</p>
-              </div>
-            )}
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+              No Agents Created
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-[250px] mx-auto leading-relaxed">
+              Get started by creating your first AI agent to manage tasks and conversations.
+            </p>
+            <Link
+              href="/dashboard/agents"
+              className="w-full max-w-[200px] flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all"
+            >
+              <span>Create Agent</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
+        )}
+
+        {/* Stats Cards - Wobble Card Style */}
+        <div className={`${!agentsLoading && !agentsError && agents.length === 0 ? "hidden sm:grid" : "grid"} gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4`}>
+          {/* Total Agents */}
+          <WobbleCard containerClassName="bg-gradient-to-br from-emerald-500 to-emerald-700 min-h-[140px]">
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-white/80">Total Agents</span>
+                <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Bot className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              {agentsLoading && !agents.length ? (
+                <Skeleton className="h-8 w-16 bg-white/20" />
+              ) : agentsError ? (
+                <p className="text-xs text-red-200">Failed to load</p>
+              ) : (
+                <div>
+                  <div className="text-3xl sm:text-4xl font-bold text-white">{totalAgents}</div>
+                  <p className="text-xs text-white/70 mt-1">All configured agents</p>
+                </div>
+              )}
+            </div>
+          </WobbleCard>
 
           {/* Active Status */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Active Status</span>
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-sm shadow-cyan-500/25">
-                <Activity className="h-5 w-5 text-white" />
-              </div>
-            </div>
-            {agentsLoading && !agents.length ? (
-              <Skeleton className="h-8 w-20 bg-slate-200 dark:bg-white/10" />
-            ) : agentsError ? (
-              <p className="text-xs text-red-500 dark:text-red-400">Error loading</p>
-            ) : (
-              <div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{activeCount}</span>
-                  <span className="text-lg text-slate-400 dark:text-slate-500">/ {activeCount + inactiveCount}</span>
+          <WobbleCard containerClassName="bg-gradient-to-br from-cyan-500 to-cyan-700 min-h-[140px]">
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-white/80">Active Status</span>
+                <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-white" />
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Active agents online</p>
               </div>
-            )}
-          </div>
+              {agentsLoading && !agents.length ? (
+                <Skeleton className="h-8 w-20 bg-white/20" />
+              ) : agentsError ? (
+                <p className="text-xs text-red-200">Error loading</p>
+              ) : (
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl sm:text-4xl font-bold text-white">{activeCount}</span>
+                    <span className="text-lg text-white/60">/ {activeCount + inactiveCount}</span>
+                  </div>
+                  <p className="text-xs text-white/70 mt-1">Active agents online</p>
+                </div>
+              )}
+            </div>
+          </WobbleCard>
 
           {/* Campaigns */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Campaigns</span>
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shadow-sm shadow-violet-500/25">
-                <Radio className="h-5 w-5 text-white" />
+          <WobbleCard containerClassName="bg-gradient-to-br from-violet-500 to-violet-700 min-h-[140px]">
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-white/80">Campaigns</span>
+                <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Radio className="h-5 w-5 text-white" />
+                </div>
               </div>
+              {!primaryAgent ? (
+                <div className="flex flex-col items-start gap-3 mt-2">
+                  <p className="text-xs font-medium text-white/90">You haven&apos;t created any agent</p>
+                  <Link
+                    href="/dashboard/agents"
+                    className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-semibold text-white transition-colors border border-white/10 flex items-center gap-1.5"
+                  >
+                    Create Agent
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              ) : campaignsLoading && !campaigns.length ? (
+                <Skeleton className="h-8 w-16 bg-white/20" />
+              ) : campaignsError ? (
+                <p className="text-xs text-red-200">Failed to load</p>
+              ) : (
+                <div>
+                  <div className="text-3xl sm:text-4xl font-bold text-white">{totalCampaigns}</div>
+                  <p className="text-xs text-white/70 mt-1">Outbound campaigns</p>
+                </div>
+              )}
             </div>
-            {!primaryAgent ? (
-              <p className="text-xs text-slate-500 dark:text-slate-400">Create an agent first</p>
-            ) : campaignsLoading && !campaigns.length ? (
-              <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
-            ) : campaignsError ? (
-              <p className="text-xs text-red-500 dark:text-red-400">Failed to load</p>
-            ) : (
-              <div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCampaigns}</div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Outbound campaigns</p>
-              </div>
-            )}
-          </div>
+          </WobbleCard>
 
           {/* Providers */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 hover:border-emerald-500/30 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Providers</span>
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm shadow-amber-500/25">
-                <Brain className="h-5 w-5 text-white" />
+          <WobbleCard containerClassName="bg-gradient-to-br from-amber-500 to-amber-700 min-h-[140px]">
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-white/80">Providers</span>
+                <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Brain className="h-5 w-5 text-white" />
+                </div>
               </div>
+              {agentsLoading && !agents.length ? (
+                <Skeleton className="h-8 w-16 bg-white/20" />
+              ) : agentsError ? (
+                <p className="text-xs text-red-200">Error</p>
+              ) : (
+                <div>
+                  <div className="text-3xl sm:text-4xl font-bold text-white">{providers.length}</div>
+                  <p className="text-xs text-white/70 mt-1">AI model providers</p>
+                </div>
+              )}
             </div>
-            {agentsLoading && !agents.length ? (
-              <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-white/10" />
-            ) : agentsError ? (
-              <p className="text-xs text-red-500 dark:text-red-400">Error</p>
-            ) : (
-              <div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white">{providers.length}</div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">AI model providers</p>
-              </div>
-            )}
-          </div>
+          </WobbleCard>
         </div>
 
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className={`${!agentsLoading && !agentsError && agents.length === 0 ? "hidden sm:grid" : "grid"} gap-6 grid-cols-1 xl:grid-cols-2`}>
           {/* Recent Agents */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl overflow-hidden">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
                   <Clock className="h-4 w-4 text-white" />
@@ -318,7 +344,7 @@ export default function OverviewPage() {
                 <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {agentsLoading && !agents.length ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
@@ -331,16 +357,28 @@ export default function OverviewPage() {
               ) : agentsError ? (
                 <p className="text-sm text-red-500 dark:text-red-400">Failed to load agents.</p>
               ) : agents.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="h-12 w-12 mx-auto rounded-xl bg-emerald-500 flex items-center justify-center mb-4">
-                    <Bot className="h-6 w-6 text-white" />
+                <div className="relative flex flex-col items-center justify-center py-10 px-4 text-center rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 overflow-hidden group">
+                  {/* Background Glow */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl pointer-events-none" />
+
+                  {/* Icon */}
+                  <div className="relative z-10 mb-4 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 shadow-lg shadow-emerald-500/5 transform transition-transform group-hover:scale-110 duration-500">
+                    <Bot className="h-6 w-6 text-emerald-500" />
                   </div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">No agents created yet</p>
+
+                  <h4 className="relative z-10 font-semibold text-slate-900 dark:text-white mb-1">
+                    No agents yet
+                  </h4>
+                  <p className="relative z-10 text-sm text-slate-500 dark:text-slate-400 mb-5 max-w-[200px] leading-relaxed">
+                    Create your first AI agent to get started
+                  </p>
+
                   <Link
                     href="/dashboard/agents"
-                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
+                    className="relative z-10 group/btn inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-emerald-600 rounded-lg hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600"
                   >
-                    Create Your First Agent
+                    <span>Create Agent</span>
+                    <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover/btn:translate-x-1" />
                   </Link>
                 </div>
               ) : (
@@ -385,8 +423,8 @@ export default function OverviewPage() {
           </div>
 
           {/* Outbound Campaigns */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl overflow-hidden">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shadow-sm shadow-violet-500/25">
                   <Radio className="h-4 w-4 text-white" />
@@ -401,7 +439,7 @@ export default function OverviewPage() {
                 <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {!primaryAgent ? (
                 <div className="text-center py-8">
                   <div className="h-12 w-12 mx-auto rounded-xl bg-violet-500 flex items-center justify-center mb-4">
@@ -410,7 +448,7 @@ export default function OverviewPage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Create an agent to start campaigns</p>
                   <Link
                     href="/dashboard/agents"
-                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300"
                   >
                     Create Agent
                   </Link>
@@ -445,7 +483,7 @@ export default function OverviewPage() {
                   </p>
                   <Link
                     href="/dashboard/outbound"
-                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
+                    className="inline-flex px-5 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-medium border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all duration-300"
                   >
                     Create Campaign
                   </Link>
@@ -488,57 +526,7 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        {/* Configuration Overview */}
-        {providers.length > 0 || memoryTypes.length > 0 ? (
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm shadow-amber-500/25">
-                  <Brain className="h-4 w-4 text-white" />
-                </div>
-                <h3 className="font-semibold text-slate-900 dark:text-white">Configuration Overview</h3>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div>
-                  <p className="text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Model Providers</p>
-                  <div className="flex flex-wrap gap-2">
-                    {providers.length > 0 ? (
-                      providers.map((p) => (
-                        <span
-                          key={p}
-                          className="inline-flex px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
-                        >
-                          {p}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-sm text-slate-500 dark:text-slate-400">None configured</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Memory Types</p>
-                  <div className="flex flex-wrap gap-2">
-                    {memoryTypes.length > 0 ? (
-                      memoryTypes.map((m) => (
-                        <span
-                          key={m}
-                          className="inline-flex px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20"
-                        >
-                          {m}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-sm text-slate-500 dark:text-slate-400">None configured</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
+
       </div>
     </div>
   )

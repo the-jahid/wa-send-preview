@@ -119,12 +119,9 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
     <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden transition-colors">
       {/* Header with gradient */}
       <div className="relative px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <Plus className="h-5 w-5 text-white" />
-            </div>
+
             <div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Templates</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400">Two-pane: list on the left, editor on the right</p>
@@ -142,7 +139,7 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
               <RefreshCcw className="h-4 w-4" />
             </button>
             <button
-              className="h-10 px-5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center gap-2"
+              className="h-10 px-5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 flex items-center gap-2"
               onClick={() => setSelectedId("new")}
             >
               <Plus className="h-4 w-4" /> New template
@@ -273,7 +270,7 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-7 px-2 gap-1 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
+                                  className="h-7 px-3 gap-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 backdrop-blur-xl text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 transition-all font-medium"
                                   onClick={async (e) => {
                                     e.stopPropagation()
                                     await selectForBroadcast(tpl.id)
@@ -283,13 +280,13 @@ export default function TemplatesPanel({ agentId }: { agentId: string }) {
                                 >
                                   {setting ? (
                                     <>
-                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                      <span className="text-xs">Setting…</span>
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                      <span className="text-[10px]">Setting…</span>
                                     </>
                                   ) : (
                                     <>
                                       <CheckCircle2 className="h-3.5 w-3.5" />
-                                      <span className="text-xs">Use</span>
+                                      <span className="text-[10px]">Use</span>
                                     </>
                                   )}
                                 </Button>
@@ -481,7 +478,7 @@ function CreateTemplateInline({ agentId, onCreated }: { agentId: string; onCreat
           <Button
             type="submit"
             disabled={createMut.isPending}
-            className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
+            className="gap-2 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 disabled:opacity-50"
           >
             {createMut.isPending ? (
               <>
@@ -646,7 +643,7 @@ function EditTemplateInline({
             </div>
           ) : (
             <Button
-              className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+              className="gap-2 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
               onClick={onSelectTemplate}
               disabled={!!isSetting}
             >
@@ -723,7 +720,7 @@ function EditTemplateInline({
               <Button
                 type="submit"
                 disabled={updateMut.isPending}
-                className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
+                className="gap-2 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 disabled:opacity-50"
               >
                 {updateMut.isPending ? (
                   <>
@@ -738,7 +735,7 @@ function EditTemplateInline({
               <Button
                 type="button"
                 variant="outline"
-                className="gap-2 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                className="gap-2 rounded-full bg-rose-500/10 hover:bg-rose-500/20 backdrop-blur-2xl text-rose-700 dark:text-rose-400 font-semibold border border-rose-200 dark:border-rose-500/30 hover:border-rose-500/50 shadow-lg shadow-rose-500/5 hover:shadow-rose-500/10 transition-all"
                 onClick={onDeleteClick}
                 disabled={deleteMut.isPending || isSetting}
               >

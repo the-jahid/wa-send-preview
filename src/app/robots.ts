@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
                 disallow: ['/api/', '/dashboard/', '/sign-in/', '/sign-up/'],
             },
         ],
-        sitemap: 'https://wasend.com/sitemap.xml',
+        sitemap: 'https://wapzen.io/sitemap.xml',
     }
 }

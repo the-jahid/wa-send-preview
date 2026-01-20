@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Bot, Calendar, Loader2, Search } from "lucide-react"
 
@@ -32,9 +32,18 @@ export function AgentSelectionModal({
     const router = useRouter()
     const [searchQuery, setSearchQuery] = useState("")
 
-    const { data: agentsResp, isLoading } = useAgents({
+    const { data: agentsResp, isLoading, refetch } = useAgents({
         limit: 100, // Fetch enough agents
+    }, {
+        staleTime: 0, // Always consider data stale to get fresh list
     })
+
+    // Refetch agents whenever modal opens
+    useEffect(() => {
+        if (isOpen) {
+            refetch()
+        }
+    }, [isOpen, refetch])
 
     const agents: any[] = useMemo(() => {
         // Robust data extraction matching outbound/page.tsx

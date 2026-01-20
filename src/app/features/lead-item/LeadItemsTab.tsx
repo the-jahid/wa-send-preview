@@ -240,6 +240,7 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
   // ---- UI state (EXISTING) ----
   const [createOpen, setCreateOpen] = useState(false)
   const [editItem, setEditItem] = useState<LeadItem | null>(null)
+  const [leadFieldsSidebarOpen, setLeadFieldsSidebarOpen] = useState(false)
 
   // Reset Lead Items page when filters change (EXISTING)
   useEffect(() => setPage(1), [name, description, sortBy, sortOrder])
@@ -301,6 +302,9 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
   const leads = leadsQuery.data?.data ?? []
   const leadsTotalPages = leadsQuery.data?.totalPages ?? 1
 
+  // Selected lead for detail sidebar
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+
   // Optional: delete captured lead (NEW)
   const deleteLead = useDeleteLead({ token })
 
@@ -345,6 +349,14 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
           >
             {updateAgent.isPending ? "Saving..." : leadsActive ? "Enabled" : "Enable"}
           </button>
+          {leadsActive && (
+            <button
+              onClick={() => setLeadFieldsSidebarOpen(true)}
+              className="px-4 py-2.5 rounded-full font-medium border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors ml-2"
+            >
+              ⚙️ Configure Fields
+            </button>
+          )}
         </div>
       </div>
 
@@ -362,391 +374,504 @@ export default function LeadItemsTab({ agentId }: { agentId: string }) {
 
       {leadsActive && (
         <div className="space-y-6">
-          {/* Lead Fields Configuration */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
-              <h3 className="font-semibold text-slate-900 dark:text-white">Lead Fields</h3>
-              <button
-                onClick={() => setCreateOpen(true)}
-                className="px-4 py-2 rounded-full bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors text-sm"
+          {/* Lead Fields Sidebar */}
+          {leadFieldsSidebarOpen && (
+            <div className="fixed inset-0 z-50">
+              {/* Backdrop */}
+              <div
+                className="fixed inset-0 bg-black/50 transition-opacity"
+                onClick={() => setLeadFieldsSidebarOpen(false)}
+              />
+
+              {/* Slide-in drawer from right */}
+              <div
+                className="fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-[#0d1424] shadow-2xl border-l border-slate-200 dark:border-white/10 flex flex-col"
+                role="dialog"
+                aria-modal="true"
               >
-                + Add Field
-              </button>
-            </div>
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between flex-shrink-0">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Lead Fields Configuration</h3>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setCreateOpen(true)}
+                      className="px-4 py-2 rounded-full bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors text-sm"
+                    >
+                      + Add Field
+                    </button>
+                    <button
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+                      onClick={() => setLeadFieldsSidebarOpen(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
 
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  <FilterSection title="Filter & Sort Options" defaultOpen={false}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Field Name</label>
+                        <input
+                          className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
+                          placeholder="Search by name..."
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
+                        <input
+                          className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
+                          placeholder="Search description..."
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
+                        <select
+                          className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value as any)}
+                        >
+                          <option value="createdAt">Date Created</option>
+                          <option value="updatedAt">Last Updated</option>
+                          <option value="name">Field Name</option>
+                          <option value="description">Description</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
+                        <select
+                          className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
+                          value={sortOrder}
+                          onChange={(e) => setSortOrder(e.target.value as any)}
+                        >
+                          <option value="desc">Newest First</option>
+                          <option value="asc">Oldest First</option>
+                        </select>
+                      </div>
+                    </div>
+                  </FilterSection>
 
-            <FilterSection title="Filter & Sort Options" defaultOpen={false}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Field Name</label>
-                  <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
-                    placeholder="Search by name..."
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
-                  <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
-                    placeholder="Search description..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
-                  <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
-                  >
-                    <option value="createdAt">Date Created</option>
-                    <option value="updatedAt">Last Updated</option>
-                    <option value="name">Field Name</option>
-                    <option value="description">Description</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
-                  <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-                    value={sortOrder}
-                    onChange={(e) => setSortOrder(e.target.value as any)}
-                  >
-                    <option value="desc">Newest First</option>
-                    <option value="asc">Oldest First</option>
-                  </select>
+                  <div className="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0d1424] shadow-sm">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
+                          <tr>
+                            <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Field Name</th>
+                            <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Description</th>
+                            <th className="text-right p-4 font-semibold text-slate-900 dark:text-white">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                          {isLoading && (
+                            <tr>
+                              <td colSpan={3} className="p-8 text-center">
+                                <div className="flex items-center justify-center gap-3">
+                                  <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                                  <span className="text-slate-600 dark:text-slate-400">Loading fields...</span>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                          {error && !isLoading && (
+                            <tr>
+                              <td colSpan={3} className="p-8 text-center">
+                                <div className="text-red-600 bg-red-50 rounded-lg p-4">
+                                  <p className="font-medium">Error loading fields</p>
+                                  <p className="text-sm mt-1">{(error as Error).message}</p>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                          {!isLoading && !error && items.length === 0 && (
+                            <tr>
+                              <td colSpan={3} className="p-12">
+                                <EmptyState
+                                  title="No lead fields configured yet"
+                                  hint="Create your first field to start collecting visitor information."
+                                  icon={
+                                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
+                                      <span className="text-green-600 dark:text-green-200 text-xl">📝</span>
+                                    </div>
+                                  }
+                                  action={
+                                    <button
+                                      onClick={() => setCreateOpen(true)}
+                                      className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
+                                    >
+                                      Create First Field
+                                    </button>
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          )}
+                          {items.map((it) => (
+                            <tr key={it.id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
+                              <td className="p-4">
+                                <span className="font-medium text-slate-900 dark:text-white">{it.name}</span>
+                              </td>
+                              <td className="p-4">
+                                <span className="text-slate-600 dark:text-slate-400">{it.description || "—"}</span>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    className="px-3 py-1.5 rounded-md border border-slate-300 dark:border-white/10 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
+                                    onClick={() => setEditItem(it)}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    className="px-3 py-1.5 rounded-md border border-red-300 dark:border-red-800 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                                    onClick={() => {
+                                      if (
+                                        confirm(`Are you sure you want to delete "${it.name}"? This action cannot be undone.`)
+                                      ) {
+                                        del.mutate(it.id)
+                                      }
+                                    }}
+                                    disabled={del.isPending}
+                                  >
+                                    {del.isPending ? "Deleting..." : "Delete"}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {items.length > 0 && (
+                    <Pagination
+                      page={page}
+                      totalPages={totalPages}
+                      onPrev={() => setPage((p) => Math.max(1, p - 1))}
+                      onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    />
+                  )}
                 </div>
               </div>
-            </FilterSection>
 
-            <div className="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0d1424] shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
-                    <tr>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Field Name</th>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Description</th>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Last Updated</th>
-                      <th className="text-right p-4 font-semibold text-slate-900 dark:text-white">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                    {isLoading && (
-                      <tr>
-                        <td colSpan={4} className="p-8 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-slate-600 dark:text-slate-400">Loading fields...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                    {error && !isLoading && (
-                      <tr>
-                        <td colSpan={4} className="p-8 text-center">
-                          <div className="text-red-600 bg-red-50 rounded-lg p-4">
-                            <p className="font-medium">Error loading fields</p>
-                            <p className="text-sm mt-1">{(error as Error).message}</p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                    {!isLoading && !error && items.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="p-12">
-                          <EmptyState
-                            title="No lead fields configured yet"
-                            hint="Create your first field to start collecting visitor information. Common fields include Full Name, Email Address, and Phone Number."
-                            icon={
-                              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
-                                <span className="text-green-600 dark:text-green-200 text-xl">📝</span>
-                              </div>
-                            }
-                            action={
-                              <button
-                                onClick={() => setCreateOpen(true)}
-                                className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
-                              >
-                                Create First Field
-                              </button>
-                            }
-                          />
-                        </td>
-                      </tr>
-                    )}
-                    {items.map((it) => (
-                      <tr key={it.id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
-                        <td className="p-4">
-                          <span className="font-medium text-slate-900 dark:text-white">{it.name}</span>
-                        </td>
-                        <td className="p-4">
-                          <span className="text-slate-600 dark:text-slate-400">{it.description || "—"}</span>
-                        </td>
-                        <td className="p-4">
-                          <span className="text-slate-500 text-sm">
-                            {new Date(it.updatedAt).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              className="px-3 py-1.5 rounded-md border border-slate-300 dark:border-white/10 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
-                              onClick={() => setEditItem(it)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="px-3 py-1.5 rounded-md border border-red-300 dark:border-red-800 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                              onClick={() => {
-                                if (
-                                  confirm(`Are you sure you want to delete "${it.name}"? This action cannot be undone.`)
-                                ) {
-                                  del.mutate(it.id)
-                                }
-                              }}
-                              disabled={del.isPending}
-                            >
-                              {del.isPending ? "Deleting..." : "Delete"}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {/* Create drawer/modal */}
+              {createOpen && (
+                <LeadItemForm
+                  title="Create New Lead Field"
+                  onCancel={() => setCreateOpen(false)}
+                  onSubmit={(vals) => create.mutate(vals)}
+                  submitting={create.isPending}
+                />
+              )}
+
+              {/* Edit drawer/modal */}
+              {editItem && (
+                <LeadItemForm
+                  title="Edit Lead Field"
+                  initial={{ name: editItem.name, description: editItem.description ?? "" }}
+                  onCancel={() => setEditItem(null)}
+                  onSubmit={(vals) => update.mutate({ id: editItem.id, data: vals })}
+                  submitting={update.isPending}
+                />
+              )}
             </div>
-
-            {items.length > 0 && (
-              <Pagination
-                page={page}
-                totalPages={totalPages}
-                onPrev={() => setPage((p) => Math.max(1, p - 1))}
-                onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-              />
-            )}
-
-            {/* Create drawer/modal */}
-            {createOpen && (
-              <LeadItemForm
-                title="Create New Lead Field"
-                onCancel={() => setCreateOpen(false)}
-                onSubmit={(vals) => create.mutate(vals)}
-                submitting={create.isPending}
-              />
-            )}
-
-            {/* Edit drawer/modal */}
-            {editItem && (
-              <LeadItemForm
-                title="Edit Lead Field"
-                initial={{ name: editItem.name, description: editItem.description ?? "" }}
-                onCancel={() => setEditItem(null)}
-                onSubmit={(vals) => update.mutate({ id: editItem.id, data: vals })}
-                submitting={update.isPending}
-              />
-            )}
-          </div>
+          )}
 
           {/* Captured Leads Section */}
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10">
-              <h3 className="font-semibold text-slate-900 dark:text-white">Captured Leads</h3>
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h3 className="font-semibold text-slate-900 dark:text-white">Captured Leads</h3>
+                {leads.length > 0 && (
+                  <span className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full font-medium">
+                    {leads.length} lead{leads.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <select
+                value={leadSortOrder}
+                onChange={(e) => setLeadSortOrder(e.target.value as "asc" | "desc")}
+                className="text-sm border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 bg-white dark:bg-[#0d1424] text-slate-700 dark:text-slate-300"
+              >
+                <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option>
+              </select>
             </div>
 
-
-            <FilterSection title="Filter Captured Leads" defaultOpen={true}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
-                  <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
-                    placeholder='e.g. "NEW", "QUALIFIED"'
-                    value={leadStatus}
-                    onChange={(e) => setLeadStatus(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Source</label>
-                  <input
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400"
-                    placeholder="e.g. WhatsApp, Website"
-                    value={leadSource}
-                    onChange={(e) => setLeadSource(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">From Date</label>
-                  <input
-                    type="date"
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
-                    value={leadCreatedAfter}
-                    onChange={(e) => setLeadCreatedAfter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">To Date</label>
-                  <input
-                    type="date"
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
-                    value={leadCreatedBefore}
-                    onChange={(e) => setLeadCreatedBefore(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sort By</label>
-                  <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-                    value={leadSortBy}
-                    onChange={(e) => setLeadSortBy(e.target.value as any)}
-                  >
-                    <option value="updatedAt">Last Updated</option>
-                    <option value="createdAt">Date Created</option>
-                    <option value="status">Status</option>
-                    <option value="source">Source</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Order</label>
-                  <select
-                    className="w-full border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-[#0d1424] text-slate-900 dark:text-white"
-                    value={leadSortOrder}
-                    onChange={(e) => setLeadSortOrder(e.target.value as any)}
-                  >
-                    <option value="desc">Newest First</option>
-                    <option value="asc">Oldest First</option>
-                  </select>
+            {leadsQuery.isLoading ? (
+              <div className="flex items-center justify-center py-16 gap-3">
+                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-slate-500 dark:text-slate-400">Loading leads...</span>
+              </div>
+            ) : leadsQuery.error ? (
+              <div className="p-6 text-center">
+                <div className="text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+                  <p className="font-medium">Error loading leads</p>
+                  <p className="text-sm mt-1">{(leadsQuery.error as Error).message}</p>
                 </div>
               </div>
-            </FilterSection>
-
-            <div className="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0d1424] shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
-                    <tr>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Status</th>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Source</th>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Lead Data</th>
-                      <th className="text-left p-4 font-semibold text-slate-900 dark:text-white">Last Updated</th>
-                      <th className="text-right p-4 font-semibold text-slate-900 dark:text-white">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                    {leadsQuery.isLoading && (
-                      <tr>
-                        <td colSpan={5} className="p-8 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-slate-600 dark:text-slate-400">Loading captured leads...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                    {leadsQuery.error && !leadsQuery.isLoading && (
-                      <tr>
-                        <td colSpan={5} className="p-8 text-center">
-                          <div className="text-red-600 bg-red-50 rounded-lg p-4">
-                            <p className="font-medium">Error loading leads</p>
-                            <p className="text-sm mt-1">{(leadsQuery.error as Error).message}</p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                    {!leadsQuery.isLoading && !leadsQuery.error && leads.length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="p-12">
-                          <EmptyState
-                            title="No leads captured yet"
-                            hint="Once your agent starts collecting information from visitors through your connected channels, they'll appear here. Try testing the flow by sending a message to your agent."
-                            icon={
-                              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                <span className="text-green-600 dark:text-green-400 text-xl">👥</span>
-                              </div>
-                            }
-                          />
-                        </td>
-                      </tr>
-                    )}
-                    {leads.map((lead: Lead) => (
-                      <tr key={lead.id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
-                        <td className="p-4">
-                          <span
-                            className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${lead.status === "NEW"
-                              ? "bg-green-100 text-green-800"
-                              : lead.status === "QUALIFIED"
-                                ? "bg-green-100 text-green-800"
-                                : lead.status === "CONTACTED"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-slate-100 text-slate-800"
-                              }`}
-                          >
-                            {lead.status}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <span className="text-slate-900 dark:text-white font-medium">{lead.source || "—"}</span>
-                        </td>
-                        <td className="p-4">
-                          <div className="max-w-xs">
-                            <pre className="whitespace-pre-wrap break-words text-xs bg-slate-50 dark:bg-white/5 rounded-lg p-3 border dark:border-white/10 text-slate-700 dark:text-slate-300 font-mono">
-                              {JSON.stringify(lead.data ?? {}, null, 2)}
-                            </pre>
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <span className="text-slate-500 text-sm">
-                            {new Date(lead.updatedAt).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center justify-end">
-                            <button
-                              className="px-3 py-1.5 rounded-md border border-red-300 dark:border-red-800 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                              onClick={() => {
-                                if (
-                                  confirm("Are you sure you want to delete this lead? This action cannot be undone.")
-                                ) {
-                                  deleteLead.mutate({ leadId: lead.id, agentId })
-                                }
-                              }}
-                              disabled={deleteLead.isPending}
-                              aria-label="Delete lead"
-                            >
-                              {deleteLead.isPending ? "Deleting..." : "Delete"}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            ) : leads.length === 0 ? (
+              <div className="p-12 text-center">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <span className="text-2xl">👥</span>
+                </div>
+                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No leads yet</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  Leads will appear here when visitors share their information through your agent.
+                </p>
               </div>
-            </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-white/5">
+                {leads.map((lead: Lead) => (
+                  <div
+                    key={lead.id}
+                    className="p-4 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer flex items-center justify-between gap-4"
+                    onClick={() => setSelectedLead(lead)}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {/* Status badge */}
+                      <span
+                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${lead.status === "NEW"
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
+                          : lead.status === "QUALIFIED"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
+                            : lead.status === "CONTACTED"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300"
+                              : "bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-slate-300"
+                          }`}
+                      >
+                        {lead.status}
+                      </span>
 
-            {leads.length > 0 && (
-              <Pagination
-                page={leadPage}
-                totalPages={leadsTotalPages}
-                onPrev={() => setLeadPage((p) => Math.max(1, p - 1))}
-                onNext={() => setLeadPage((p) => Math.min(leadsTotalPages, p + 1))}
-              />
+                      {/* Sender Phone - main display */}
+                      <span className="inline-flex items-center gap-1.5 text-base text-slate-900 dark:text-white font-medium">
+                        <span className="text-emerald-500">📱</span>
+                        {lead.senderPhone
+                          ? lead.senderPhone.replace(/@s\.whatsapp\.net$/, '')
+                          : 'Unknown'}
+                      </span>
+
+                      {/* Source */}
+                      {lead.source && (
+                        <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded">
+                          {lead.source}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      {/* Date */}
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                        {new Date(lead.updatedAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+
+                      {/* Delete button */}
+                      <button
+                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (confirm("Delete this lead?")) {
+                            deleteLead.mutate({ leadId: lead.id, agentId })
+                          }
+                        }}
+                        disabled={deleteLead.isPending}
+                        title="Delete lead"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+
+                      {/* Arrow indicator */}
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
+
+            {/* Simple pagination */}
+            {leads.length > 0 && leadsTotalPages > 1 && (
+              <div className="px-5 py-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
+                <span className="text-sm text-slate-500 dark:text-slate-400">
+                  Page {leadPage} of {leadsTotalPages}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => setLeadPage((p) => Math.max(1, p - 1))}
+                    disabled={leadPage <= 1}
+                  >
+                    ← Prev
+                  </button>
+                  <button
+                    className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => setLeadPage((p) => Math.min(leadsTotalPages, p + 1))}
+                    disabled={leadPage >= leadsTotalPages}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Lead Detail Sidebar */}
+      {selectedLead && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 transition-opacity"
+            onClick={() => setSelectedLead(null)}
+          />
+
+          {/* Slide-in drawer from right */}
+          <div
+            className="fixed top-0 right-0 h-full w-full max-w-lg bg-white dark:bg-[#0d1424] shadow-2xl border-l border-slate-200 dark:border-white/10 flex flex-col"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">📱</span>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    {selectedLead.senderPhone
+                      ? selectedLead.senderPhone.replace(/@s\.whatsapp\.net$/, '')
+                      : 'Unknown Lead'}
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Lead Details</p>
+                </div>
+              </div>
+              <button
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => setSelectedLead(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Status & Source */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-4">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Status</p>
+                  <span
+                    className={`inline-flex px-3 py-1 rounded-full text-sm font-semibold ${selectedLead.status === "NEW"
+                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
+                      : selectedLead.status === "QUALIFIED"
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
+                        : selectedLead.status === "CONTACTED"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300"
+                          : "bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-slate-300"
+                      }`}
+                  >
+                    {selectedLead.status}
+                  </span>
+                </div>
+                <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-4">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Source</p>
+                  <p className="text-sm text-slate-900 dark:text-white font-medium">
+                    {selectedLead.source || '—'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Phone Number */}
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mb-1">WhatsApp Number</p>
+                <p className="text-lg text-emerald-700 dark:text-emerald-300 font-semibold">
+                  {selectedLead.senderPhone
+                    ? selectedLead.senderPhone.replace(/@s\.whatsapp\.net$/, '')
+                    : 'Unknown'}
+                </p>
+              </div>
+
+              {/* Timestamps */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-4">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Created</p>
+                  <p className="text-sm text-slate-900 dark:text-white">
+                    {new Date(selectedLead.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-4">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Updated</p>
+                  <p className="text-sm text-slate-900 dark:text-white">
+                    {new Date(selectedLead.updatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              </div>
+
+              {/* Captured Data */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Captured Data</h4>
+                {selectedLead.data && typeof selectedLead.data === "object" && Object.keys(selectedLead.data).length > 0 ? (
+                  <div className="space-y-3">
+                    {Object.entries(selectedLead.data as Record<string, unknown>).map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="bg-slate-50 dark:bg-white/5 rounded-xl p-4 flex items-start justify-between gap-4"
+                      >
+                        <span className="text-sm text-slate-500 dark:text-slate-400 capitalize">{key}</span>
+                        <span className="text-sm text-slate-900 dark:text-white font-medium text-right">
+                          {String(value ?? "—")}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-6 text-center">
+                    <span className="text-slate-500 dark:text-slate-400 text-sm italic">No data captured</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer with actions */}
+            <div className="px-6 py-4 border-t border-slate-200 dark:border-white/10 flex-shrink-0">
+              <button
+                className="w-full px-4 py-2.5 rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium"
+                onClick={() => {
+                  if (confirm("Delete this lead?")) {
+                    deleteLead.mutate({ leadId: selectedLead.id, agentId })
+                    setSelectedLead(null)
+                  }
+                }}
+                disabled={deleteLead.isPending}
+              >
+                {deleteLead.isPending ? "Deleting..." : "Delete Lead"}
+              </button>
+            </div>
           </div>
         </div>
       )}

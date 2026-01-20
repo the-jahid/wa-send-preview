@@ -59,7 +59,7 @@ export async function apiGetGoogleAuthUrlSimple(
   if (opts?.agentId) qs.set('agentId', opts.agentId);
   if (opts?.returnTo) qs.set('returnTo', opts.returnTo);
 
-  const url = `http://localhost:3000${PATH_URL}${qs.toString() ? `?${qs}` : ''}`;
+  const url = `${BASE}${PATH_URL}${qs.toString() ? `?${qs}` : ''}`;
   const res = await fetch(url, { method: 'GET' });
 
   if (!res.ok) {

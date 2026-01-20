@@ -95,6 +95,7 @@ export async function listLeadsByAgent(
   opts?: WithToken & WithSignal
 ): Promise<PaginatedLeadsResult> {
   const url = withQuery(`${resolveBase()}/leads/agent/${agentId}`, normalizeQuery(params));
+
   const res = await fetch(url, {
     headers: await authHeaders(opts?.token),
     signal: opts?.signal,
@@ -134,6 +135,31 @@ export async function deleteLead(
   const res = await fetch(url, {
     method: 'DELETE',
     headers: await authHeaders(opts?.token),
+    signal: opts?.signal,
+  });
+
+  if (!res.ok) throw new Error(await safeErr(res));
+
+  const json = await res.json();
+  return LeadSchema.parse(json);
+}
+
+export type CreateLeadPayload = {
+  agentId: string;
+  status?: string;
+  source?: string;
+  data?: Record<string, any>;
+};
+
+export async function createLead(
+  payload: CreateLeadPayload,
+  opts?: WithToken & WithSignal
+): Promise<Lead> {
+  const url = `${resolveBase()}/leads`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: await authHeaders(opts?.token),
+    body: JSON.stringify(payload),
     signal: opts?.signal,
   });
 

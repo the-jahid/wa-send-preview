@@ -324,13 +324,6 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
         continue
       }
 
-      const custom: Record<string, any> = {}
-      for (const h of headers) {
-        if (h === mapName || h === mapPhone) continue
-        const v = r[h]
-        if (v !== "" && v !== undefined) custom[h] = v
-      }
-
       try {
         const dto = CreateOutboundLeadSchema.parse({
           phoneNumber,
@@ -338,7 +331,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
           timeZone: "UTC",
           status: "QUEUED",
           maxAttempts: 3,
-          customFields: custom,
+          customFields: {},
         })
         await createLead(dto)
         ok++
@@ -451,8 +444,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1a] p-6 transition-colors duration-300">
         <div className="max-w-2xl mx-auto">
-          <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-white dark:via-[#0d1424] to-cyan-500/5 p-8 overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-8 overflow-hidden">
             <div className="text-center space-y-4 relative">
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/25">
                 <svg
@@ -513,11 +505,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
             {/* Top Row: Title & Actions */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
+
                 <div>
                   <h1 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Leads Manager</h1>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -557,7 +545,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
 
                 <button
                   onClick={() => setShowCreate((s) => !s)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 px-2.5 py-1.5 text-white text-xs font-medium shadow-sm transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-md px-2.5 py-1.5 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/30 text-xs font-semibold shadow-sm transition-all"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -610,7 +598,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                 <button
                   onClick={saveMessageGap}
                   disabled={updatingBroadcast || !effectiveAgentId}
-                  className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:underline disabled:opacity-50 disabled:no-underline"
+                  className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:underline disabled:opacity-50 disabled:no-underline px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all"
                 >
                   Save
                 </button>
@@ -620,7 +608,7 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                 <button
                   onClick={bulkDelete}
                   disabled={isDeletingBulk}
-                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 px-3 py-1.5 text-white text-xs font-medium shadow-sm transition-all animate-in fade-in zoom-in duration-200 disabled:opacity-50"
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 backdrop-blur-md px-3 py-1.5 text-rose-700 dark:text-rose-400 border border-rose-500/20 hover:border-rose-500/30 text-xs font-semibold shadow-sm transition-all animate-in fade-in zoom-in duration-200 disabled:opacity-50"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -711,39 +699,6 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                         </div>
                       </div>
 
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Settings
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4">
-                          <LabeledInput
-                            label="Time Zone"
-                            placeholder="UTC"
-                            value={createState.timeZone ?? ""}
-                            onChange={(v) => setCreateState((s) => ({ ...s, timeZone: v }))}
-                          />
-                          <LabeledSelect
-                            label="Status"
-                            value={(createState.status as any) ?? ""}
-                            onChange={(v) => setCreateState((s) => ({ ...s, status: v as any }))}
-                            options={STATUS_OPTIONS}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Additional Data
-                        </h4>
-                        <LabeledTextarea
-                          label="Custom Fields (JSON)"
-                          placeholder='{"company": "ACME Inc", "role": "Manager"}'
-                          value={createState.customFieldsInput ?? "{}"}
-                          onChange={(v) => setCreateState((s) => ({ ...s, customFieldsInput: v }))}
-                          className="h-32 text-xs font-mono"
-                        />
-                      </div>
-
                       {createErr && (
                         <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-xs text-rose-600 dark:text-rose-400 font-medium">
                           {createErr}
@@ -803,6 +758,31 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                             <span className="font-medium truncate">{fileName}</span>
                           </div>
                         )}
+
+                        {/* Download Sample Templates */}
+                        <div className="flex items-center gap-3 pt-2">
+                          <span className="text-xs text-slate-500 dark:text-slate-400">Download sample:</span>
+                          <a
+                            href="/samples/leads-template.csv"
+                            download="leads-template.csv"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            CSV
+                          </a>
+                          <a
+                            href="/samples/leads-template.xlsx"
+                            download="leads-template.xlsx"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            XLSX
+                          </a>
+                        </div>
                       </div>
 
                       {headers.length > 0 && (
@@ -1073,25 +1053,6 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                             </div>
 
                             <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                              <button
-                                onClick={async () => {
-                                  if (confirm("Record an attempt for this lead?")) {
-                                    await recordAttempt(row.id)
-                                  }
-                                }}
-                                disabled={busy}
-                                className="inline-flex items-center gap-1 rounded-md bg-sky-50 dark:bg-sky-500/20 hover:bg-sky-100 dark:hover:bg-sky-500/30 px-2 py-1 text-[11px] font-medium text-sky-700 dark:text-sky-300 transition-all disabled:opacity-50"
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 4v16m8-8H4"
-                                  />
-                                </svg>
-                                Attempt
-                              </button>
 
                               <button
                                 onClick={() => startEdit(row)}
@@ -1107,28 +1068,6 @@ export default function BroadcastTab({ campaignId, agentId }: { campaignId: stri
                                   />
                                 </svg>
                                 Edit
-                              </button>
-
-                              <button
-                                onClick={() => onViewJson(row.id)}
-                                disabled={busy}
-                                className="inline-flex items-center gap-1 rounded-md bg-slate-50 dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/20 px-2 py-1 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50"
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                  />
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                  />
-                                </svg>
-                                View
                               </button>
 
                               <button

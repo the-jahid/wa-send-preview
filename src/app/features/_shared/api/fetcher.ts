@@ -3,9 +3,7 @@
 // - Supports query string and override of cache/credentials/etc.
 
 export const apiBase =
-  typeof window === "undefined"
-    ? process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
-    : "";
+  process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "http://localhost:3000";
 
 export type Query = Record<string, string | number | boolean | undefined | null>;
 

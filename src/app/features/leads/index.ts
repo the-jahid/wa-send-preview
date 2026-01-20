@@ -18,7 +18,7 @@ export { LeadSchema, PaginatedLeadsResultSchema } from './schemas';
 export { leadKeys } from './keys';
 
 // API calls
-export { listLeads, listLeadsByAgent, getLeadById, deleteLead } from './apis';
+export { listLeads, listLeadsByAgent, getLeadById, deleteLead, createLead, type CreateLeadPayload } from './apis';
 
 // React Query hooks
-export { useLeads, useLeadsByAgent, useLead, useDeleteLead } from './query';
+export { useLeads, useLeadsByAgent, useLead, useDeleteLead, useCreateLead } from './query';

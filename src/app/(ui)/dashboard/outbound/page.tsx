@@ -86,7 +86,8 @@ export default function OutboundListPage() {
     if (savedTheme) {
       setIsDark(savedTheme === "dark")
     } else {
-      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+      // Default to dark mode for first-time users
+      setIsDark(true)
     }
   }, [])
 
@@ -259,7 +260,7 @@ export default function OutboundListPage() {
   // Prevent flash of wrong theme
   if (!mounted) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0a0f1a]">
+      <div className="h-screen flex items-center justify-center bg-slate-200 dark:bg-[#0a0f1a]">
         <div className="animate-pulse">
           <TrendingUp className="h-12 w-12 text-emerald-500" />
         </div>
@@ -269,19 +270,21 @@ export default function OutboundListPage() {
 
   if (!isLoaded)
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+      <div className="flex items-center justify-center h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300">
         <div className="text-slate-500 dark:text-slate-400">Loading…</div>
       </div>
     )
   if (!user)
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+      <div className="flex items-center justify-center h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300">
         <div className="text-slate-500 dark:text-slate-400">Please sign in.</div>
       </div>
     )
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+    <div className="flex flex-col h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300 relative overflow-hidden">
+      {/* Page Background Decoration */}
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none translate-x-1/3 -translate-y-1/4 z-20" />
       {/* Toast Notification */}
       {toast && (
         <div
@@ -292,88 +295,78 @@ export default function OutboundListPage() {
         </div>
       )}
 
-      {/* Header - Landing Page Style */}
-      <div className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0f1a]/95 backdrop-blur-sm transition-colors duration-300">
+      {/* Header - Landing Page Style - Merged Compact Version */}
+      <div className="sticky top-0 z-10 bg-slate-200/95 dark:bg-[#0a0f1a]/95 backdrop-blur-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          {/* Main Header Card */}
-          <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 mb-4 overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
-            <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                  <TrendingUp className="h-7 w-7 text-white" />
+          <div className="rounded-2xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] p-4 mb-4 shadow-sm">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+
+              {/* Left Side: Title & Agent Selector */}
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 flex-shrink-0">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Campaigns</h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Manage outbound campaigns</p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Campaigns</h1>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Manage outbound campaigns for your agents
-                  </p>
+
+                {/* Divider (Hidden on mobile) */}
+                <div className="hidden md:block h-8 w-px bg-slate-300 dark:bg-slate-700/50" />
+
+                {/* Agent Selector */}
+                <div className="flex items-center gap-2 w-full md:w-auto bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10">
+                  <div className="pl-2 pr-1 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agent</div>
+                  {agentsLoading ? (
+                    <div className="h-8 w-32 bg-slate-200 dark:bg-white/10 animate-pulse rounded-lg" />
+                  ) : (
+                    <select
+                      value={agentId ?? ""}
+                      onChange={(e) => {
+                        const next = e.target.value || null
+                        setAgentId(next)
+                        setPage(1)
+                        setStatusFilter(undefined)
+                      }}
+                      className="h-8 pl-2 pr-8 text-sm font-medium border-0 bg-transparent text-slate-900 dark:text-white focus:ring-0 cursor-pointer min-w-[140px]"
+                    >
+                      {agents.map((a) => (
+                        <option key={a.id} value={a.id} className="bg-white dark:bg-[#0d1424]">
+                          {a.name ?? a.id}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                {/* Agent Selector */}
-                {agentsLoading ? (
-                  <div className="h-10 w-52 bg-slate-200 dark:bg-white/10 animate-pulse rounded-xl" />
-                ) : (
-                  <select
-                    value={agentId ?? ""}
-                    onChange={(e) => {
-                      const next = e.target.value || null
-                      setAgentId(next)
-                      setPage(1)
-                      setStatusFilter(undefined)
+              {/* Right Side: Search & Actions */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
+                  <Input
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setPage(1)
+                        refetch()
+                      }
                     }}
-                    className="h-10 px-4 py-2 text-sm font-medium border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-white/5 text-slate-900 dark:text-white hover:border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                  >
-                    {agents.map((a) => (
-                      <option key={a.id} value={a.id} className="bg-white dark:bg-[#0d1424]">
-                        {a.name ?? a.id}
-                      </option>
-                    ))}
-                  </select>
-                )}
-
-                {/* Theme Toggle */}
+                    className="pl-9 w-full h-10 text-sm border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
+                </div>
                 <button
-                  onClick={toggleTheme}
-                  className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+                  onClick={() => setOpenCreate(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                 >
-                  {isDark ? (
-                    <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  ) : (
-                    <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  )}
+                  <Plus className="h-4 w-4" />
+                  New Campaign
                 </button>
               </div>
-            </div>
-          </div>
-
-          {/* Search & Actions Bar */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 mb-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="relative w-full sm:w-auto">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
-                <Input
-                  placeholder="Search campaigns..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setPage(1)
-                      refetch()
-                    }
-                  }}
-                  className="pl-9 w-full sm:w-80 h-10 text-sm border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                />
-              </div>
-              <button
-                onClick={() => setOpenCreate(true)}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 flex items-center justify-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Campaign
-              </button>
             </div>
           </div>
 
@@ -441,7 +434,7 @@ export default function OutboundListPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {/* Create Campaign Card */}
             <div
-              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/20 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[180px] group bg-white dark:bg-[#0d1424]"
+              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700/50 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-100/50 dark:hover:bg-slate-800/50 cursor-pointer transition-all duration-200 flex items-center justify-center min-h-[180px] group bg-slate-100 dark:bg-slate-800/30 backdrop-blur-sm"
               onClick={() => setOpenCreate(true)}
             >
               <div className="p-6 flex flex-col items-center justify-center">
@@ -473,7 +466,7 @@ export default function OutboundListPage() {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get started by creating your first campaign</p>
                 <button
                   onClick={() => setOpenCreate(true)}
-                  className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 inline-flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 backdrop-blur-sm border border-emerald-500/50 hover:border-emerald-400 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold transition-all inline-flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   Create Campaign
@@ -666,13 +659,13 @@ function CampaignCard({
     if ((e.target as HTMLElement).closest("button") || (e.target as HTMLElement).closest("a[href]")) {
       return
     }
-    router.push(`/dashboard/outbound/${campaign.id}/campaign${agentId ? `?agentId=${agentId}` : ""}`)
+    router.push(`/dashboard/outbound/${campaign.id}/campaign?tab=leads${agentId ? `&agentId=${agentId}` : ""}`)
   }
 
   return (
     <div
       onClick={handleCardClick}
-      className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-200 min-h-[180px] relative group cursor-pointer"
+      className="rounded-2xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm hover:border-slate-400 dark:hover:border-slate-600 transition-all duration-300 min-h-[180px] relative group cursor-pointer shadow-md shadow-slate-300/30 dark:shadow-none hover:shadow-lg hover:shadow-slate-400/30 dark:hover:shadow-none overflow-hidden"
     >
       <div className="p-5">
         <div className="flex justify-between items-start gap-2 mb-4">
@@ -693,7 +686,7 @@ function CampaignCard({
             {menuOpen && (
               <div className="absolute right-0 top-9 w-44 bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl dark:shadow-2xl z-20 py-1 overflow-hidden">
                 <Link
-                  href={{ pathname: `/dashboard/outbound/${campaign.id}/campaign`, query: { agentId } }}
+                  href={{ pathname: `/dashboard/outbound/${campaign.id}/campaign`, query: { tab: 'leads', agentId } }}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 no-underline transition-colors"
                   onClick={(e) => {
                     e.stopPropagation()

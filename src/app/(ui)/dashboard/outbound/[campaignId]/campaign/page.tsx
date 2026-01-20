@@ -12,13 +12,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 /* ----------------- Panels ----------------- */
 import TemplatesPanel from "@/components/dashboard/outbound/campaign/template"
-import Overview from "@/components/dashboard/outbound/campaign/overView"
+
 import BroadcastTab from "@/components/dashboard/outbound/campaign/broadcast"
-import BroadcastSettingsPanel from "@/components/dashboard/outbound/campaign/broadcast-settings"
+import Overview from "@/components/dashboard/outbound/campaign/CampaignOverview"
 
 /* ----------------- Outbound Broadcast feature ----------------- */
 import { useBroadcastStatus } from "@/app/features/outbound-broadcast-settings"
-import MessagesTab from "@/components/dashboard/outbound/campaign/messages"
+import { useCampaign } from "@/app/features/outbound_campaign/query"
+
 
 export default function CampaignPage() {
   const router = useRouter()
@@ -40,7 +41,8 @@ export default function CampaignPage() {
     if (savedTheme) {
       setIsDark(savedTheme === "dark")
     } else {
-      setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches)
+      // Default to dark mode for first-time users
+      setIsDark(true)
     }
   }, [])
 
@@ -70,8 +72,8 @@ export default function CampaignPage() {
 
   const toggleTheme = () => setIsDark(!isDark)
 
-  const validTabs = ["overview", "templates", "broadcastSettings", "leads", "messages"] as const
-  const activeTab = (validTabs as readonly string[]).includes(urlTab) ? urlTab : "overview"
+  const validTabs = ["leads", "overview", "templates"] as const
+  const activeTab = (validTabs as readonly string[]).includes(urlTab) ? urlTab : "leads"
 
   const backToList = () => {
     router.push(agentId ? `/dashboard/outbound?agentId=${encodeURIComponent(agentId)}` : `/dashboard/outbound`)
@@ -86,6 +88,9 @@ export default function CampaignPage() {
 
   // Header badges
   const { data: statusData } = useBroadcastStatus(campaignId)
+
+  // Fetch campaign data
+  const { data: campaignData } = useCampaign(campaignId, agentId, { enabled: !!campaignId })
 
   // Prevent flash of wrong theme
   if (!mounted) {
@@ -122,15 +127,15 @@ export default function CampaignPage() {
 
   return (
     <PageShell>
-      <div className="flex flex-col gap-4">
+      {/* Background Decoration - Left Middle Circle */}
+      <div className="fixed top-1/2 left-0 -translate-x-1/3 -translate-y-1/2 w-[300px] h-[300px] bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none z-0" />
+
+      <div className="flex flex-col gap-4 relative z-10">
         {/* Header - Landing Page Style */}
-        <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-6 overflow-hidden">
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <TrendingUp className="h-7 w-7 text-white" />
-              </div>
+
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <button
@@ -140,7 +145,9 @@ export default function CampaignPage() {
                     Campaigns
                   </button>
                   <span className="text-slate-400 dark:text-slate-600">/</span>
-                  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Campaign Details</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                    {campaignData?.name || "Campaign Details"}
+                  </h1>
                 </div>
                 {/* Status badges */}
                 <div className="flex items-center gap-2 flex-wrap">
@@ -166,22 +173,10 @@ export default function CampaignPage() {
               {/* Back Button */}
               <button
                 onClick={backToList}
-                className="h-10 px-4 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-white/10 hover:border-emerald-500/30 transition-all flex items-center gap-2"
+                className="h-10 px-4 rounded-full border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-100/50 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
-              </button>
-
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="h-10 w-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
-              >
-                {isDark ? (
-                  <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                ) : (
-                  <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                )}
               </button>
 
               {/* Backend info - hidden on mobile, compact on desktop */}
@@ -192,8 +187,15 @@ export default function CampaignPage() {
 
         {/* Tabs - Landing Page Style */}
         <Tabs value={activeTab} onValueChange={setTab} className="w-full">
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-2">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0d1424]/80 backdrop-blur-xl p-2">
             <TabsList className="w-full sm:w-auto bg-slate-100 dark:bg-white/5 border-0 p-1 rounded-xl">
+              <TabsTrigger
+                value="leads"
+                disabled={!campaignId}
+                className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 disabled:opacity-50"
+              >
+                Broadcast
+              </TabsTrigger>
               <TabsTrigger
                 value="overview"
                 className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25"
@@ -206,26 +208,7 @@ export default function CampaignPage() {
               >
                 Templates
               </TabsTrigger>
-              <TabsTrigger
-                value="broadcastSettings"
-                className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25"
-              >
-                Broadcast Settings
-              </TabsTrigger>
-              <TabsTrigger
-                value="leads"
-                disabled={!campaignId}
-                className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 disabled:opacity-50"
-              >
-                Broadcast
-              </TabsTrigger>
-              <TabsTrigger
-                value="messages"
-                disabled={!agentId || !campaignId}
-                className="text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 disabled:opacity-50"
-              >
-                Messages
-              </TabsTrigger>
+
             </TabsList>
           </div>
 
@@ -246,19 +229,6 @@ export default function CampaignPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="broadcastSettings" className="mt-4">
-            {agentId ? (
-              <BroadcastSettingsPanel agentId={agentId} campaignId={campaignId} />
-            ) : (
-              <div className="rounded-2xl border border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 p-6">
-                <h3 className="font-semibold text-rose-800 dark:text-rose-300 mb-2">Missing parameters</h3>
-                <p className="text-rose-700 dark:text-rose-400 text-sm">
-                  Broadcast needs <code className="bg-rose-100 dark:bg-rose-500/20 px-1.5 py-0.5 rounded">?agentId=…</code> in the URL.
-                </p>
-              </div>
-            )}
-          </TabsContent>
-
           <TabsContent value="leads" className="mt-4">
             {campaignId ? (
               <BroadcastTab campaignId={campaignId} agentId={agentId} />
@@ -272,19 +242,7 @@ export default function CampaignPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="messages" className="mt-4">
-            {agentId && campaignId ? (
-              <MessagesTab agentId={agentId} campaignId={campaignId} />
-            ) : (
-              <div className="rounded-2xl border border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 p-6">
-                <h3 className="font-semibold text-rose-800 dark:text-rose-300 mb-2">Missing parameters</h3>
-                <p className="text-rose-700 dark:text-rose-400 text-sm">
-                  Messages need both <code className="bg-rose-100 dark:bg-rose-500/20 px-1.5 py-0.5 rounded">campaignId</code> and{" "}
-                  <code className="bg-rose-100 dark:bg-rose-500/20 px-1.5 py-0.5 rounded">?agentId=…</code>.
-                </p>
-              </div>
-            )}
-          </TabsContent>
+
         </Tabs>
       </div>
     </PageShell>
@@ -294,7 +252,7 @@ export default function CampaignPage() {
 /* --------------------- Layout Shell --------------------- */
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1a] transition-colors duration-300">
+    <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1a] transition-colors duration-300">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">{children}</div>
     </div>
   )
@@ -308,7 +266,7 @@ function campaignStatusClass(status: string) {
     case "SCHEDULED":
       return "bg-sky-500 text-white"
     case "COMPLETED":
-      return "bg-slate-500 text-white"
+      return "bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/10 text-slate-800 dark:text-slate-100 shadow-sm"
     case "CANCELLED":
       return "bg-rose-500 text-white"
     case "DRAFT":
@@ -326,7 +284,7 @@ function broadcastStatusClass(status: string) {
     case "PAUSED":
       return "bg-amber-500 text-black"
     case "COMPLETED":
-      return "bg-slate-500 text-white"
+      return "bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/10 text-slate-800 dark:text-slate-100 shadow-sm"
     case "CANCELLED":
       return "bg-rose-500 text-white"
     case "DRAFT":

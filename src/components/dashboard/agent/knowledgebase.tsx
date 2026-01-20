@@ -15,7 +15,7 @@ import {
   Tag,
   Calendar,
   Database,
-  Sparkles,
+
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
@@ -37,7 +37,7 @@ import {
   useCreateTextDocument,
   useDeleteDocument,
   useDocuments,
-  useKBSearch,
+
   useKnowledgeBase,
   useReembedDocument,
   useUpdateDocument,
@@ -70,6 +70,20 @@ function prettyBytes(n?: number | null): string {
   let v = n
   while (v >= 1024 && i < units.length - 1) (v /= 1024), i++
   return `${v.toFixed(v < 10 && i > 0 ? 1 : 0)} ${units[i]}`
+}
+
+
+/** Safely extract error message */
+function getErrorMessage(err: unknown): string {
+  if (!err) return ""
+  if (typeof err === 'string') return err
+  if (err instanceof Error) return err.message
+  if (typeof err === 'object' && 'message' in err) return String((err as any).message)
+  try {
+    return JSON.stringify(err)
+  } catch {
+    return String(err)
+  }
 }
 
 export default function Knowledgebase({ open, onClose, agentId }: Props) {
@@ -142,10 +156,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
     }
   }, [kb])
 
-  /* ---------------- Search (semantic) ---------------- */
-  const kbSearch = useKBSearch(agentId)
-  const [searchQ, setSearchQ] = useState("")
-  const [topK, setTopK] = useState<number>(8)
+
 
   /* ---------------- Modal state (stable hooks) ---------------- */
   const [selectedDoc, setSelectedDoc] = useState<KnowledgeBaseDocument | null>(null)
@@ -238,14 +249,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
     }
   }
 
-  const onSearch = async () => {
-    if (!searchQ.trim()) return
-    await kbSearch.mutateAsync({
-      query: searchQ.trim(),
-      topK: Number.isFinite(topK) ? topK : 8,
-      includeMetadata: true,
-    })
-  }
+
 
   void onSaveKB
   void setKbForm
@@ -281,15 +285,10 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
         aria-label="Knowledgebase panel"
       >
         {/* Header with Landing Page Theme */}
-        <div className="relative border-b border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 px-4 sm:px-6 py-5 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] px-4 sm:px-6 py-5 overflow-hidden">
 
           <div className="relative flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0 flex-1">
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 shrink-0">
-                <BookOpen className="h-7 w-7 text-white" />
-              </div>
               <div className="flex flex-col truncate">
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate">Knowledgebase</h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 truncate flex items-center gap-2">
@@ -327,7 +326,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
                 <span className="text-sm font-medium text-rose-700 dark:text-rose-400">Error Loading Data</span>
               </div>
               <p className="text-sm text-rose-600 dark:text-rose-300">
-                {String(agentError || kbError || docsError)}
+                {getErrorMessage(agentError || kbError || docsError)}
               </p>
             </div>
           )}
@@ -338,7 +337,6 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* New Text Doc */}
               <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-5 overflow-hidden hover:border-emerald-500/40 transition-all">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
@@ -389,7 +387,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
                       <Button
                         onClick={onCreateText}
                         disabled={createText.isPending || !newTitle.trim() || !newContent.trim()}
-                        className="flex-1 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25"
+                        className="flex-1 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
                       >
                         {createText.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Create Document
@@ -411,8 +409,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
               </div>
 
               {/* Upload + Embed */}
-              <div className="relative rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-white dark:via-[#0d1424] to-blue-500/10 p-5 overflow-hidden hover:border-cyan-500/40 transition-all">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-5 overflow-hidden hover:border-slate-300 dark:hover:border-white/20 transition-all">
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
@@ -463,7 +460,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
                     <Button
                       onClick={onUploadFile}
                       disabled={!file || fileBusy || uploadFileAndEmbed.isPending}
-                      className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25"
+                      className="w-full rounded-full bg-cyan-500/15 hover:bg-cyan-500/25 backdrop-blur-2xl text-cyan-700 dark:text-cyan-50 font-semibold border border-cyan-400/25 hover:border-cyan-400/40 ring-1 ring-inset ring-cyan-300/10 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20"
                     >
                       {(fileBusy || uploadFileAndEmbed.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Upload & Embed
@@ -625,109 +622,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
             </div>
           </div>
 
-          {/* Semantic Search Section */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-purple-500" />
-              Semantic Search
-            </h3>
-            <div className="rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-white dark:via-[#0d1424] to-pink-500/5 p-5 overflow-hidden">
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div className="sm:col-span-9">
-                  <Label htmlFor="searchQ" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
-                    Search Query
-                  </Label>
-                  <Input
-                    id="searchQ"
-                    placeholder="Ask your knowledgebase anything…"
-                    value={searchQ}
-                    onChange={(e) => setSearchQ(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && onSearch()}
-                    className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-purple-500 focus:ring-purple-500/20"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label htmlFor="topK" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
-                    Results
-                  </Label>
-                  <Input
-                    id="topK"
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={topK}
-                    onChange={(e) =>
-                      setTopK(() => {
-                        const n = Number(e.target.value)
-                        return Number.isFinite(n) ? Math.max(1, Math.min(50, n)) : 8
-                      })
-                    }
-                    className="h-10 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-purple-500 focus:ring-purple-500/20"
-                  />
-                </div>
-                <div className="sm:col-span-1 flex items-end">
-                  <Button
-                    onClick={onSearch}
-                    className="w-full h-10 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25"
-                    disabled={kbSearch.isPending || !searchQ.trim()}
-                  >
-                    {kbSearch.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Search className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
 
-              {kbSearch.data && (
-                <div className="space-y-3 pt-4 mt-4 border-t border-purple-500/20">
-                  {kbSearch.data.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-8 gap-2">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10">
-                        <Search className="h-6 w-6 text-slate-400 dark:text-slate-500" />
-                      </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">No matches found</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between pb-2">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          Found {kbSearch.data.length} result{kbSearch.data.length !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-                      {kbSearch.data.map((m, idx) => (
-                        <div
-                          key={`${m.id}-${m.chunkIndex ?? 0}`}
-                          className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-4 space-y-2 hover:border-purple-500/30 transition-colors"
-                        >
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                            <span className="font-semibold text-purple-600 dark:text-purple-400">#{idx + 1}</span>
-                            <span className="flex items-center gap-1">
-                              Score: <span className="font-medium text-slate-700 dark:text-slate-300">{m.score !== undefined ? m.score.toFixed(3) : "-"}</span>
-                            </span>
-                            <span>Chunk: {m.chunkIndex ?? "-"}</span>
-                            <span className="truncate">Doc: {m.documentId ?? "-"}</span>
-                          </div>
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-300">{m.text}</p>
-                          {m.metadata && (
-                            <details className="text-xs">
-                              <summary className="cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300">
-                                View metadata
-                              </summary>
-                              <pre className="mt-2 rounded-lg bg-slate-100 dark:bg-white/5 p-2 overflow-x-auto text-slate-600 dark:text-slate-400">
-                                {JSON.stringify(m.metadata, null, 2)}
-                              </pre>
-                            </details>
-                          )}
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
@@ -735,7 +630,7 @@ export default function Knowledgebase({ open, onClose, agentId }: Props) {
           <p className="text-xs text-slate-500 dark:text-slate-400">{docsPage ? `${docsPage.total} documents` : "Loading…"}</p>
           <Button
             onClick={onClose}
-            className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25"
+            className="rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
           >
             Close Panel
           </Button>

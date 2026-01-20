@@ -125,6 +125,7 @@ export async function waStart(agentId: string, tokenGetter?: TokenGetter): Promi
 }
 
 // 6) Start by phone (pairing)
+// Note: This endpoint returns a FLAT response (not wrapped in .data)
 export async function waStartByPhone(
   agentId: string,
   body: StartByPhoneBody,
@@ -132,12 +133,18 @@ export async function waStartByPhone(
 ): Promise<StartByPhoneResponseData> {
   // validate on client too (optional)
   StartByPhoneBodySchema.parse(body);
-  const json = await http<ApiEnvelope<StartByPhoneResponseData>>(
+  const json = await http<{ statusCode: number; status: string; message: string; pairingCode?: string }>(
     `/whatsapp/start-by-phone/${agentId}`,
     { method: 'POST', body: JSON.stringify(body) },
     tokenGetter
   );
-  return unwrap(json, StartByPhoneResponseDataSchema);
+  // API returns flat response: { statusCode, status, message, pairingCode }
+  // Extract fields directly (not from nested .data)
+  return {
+    status: json.status as StartByPhoneResponseData['status'],
+    message: json.message,
+    pairingCode: json.pairingCode,
+  };
 }
 
 // 7) Toggle agent active
