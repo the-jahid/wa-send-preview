@@ -189,19 +189,14 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <main className={`${STYLES.page} space-y-6`}>
-      {/* Page Header */}
-
-      {/* Page Header */}
-      <PageHeader
-        agent={agent}
-        onOpenKnowledgebase={() => setIsKnowledgebaseOpen(true)}
-        onDelete={handleDelete}
-        isDeleting={deleteAgent.isPending}
-      />
-
-      {/* Tabbed Content */}
+      {/* Compact Header with Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsNavigation />
+        <CompactHeader
+          agent={agent}
+          onOpenKnowledgebase={() => setIsKnowledgebaseOpen(true)}
+          onDelete={handleDelete}
+          isDeleting={deleteAgent.isPending}
+        />
 
         <TabsContent value="whatsapp" className="mt-4">
           <WhatsAppCard agent={agent} onRefreshAgent={refetch} />
@@ -255,8 +250,8 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
 
 
 
-/** Page header with agent name and action buttons */
-function PageHeader({
+/** Compact header with agent info, tabs, and action buttons in one row */
+function CompactHeader({
   agent,
   onOpenKnowledgebase,
   onDelete,
@@ -268,69 +263,64 @@ function PageHeader({
   isDeleting: boolean
 }) {
   return (
-    <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-      {/* Agent Info & Back Nav */}
-      <div className="flex items-start gap-4">
-        <Link
-          href="/dashboard/agents"
-          className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div className="min-w-0 flex-1 space-y-1">
-          <h1 className="text-xl sm:text-2xl font-bold truncate text-slate-900 dark:text-white">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-2 sm:p-3">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+        {/* Left: Back button + Agent name + Status */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <Link
+            href="/dashboard/agents"
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <h1 className="text-lg font-bold truncate text-slate-900 dark:text-white max-w-[120px] sm:max-w-[150px]">
             {agent.name}
           </h1>
-          <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${agent.isActive
-              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20'
-              : 'bg-slate-50 dark:bg-slate-500/10 text-slate-700 dark:text-slate-400 ring-slate-600/20'
-              }`}>
-              {agent.isActive ? 'Active' : 'Inactive'}
-            </span>
-          </div>
+          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset ${agent.isActive
+            ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20'
+            : 'bg-slate-50 dark:bg-slate-500/10 text-slate-700 dark:text-slate-400 ring-slate-600/20'
+            }`}>
+            {agent.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+
+        {/* Center: Tabs */}
+        <div className="flex-1 overflow-x-auto">
+          <TabsList className="w-full min-w-max bg-slate-100 dark:bg-white/5 border-0 p-1 rounded-xl flex">
+            {AGENT_TABS.map(({ value, label, icon: Icon }) => (
+              <TabsTrigger
+                key={value}
+                value={value}
+                className="flex-1 flex items-center justify-center gap-1.5 text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 px-2 sm:px-3 py-1.5 whitespace-nowrap"
+              >
+                <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">{label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+
+        {/* Right: Action Buttons */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenKnowledgebase}
+            className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
+          >
+            <BookOpen className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+            <span className="hidden sm:inline">Knowledgebase</span>
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onDelete}
+            disabled={isDeleting}
+          >
+            Delete
+          </Button>
         </div>
       </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-        <Button
-          variant="outline"
-          onClick={onOpenKnowledgebase}
-          className="flex-1 sm:flex-none border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
-        >
-          <BookOpen className="h-4 w-4 mr-2 text-emerald-500" />
-          Knowledgebase
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={onDelete}
-          disabled={isDeleting}
-          className="flex-1 sm:flex-none"
-        >
-          Delete
-        </Button>
-      </div>
-    </div>
-  )
-}
-
-/** Tabs navigation bar */
-function TabsNavigation() {
-  return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] p-1.5 sm:p-2 overflow-x-auto">
-      <TabsList className="w-full min-w-max sm:min-w-0 bg-slate-100 dark:bg-white/5 border-0 p-1 rounded-xl flex">
-        {AGENT_TABS.map(({ value, label, icon: Icon }) => (
-          <TabsTrigger
-            key={value}
-            value={value}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm rounded-lg text-slate-600 dark:text-slate-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
-          >
-            <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-            <span className="hidden xs:inline sm:inline">{label}</span>
-          </TabsTrigger>
-        ))}
-      </TabsList>
     </div>
   )
 }
