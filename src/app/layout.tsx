@@ -9,9 +9,10 @@ import type { Metadata, Viewport } from "next";
 export const metadata: Metadata = {
   title: {
     default: "Wapzen - AI-Powered WhatsApp Automation Platform",
-    template: "%s | Wapzen"
+    template: "%s | Wapzen",
   },
-  description: "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, lead capture, CRM integration, and unlimited messaging for just $20/month. Increase conversions by 300%.",
+  description:
+    "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, lead capture, CRM integration, and unlimited messaging for just $20/month. Increase conversions by 300%.",
   keywords: [
     "WhatsApp automation",
     "WhatsApp chatbot",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     "business messaging",
     "sales automation",
     "customer engagement",
-    "marketing automation"
+    "marketing automation",
   ],
   authors: [{ name: "Wapzen Team" }],
   creator: "Wapzen",
@@ -47,7 +48,8 @@ export const metadata: Metadata = {
     url: "https://wapzen.io",
     siteName: "Wapzen",
     title: "Wapzen - AI-Powered WhatsApp Automation Platform",
-    description: "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, lead capture, and CRM integration. Start for just $20/month.",
+    description:
+      "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, lead capture, and CRM integration. Start for just $20/month.",
     images: [
       {
         url: "https://i.ibb.co.com/7dhtvq1m/wapzen-title-edited.png",
@@ -60,7 +62,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Wapzen - AI-Powered WhatsApp Automation",
-    description: "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, and lead capture.",
+    description:
+      "Automate your WhatsApp business communication with AI. Smart chatbot, appointment booking, and lead capture.",
     images: ["https://i.ibb.co.com/7dhtvq1m/wapzen-title-edited.png"],
     creator: "@wapzen",
   },
@@ -81,11 +84,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicons.ico" sizes="64*64" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
@@ -99,7 +106,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               name: "Wapzen",
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
-              description: "AI-Powered WhatsApp Automation Platform for businesses. Automate customer communication, booking, and lead capture.",
+              description:
+                "AI-Powered WhatsApp Automation Platform for businesses. Automate customer communication, booking, and lead capture.",
               offers: {
                 "@type": "Offer",
                 price: "20",
@@ -111,15 +119,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 ratingValue: "4.9",
                 ratingCount: "200",
                 bestRating: "5",
-                worstRating: "1"
+                worstRating: "1",
               },
               featureList: [
                 "AI Chatbot",
                 "Appointment Booking",
                 "Lead Capture",
                 "CRM Integration",
-                "Unlimited Messages"
-              ]
+                "Unlimited Messages",
+              ],
             }),
           }}
         />
@@ -135,4 +143,3 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     </html>
   );
 }
-
