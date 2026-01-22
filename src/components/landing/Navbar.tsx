@@ -53,7 +53,7 @@ export default function Navbar({ toggleTheme, isDark }: NavbarProps) {
       <motion.div
         className={`flex items-center justify-between transition-all duration-500 ease-out ${
           isScrolled
-            ? "mt-4 mx-4 px-4 py-2 rounded-full border border-slate-200/50 dark:border-white/10 bg-white/80 dark:bg-[#0a0f1a]/90 backdrop-blur-xl shadow-lg shadow-black/5 dark:shadow-black/20"
+            ? "mt-2 mx-4 px-4 py-2 rounded-full border border-slate-200/50 dark:border-white/10 bg-white/80 dark:bg-[#0a0f1a]/90 backdrop-blur-xl shadow-lg shadow-black/5 dark:shadow-black/20"
             : "w-full px-4 sm:px-6 lg:px-8 py-4 bg-white/80 dark:bg-[#0a0f1a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5"
         }`}
         layout
@@ -62,19 +62,18 @@ export default function Navbar({ toggleTheme, isDark }: NavbarProps) {
         }}
       >
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 mr-1 group flex-shrink-0"
-        >
+        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <motion.div
             className="relative flex items-center justify-center overflow-hidden"
             animate={{
-              height: isScrolled ? 40 : 36,
+              height: isScrolled ? 48 : 36,
             }}
             transition={{ duration: 0.3 }}
           >
             <Image
-              src={isScrolled ? "/WapZen Logo-05.png" : "/WapZen Logo-06.png"}
+              src={
+                isScrolled ? "/WapZen Logo-05.png" : "/WapZen Logo green.png"
+              }
               alt="WapZen Logo"
               width={180}
               height={50}
@@ -97,7 +96,7 @@ export default function Navbar({ toggleTheme, isDark }: NavbarProps) {
               className={`relative z-10 px-3 py-1.5 text-sm font-medium rounded-full transition-colors duration-200 ${
                 activeIdx === idx
                   ? "text-slate-900 dark:text-white"
-                  : "text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {activeIdx === idx && (
@@ -124,7 +123,7 @@ export default function Navbar({ toggleTheme, isDark }: NavbarProps) {
               className={`relative z-10 flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-full transition-colors duration-200 ${
                 activeIdx === NAV_ITEMS.length
                   ? "text-slate-900 dark:text-white"
-                  : "text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {activeIdx === NAV_ITEMS.length && (
@@ -179,11 +178,11 @@ export default function Navbar({ toggleTheme, isDark }: NavbarProps) {
         </nav>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isScrolled && "ml-2"}`}>
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 ml-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             aria-label="Toggle theme"
           >
             {isDark ? (
