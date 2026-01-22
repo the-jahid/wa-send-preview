@@ -71,7 +71,9 @@ export default function Navbar({ toggleTheme, isDark }: NavbarProps) {
             transition={{ duration: 0.3 }}
           >
             <Image
-              src={isScrolled ? "/WapZen Logo-05.png" : "/WapZen Logo-06.png"}
+              src={
+                isScrolled ? "/WapZen Logo-05.png" : "/WapZen Logo green.png"
+              }
               alt="WapZen Logo"
               width={180}
               height={50}
