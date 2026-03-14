@@ -4,14 +4,14 @@ import { useState, useEffect } from "react"
 import Navbar from "@/components/landing/Navbar"
 import Hero from "@/components/landing/Hero"
 import SocialProof from "@/components/landing/SocialProof"
-import TwoMinuteSetup from "@/components/landing/TwoMinuteSetup"
+
+import IntegrationShowcase from "@/components/landing/IntegrationShowcase"
 import AutomationShowcase from "@/components/landing/AutomationShowcase"
 import PainPoints from "@/components/landing/PainPoints"
 import DiamondFeatures from "@/components/landing/DiamondFeatures"
 import HowItWorks from "@/components/landing/HowItWorks"
 import ROICalculator from "@/components/landing/ROICalculator"
 import UseCases from "@/components/landing/UseCases"
-import Testimonials from "@/components/landing/Testimonials"
 import FAQ from "@/components/landing/FAQ"
 import FinalCTA from "@/components/landing/FinalCTA"
 import Footer from "@/components/landing/Footer"
@@ -55,15 +55,16 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1a] text-slate-900 dark:text-white antialiased transition-colors duration-300">
       <Navbar toggleTheme={toggleTheme} isDark={isDark} />
       <Hero />
+      <HowItWorks />
       <SocialProof />
-      <TwoMinuteSetup />
+
+      <IntegrationShowcase />
       <AutomationShowcase />
       <PainPoints />
       <DiamondFeatures />
-      <HowItWorks />
+     
       <ROICalculator />
       <UseCases />
-      <Testimonials />
       <FAQ />
       <FinalCTA />
       <Footer />

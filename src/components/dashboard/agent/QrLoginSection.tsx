@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { RefreshCw, CheckCircle2, Smartphone, ArrowRight } from "lucide-react"
 import {
     useWaStart,
     useWaGenerateQr,
@@ -25,9 +25,7 @@ export default function QrLoginSection({ agentId }: { agentId: string }) {
     useEffect(() => {
         start.mutate()
         refreshQr()
-        return () => {
-            if (refreshTimer.current) clearTimeout(refreshTimer.current)
-        }
+        return () => { if (refreshTimer.current) clearTimeout(refreshTimer.current) }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [agentId])
 
@@ -54,82 +52,101 @@ export default function QrLoginSection({ agentId }: { agentId: string }) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-            <div className="space-y-3 sm:space-y-4 order-2 md:order-1">
-                {/* Instructions */}
-                <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 p-3 sm:p-4">
-                    <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                        On your phone: WhatsApp → <span className="font-semibold text-emerald-600 dark:text-emerald-400">Linked devices</span> → <span className="font-semibold text-emerald-600 dark:text-emerald-400">Link a device</span> → scan the QR code.
-                    </p>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+            {/* Left: Instructions + actions */}
+            <div className="flex flex-col gap-4 order-2 md:order-1">
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 sm:gap-3">
-                    <button
-                        onClick={() => start.mutate()}
-                        disabled={start.isPending}
-                        className="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white font-semibold hover:bg-slate-100 dark:hover:bg-white/5 transition-all disabled:opacity-50"
-                    >
-                        {start.isPending ? "Starting…" : "Restart"}
-                    </button>
-                    {!connected && (
-                        <button
-                            onClick={refreshQr}
-                            disabled={genQr.isPending}
-                            className="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 disabled:opacity-50"
-                        >
-                            {genQr.isPending ? "Refreshing…" : "Refresh QR"}
-                        </button>
-                    )}
-                </div>
-
-                {/* Error Message */}
-                {err && (
-                    <div className="text-xs sm:text-sm text-red-500 dark:text-red-400 p-2.5 sm:p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                        {err}
+                {connected ? (
+                    /* Connected state */
+                    <div className="flex items-start gap-3 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06]">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-400 mt-0.5 shrink-0" />
+                        <div>
+                            <p className="text-sm font-semibold text-emerald-400">Connected successfully</p>
+                            <p className="text-xs text-slate-400 mt-0.5">Your WhatsApp is linked and ready to use.</p>
+                        </div>
                     </div>
+                ) : (
+                    /* Instructions */
+                    <>
+                        <div>
+                            <h3 className="text-sm font-semibold text-white mb-3">How to connect</h3>
+                            <ol className="space-y-2.5">
+                                {[
+                                    { step: "1", text: "Open WhatsApp on your phone" },
+                                    { step: "2", text: <>Tap <strong className="text-white">Linked devices</strong> from the menu</> },
+                                    { step: "3", text: <>Tap <strong className="text-white">Link a device</strong></> },
+                                    { step: "4", text: "Scan the QR code on the right" },
+                                ].map((item) => (
+                                    <li key={item.step} className="flex items-start gap-3">
+                                        <span className="h-5 w-5 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-[11px] font-semibold text-slate-400 shrink-0 mt-0.5">
+                                            {item.step}
+                                        </span>
+                                        <span className="text-sm text-slate-400">{item.text}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1">
+                            <button
+                                onClick={() => start.mutate()}
+                                disabled={start.isPending}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
+                            >
+                                {start.isPending ? "Restarting…" : "Restart"}
+                            </button>
+                            <button
+                                onClick={refreshQr}
+                                disabled={genQr.isPending}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15 text-xs font-medium transition-colors disabled:opacity-50"
+                            >
+                                <RefreshCw className={`h-3.5 w-3.5 ${genQr.isPending ? 'animate-spin' : ''}`} />
+                                {genQr.isPending ? "Refreshing…" : "Refresh QR"}
+                            </button>
+                        </div>
+                    </>
                 )}
 
-                {/* Success Message */}
-                {connected && (
-                    <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 p-3 sm:p-4">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 flex-shrink-0">
-                                <span className="text-white text-base sm:text-lg">✓</span>
-                            </div>
-                            <div>
-                                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm sm:text-base">Connected 🎉</p>
-                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">You can start sending messages.</p>
-                            </div>
-                        </div>
+                {/* Error */}
+                {err && (
+                    <div className="flex items-start gap-2 p-3 rounded-lg border border-red-500/20 bg-red-500/[0.06]">
+                        <span className="text-xs text-red-400 leading-relaxed">{err}</span>
                     </div>
                 )}
             </div>
 
-            {/* QR Code Display */}
+            {/* Right: QR Code */}
             <div className="flex items-center justify-center order-1 md:order-2">
                 {connected ? (
-                    <div className="w-full max-w-[260px] sm:max-w-[340px] aspect-square grid place-items-center rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10">
-                        <div className="text-center">
-                            <div className="h-12 w-12 sm:h-16 sm:w-16 mx-auto rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 mb-3 sm:mb-4">
-                                <span className="text-white text-xl sm:text-2xl">✓</span>
-                            </div>
-                            <p className="text-base sm:text-lg font-semibold text-emerald-600 dark:text-emerald-400">Logged in</p>
+                    <div className="flex flex-col items-center justify-center w-full max-w-[260px] aspect-square rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04]">
+                        <div className="h-14 w-14 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center mb-3">
+                            <CheckCircle2 className="h-7 w-7 text-emerald-400" />
                         </div>
+                        <p className="text-sm font-semibold text-emerald-400">Logged in</p>
+                        <p className="text-xs text-slate-500 mt-1">Device linked</p>
                     </div>
                 ) : qr?.qr ? (
-                    <div className="p-2 sm:p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] shadow-sm">
-                        <img src={qr.qr || "/placeholder.svg"} alt="WhatsApp QR" className="w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] object-contain rounded-lg" />
-                        <div className="mt-2 sm:mt-3 text-center text-xs text-slate-500 dark:text-slate-400 max-w-[200px] sm:max-w-[300px]">
-                            Ticket: <code className="break-all bg-slate-100 dark:bg-white/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs">{qr.qrId}</code>
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="p-3 rounded-2xl border border-white/[0.08] bg-white shadow-2xl shadow-black/40">
+                            <img
+                                src={qr.qr}
+                                alt="WhatsApp QR Code"
+                                className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] object-contain rounded-lg"
+                            />
                         </div>
+                        {qr.qrId && (
+                            <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                                <span>Ticket:</span>
+                                <code className="bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded text-slate-500 font-mono truncate max-w-[200px]">
+                                    {qr.qrId}
+                                </code>
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <div className="w-full max-w-[260px] sm:max-w-[340px] aspect-square grid place-items-center rounded-2xl border border-dashed border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5">
-                        <div className="text-center">
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">Waiting for QR…</p>
-                        </div>
+                    <div className="flex flex-col items-center justify-center w-full max-w-[260px] aspect-square rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.02]">
+                        <div className="h-8 w-8 rounded-full border-2 border-emerald-500/40 border-t-emerald-500 animate-spin mb-3" />
+                        <p className="text-sm text-slate-500">Generating QR…</p>
                     </div>
                 )}
             </div>

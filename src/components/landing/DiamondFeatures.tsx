@@ -37,8 +37,8 @@ export default function DiamondFeatures() {
     {
       id: 4,
       icon: <Send className="h-8 w-8" />,
-      title: "Bulk Messaging",
-      desc: "Blast to unlimited users.",
+      title: "Smart AI Replies",
+      desc: "AI responds instantly 24/7.",
       color: "text-violet-500",
       bg: "bg-violet-50 dark:bg-violet-900/10",
       border: "border-violet-200 dark:border-violet-800/30",

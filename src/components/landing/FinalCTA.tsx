@@ -17,7 +17,7 @@ export default function FinalCTA() {
 
             <div className="relative mx-auto max-w-4xl text-center px-4 sm:px-6 lg:px-8">
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-6">
-                    Capture leads. Book appointments. Message thousands. All on autopilot.
+                    Capture leads. Book appointments. Engage customers. All on autopilot.
                 </h2>
                 <p className="text-lg sm:text-xl text-emerald-100 mb-10 max-w-2xl mx-auto">
                     Your AI sales assistant works 24/7 - qualifying leads, booking meetings, and engaging customers while you focus on closing deals.
@@ -58,7 +58,7 @@ export default function FinalCTA() {
                     </div>
                     <div className="flex items-center gap-2">
                         <CheckCircle className="h-5 w-5" />
-                        CSV Bulk Messaging
+                        Smart AI Replies
                     </div>
                     <div className="flex items-center gap-2">
                         <CheckCircle className="h-5 w-5" />

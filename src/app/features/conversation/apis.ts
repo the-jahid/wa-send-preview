@@ -109,6 +109,108 @@ export async function getSentNumbersByCampaign(
 }
 
 /* -------------------------------------------------------------------------- */
+/*                       AI PAUSE/RESUME API FUNCTIONS                         */
+/* -------------------------------------------------------------------------- */
+
+import {
+  PauseStatusSchema,
+  PausedUsersListSchema,
+} from "./schemas";
+import type { PauseStatus, PausedUser, PauseUserPayload } from "./types";
+
+/**
+ * Get all paused users for an agent.
+ * GET /conversations/agent/:agentId/paused
+ */
+export async function getPausedUsers(
+  agentId: string
+): Promise<PausedUser[]> {
+  return apiFetch(`/conversations/agent/${agentId}/paused`, PausedUsersListSchema);
+}
+
+/**
+ * Check if AI is paused for a specific user.
+ * GET /conversations/agent/:agentId/pause/:senderJid/status
+ */
+export async function getPauseStatus(
+  agentId: string,
+  senderJid: string
+): Promise<PauseStatus> {
+  const encodedJid = encodeURIComponent(senderJid);
+  return apiFetch(
+    `/conversations/agent/${agentId}/pause/${encodedJid}/status`,
+    PauseStatusSchema
+  );
+}
+
+/**
+ * Pause AI for a user.
+ * POST /conversations/agent/:agentId/pause/:senderJid
+ */
+export async function pauseUser(
+  agentId: string,
+  senderJid: string,
+  payload: PauseUserPayload
+): Promise<void> {
+  const encodedJid = encodeURIComponent(senderJid);
+  const res = await fetch(`${API_BASE}/conversations/agent/${agentId}/pause/${encodedJid}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = `Request failed with status ${res.status}`;
+    try {
+      const errorBody = await res.json();
+      if (errorBody?.message) {
+        message = Array.isArray(errorBody.message)
+          ? errorBody.message.join(", ")
+          : errorBody.message;
+      }
+    } catch {
+      // ignore JSON parse error
+    }
+    throw new Error(message);
+  }
+}
+
+/**
+ * Resume AI for a user.
+ * DELETE /conversations/agent/:agentId/pause/:senderJid
+ */
+export async function resumeUser(
+  agentId: string,
+  senderJid: string
+): Promise<void> {
+  const encodedJid = encodeURIComponent(senderJid);
+  const res = await fetch(`${API_BASE}/conversations/agent/${agentId}/pause/${encodedJid}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    let message = `Request failed with status ${res.status}`;
+    try {
+      const errorBody = await res.json();
+      if (errorBody?.message) {
+        message = Array.isArray(errorBody.message)
+          ? errorBody.message.join(", ")
+          : errorBody.message;
+      }
+    } catch {
+      // ignore JSON parse error
+    }
+    throw new Error(message);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /*                             AGGREGATED EXPORTS                             */
 /* -------------------------------------------------------------------------- */
 
@@ -117,4 +219,8 @@ export const conversationApis = {
   getUserConversations,
   getConversationById,
   getSentNumbersByCampaign,
+  getPausedUsers,
+  getPauseStatus,
+  pauseUser,
+  resumeUser,
 };

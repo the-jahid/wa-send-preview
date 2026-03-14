@@ -1,160 +1,178 @@
 "use client"
 
-import { SignedOut, SignUpButton } from "@clerk/nextjs"
-import { Zap, Bot, CheckCircle, ArrowRight, Send } from "lucide-react"
+import { motion } from "motion/react"
+import { Clock } from "lucide-react"
+
+// Step data matching the design
+const steps = [
+    {
+        step: "01",
+        title: "Scan QR Code",
+        time: "30 sec",
+        description: "Just scan a QR code with your existing WhatsApp. No API approval, no verification, no waiting. Instant connection.",
+        position: "left" as const,
+    },
+    {
+        step: "02",
+        title: "Describe Your Business",
+        time: "1 min",
+        description: "Tell us what you do and who you serve. Upload docs or just paste text - AI learns instantly.",
+        position: "right" as const,
+    },
+    {
+        step: "03",
+        title: "Go Live Instantly",
+        time: "30 sec",
+        description: "Your AI bot is ready! Start chatting with customers or upload a CSV to blast messages to thousands.",
+        position: "left" as const,
+    },
+    {
+        step: "04",
+        title: "Scale with CSV Uploads",
+        time: "Ongoing",
+        timeColor: "orange" as const,
+        description: "Upload contact lists anytime. Send personalized campaigns to unlimited users with one click.",
+        position: "right" as const,
+    },
+]
+
+// Step Card Component
+const StepCard = ({
+    step,
+    title,
+    time,
+    description,
+    position,
+    timeColor = "emerald",
+    index,
+}: {
+    step: string
+    title: string
+    time: string
+    description: string
+    position: "left" | "right"
+    timeColor?: "emerald" | "orange"
+    index: number
+}) => {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 40, x: position === "left" ? -30 : 30 }}
+            whileInView={{ opacity: 1, y: 0, x: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-50px" }}
+            className={`flex ${position === "right" ? "justify-end" : "justify-start"} w-full`}
+        >
+            <div
+                className={`
+                    relative max-w-lg w-full p-6 rounded-2xl
+                    bg-slate-800/50 backdrop-blur-xl
+                    border border-slate-700/60
+                    hover:border-emerald-500/40 hover:bg-slate-800/70
+                    transition-all duration-300
+                    group
+                `}
+            >
+                {/* Subtle glow effect on hover */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                <div className="relative z-10">
+                    {/* Step number and title row */}
+                    <div className="flex items-center gap-4 mb-3">
+                        {/* Step Badge - Rounded square like in the design */}
+                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-bold text-base shadow-lg shadow-emerald-500/30">
+                            {step}
+                        </div>
+
+                        {/* Title and Time */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <h3 className="text-xl font-semibold text-white">
+                                {title}
+                            </h3>
+                            <span
+                                className={`
+                                    px-3 py-1 rounded-full text-xs font-medium
+                                    ${timeColor === "orange"
+                                        ? "bg-orange-500/20 text-orange-400 border border-orange-500/40"
+                                        : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                                    }
+                                `}
+                            >
+                                {time}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-slate-400 text-sm leading-relaxed pl-16">
+                        {description}
+                    </p>
+                </div>
+            </div>
+        </motion.div>
+    )
+}
+
 
 export default function TwoMinuteSetup() {
     return (
-        <section className="py-20 lg:py-28 bg-white dark:bg-transparent overflow-hidden">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-sm font-medium text-amber-600 dark:text-amber-400 mb-6">
-                        <Zap className="h-4 w-4" />
-                        Ridiculously Simple
+        <section className="py-24 lg:py-32 bg-[#0a0f1a] overflow-hidden" id="two-minute-setup">
+            {/* Background gradient effects */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
+                {/* Badge */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="flex justify-center mb-8"
+                >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-sm font-medium text-emerald-400">
+                        <Clock className="h-4 w-4" />
+                        Lightning Fast Setup
                     </div>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-slate-900 dark:text-white">
-                        Build your bot in <span className="text-emerald-600 dark:text-emerald-400">2 minutes</span>.<br />
-                        Blast to <span className="text-emerald-600 dark:text-emerald-400">unlimited contacts</span>.
+                </motion.div>
+
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-16"
+                >
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                        <span className="text-white">Live in </span>
+                        <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                            under 2 minutes
+                        </span>
                     </h2>
-                    <p className="text-lg text-slate-600 dark:text-slate-400">
-                        No API approval. No coding. No waiting. Just scan, setup, and send.
+                    <p className="text-slate-400 text-lg max-w-xl mx-auto">
+                        No developers. No complexity. Just connect, describe, and go.
                     </p>
+                </motion.div>
+
+                {/* Steps Grid - Staggered Layout */}
+                <div className="space-y-6">
+                    {steps.map((step, index) => (
+                        <StepCard
+                            key={step.step}
+                            step={step.step}
+                            title={step.title}
+                            time={step.time}
+                            description={step.description}
+                            position={step.position}
+                            timeColor={step.timeColor}
+                            index={index}
+                        />
+                    ))}
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-                    {/* Bot Builder Card */}
-                    <div className="relative rounded-3xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-500/10 dark:to-cyan-500/10 p-8 lg:p-10 overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
-
-                        <div className="relative">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-6">
-                                <Bot className="h-4 w-4" />
-                                Zero Code Bot Builder
-                            </div>
-
-                            <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                                Create Your AI Bot in 2 Minutes
-                            </h3>
-
-                            <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                                Scan a QR code, answer 2 questions, and your AI bot is live. No API applications, no verification process.
-                            </p>
-
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">1</div>
-                                    <div>
-                                        <div className="font-semibold text-slate-900 dark:text-white">Scan QR code</div>
-                                        <div className="text-sm text-slate-500">Use your existing WhatsApp</div>
-                                    </div>
-                                    <div className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">10 sec</div>
-                                </div>
-
-                                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">2</div>
-                                    <div>
-                                        <div className="font-semibold text-slate-900 dark:text-white">Describe your business</div>
-                                        <div className="text-sm text-slate-500">What you do, who you serve</div>
-                                    </div>
-                                    <div className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">30 sec</div>
-                                </div>
-
-                                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">3</div>
-                                    <div>
-                                        <div className="font-semibold text-slate-900 dark:text-white">Add your knowledge</div>
-                                        <div className="text-sm text-slate-500">FAQs, docs, or just paste text</div>
-                                    </div>
-                                    <div className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">1 min</div>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/30">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                                    <span className="font-semibold text-emerald-700 dark:text-emerald-400">Your bot is LIVE and ready to chat!</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* CSV Bulk Messaging Card */}
-                    <div className="relative rounded-3xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-500/10 dark:to-purple-500/10 p-8 lg:p-10 overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/20 rounded-full blur-3xl" />
-
-                        <div className="relative">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/20 text-xs font-bold text-violet-700 dark:text-violet-400 uppercase tracking-wider mb-6">
-                                <Send className="h-4 w-4" />
-                                Bulk Outbound Messaging
-                            </div>
-
-                            <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                                Send to Unlimited Contacts via CSV
-                            </h3>
-
-                            <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                                Upload your contact list, write your message, and hit send. Reach thousands of customers in seconds.
-                            </p>
-
-                            {/* CSV Upload Demo */}
-                            <div className="rounded-2xl bg-white/80 dark:bg-[#0d1424] border border-slate-200 dark:border-white/10 overflow-hidden">
-                                <div className="px-4 py-3 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                                    <span className="ml-2 text-xs text-slate-500">contacts.csv</span>
-                                </div>
-                                <div className="p-4 font-mono text-xs">
-                                    <div className="text-slate-500 dark:text-slate-600">name,phone,company</div>
-                                    <div className="text-slate-700 dark:text-slate-300">John Smith,+1234567890,Acme Inc</div>
-                                    <div className="text-slate-700 dark:text-slate-300">Sarah Lee,+1987654321,TechCorp</div>
-                                    <div className="text-slate-700 dark:text-slate-300">Mike Chen,+1555123456,StartupXYZ</div>
-                                    <div className="text-violet-600 dark:text-violet-400">... +4,997 more contacts</div>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-violet-600 dark:text-violet-400 flex-shrink-0" />
-                                    <span className="text-slate-700 dark:text-slate-300">Personalized messages with merge tags</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-violet-600 dark:text-violet-400 flex-shrink-0" />
-                                    <span className="text-slate-700 dark:text-slate-300">Schedule campaigns for optimal timing</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-violet-600 dark:text-violet-400 flex-shrink-0" />
-                                    <span className="text-slate-700 dark:text-slate-300">Track delivery, opens, and replies</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-violet-600 dark:text-violet-400 flex-shrink-0" />
-                                    <span className="text-slate-700 dark:text-slate-300">No per-message fees - truly unlimited</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 flex items-center gap-4">
-                                <div className="flex -space-x-2">
-                                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 border-2 border-white dark:border-[#0d1424] flex items-center justify-center text-white text-xs font-bold">5K</div>
-                                </div>
-                                <div className="text-sm text-slate-600 dark:text-slate-400">
-                                    <span className="font-semibold text-slate-900 dark:text-white">5,000 messages</span> sent in 30 seconds
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* CTA */}
-                <div className="text-center mt-12">
-                    <SignedOut>
-                        <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
-                            <button className="group px-8 py-4 text-base font-semibold rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 inline-flex items-center gap-2">
-                                Build Your Bot Now - It is Free
-                                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                        </SignUpButton>
-                    </SignedOut>
-                </div>
+                {/* IntegrationHub removed and moved to separate section */}
             </div>
         </section>
     )

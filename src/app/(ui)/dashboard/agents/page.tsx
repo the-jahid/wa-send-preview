@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-import { Bot, Sun, Moon } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 import OverviewTab from "@/components/dashboard/agent/OverviewTab"
 
@@ -58,24 +58,21 @@ export default function AgentsTabsPage() {
 
   const toggleTheme = () => setIsDark(!isDark)
 
-  // Prevent flash of wrong theme
   if (!mounted) {
     return (
-      <div className="h-full flex items-center justify-center bg-slate-200 dark:bg-[#0a0f1a]">
-        <div className="animate-pulse">
-          <div className="h-12 w-12 rounded-lg bg-emerald-500" />
-        </div>
+      <div className="h-full flex items-center justify-center bg-[#080d17]">
+        <Loader2 className="h-6 w-6 animate-spin text-white/20" />
       </div>
     )
   }
 
   return (
     <QueryClientProvider client={qc}>
-      <main className="mx-auto max-w-7xl p-6 bg-slate-200 dark:bg-[#0a0f1a] min-h-screen transition-colors duration-300">
+      <main className="mx-auto max-w-7xl p-5 sm:p-6 bg-[#080d17] min-h-screen">
         <OverviewTab />
       </main>
       <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider >
+    </QueryClientProvider>
   )
 }
 

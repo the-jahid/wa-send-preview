@@ -7,26 +7,19 @@ import React, { useState, createContext, useContext } from "react";
 import {
   Home,
   Bot,
-  ArrowLeftFromLine,
   Sun,
   Moon,
   Calendar,
   Users,
   MessageSquare,
+  BarChart2,
 } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "motion/react";
-import { IconMenu2, IconX } from "@tabler/icons-react";
 
 import { cn } from "@/lib/utils";
 
 export const NAV_MAIN = [
-  {
-    href: "/dashboard",
-    label: "Overview",
-    Icon: Home,
-    description: "Dashboard overview",
-  },
   {
     href: "/dashboard/agents",
     label: "Agents",
@@ -34,35 +27,30 @@ export const NAV_MAIN = [
     description: "Manage AI agents",
   },
   {
-    href: "/dashboard/outbound",
-    label: "Outbound",
-    Icon: ArrowLeftFromLine,
-    description: "Campaign management",
-  },
-  {
     href: "/dashboard/conversation",
     label: "Conversation",
     Icon: MessageSquare,
     description: "Chat conversations",
   },
+  {
+    href: "/dashboard/analytics",
+    label: "Analytics",
+    Icon: BarChart2,
+    description: "Dashboard analytics",
+  },
 ];
 
-// Sidebar Context
 interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
 }
 
-const SidebarContext = createContext<SidebarContextProps | undefined>(
-  undefined,
-);
+const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
 
 const useSidebarContext = () => {
   const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebarContext must be used within AppSidebar");
-  }
+  if (!context) throw new Error("useSidebarContext must be used within AppSidebar");
   return context;
 };
 
@@ -73,63 +61,54 @@ interface AppSidebarProps {
   onOpenLeads: () => void;
 }
 
-export function AppSidebar({
-  isDark,
-  onToggleTheme,
-  onOpenBooking,
-  onOpenLeads,
-}: AppSidebarProps) {
+export function AppSidebar({ isDark, onToggleTheme, onOpenBooking, onOpenLeads }: AppSidebarProps) {
   const pathname = usePathname();
   const { user } = useUser();
   const [open, setOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate: true }}>
-      {/* Desktop Sidebar */}
       <motion.aside
-        className={cn(
-          "hidden md:flex flex-col h-full border-r border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#0d1424] shadow-lg shadow-slate-300/50 dark:shadow-none",
-        )}
-        animate={{
-          width: open ? "260px" : "72px",
-        }}
-        transition={{
-          duration: 0.3,
-          ease: "easeInOut",
-        }}
+        className="hidden md:flex flex-col h-full border-r border-white/[0.06] bg-[#080d17]"
+        animate={{ width: open ? "240px" : "64px" }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
       >
         {/* Brand Header */}
-        <div className="flex items-center h-16 px-4 border-b border-slate-200 dark:border-white/10">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            {/* Show icon logo when collapsed */}
-            {!open && (
-              <div className="h-10 w-10 flex items-center justify-center flex-shrink-0">
-                <Image
-                  src="/WapZen Logo.png"
-                  alt="WapZen Logo"
-                  width={40}
-                  height={40}
-                  className="object-contain"
-                />
-              </div>
-            )}
-            {/* Show text logo when expanded */}
-            <AnimatePresence>
-              {open && (
+        <div className="flex items-center h-14 px-3.5 border-b border-white/[0.06] shrink-0">
+          <Link href="/dashboard" className="flex items-center min-w-0">
+            <AnimatePresence mode="wait">
+              {open ? (
                 <motion.div
+                  key="full"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.15 }}
                 >
                   <Image
                     src="/WapZen Logo-06.png"
                     alt="WapZen"
-                    width={140}
-                    height={36}
+                    width={110}
+                    height={28}
+                    className="object-contain"
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="icon"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="h-8 w-8 flex items-center justify-center"
+                >
+                  <Image
+                    src="/WapZen Logo.png"
+                    alt="WapZen"
+                    width={32}
+                    height={32}
                     className="object-contain"
                   />
                 </motion.div>
@@ -138,109 +117,86 @@ export function AppSidebar({
           </Link>
         </div>
 
-        {/* Navigation Content */}
-        <div className="flex-1 py-4 px-3 overflow-y-auto overflow-x-hidden">
-          {/* Action Buttons */}
-          <div className="mb-6 space-y-2">
-            <ActionButton
-              icon={Calendar}
-              label="Book Appointment"
-              onClick={onOpenBooking}
-              open={open}
-            />
-            <ActionButton
-              icon={Users}
-              label="Collect Lead"
-              onClick={onOpenLeads}
-              open={open}
-            />
+        {/* Navigation */}
+        <div className="flex-1 py-3 px-2.5 overflow-y-auto overflow-x-hidden space-y-4">
+          {/* Quick Actions */}
+          <div className="space-y-1">
+            <ActionButton icon={Calendar} label="Book Appointment" onClick={onOpenBooking} open={open} />
+            <ActionButton icon={Users} label="Collect Lead" onClick={onOpenLeads} open={open} />
           </div>
 
-          {/* Main Menu Label */}
+          {/* Divider */}
+          <div className="border-t border-white/[0.05]" />
+
+          {/* Section Label */}
           <AnimatePresence>
             {open && (
-              <motion.div
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mb-2 px-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
+                className="px-1 text-[10px] font-semibold text-white/25 uppercase tracking-widest"
               >
                 Main Menu
-              </motion.div>
+              </motion.p>
             )}
           </AnimatePresence>
 
-          {/* Navigation Items */}
-          <nav className="space-y-1">
+          {/* Nav Items */}
+          <nav className="space-y-0.5">
             {NAV_MAIN.map(({ href, label, Icon, description }) => {
-              const active =
-                pathname === href ||
-                (href !== "/dashboard" && pathname?.startsWith(href));
-
+              const active = pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg transition-all group relative",
-                    open ? "px-3 py-2.5" : "px-0 py-2 justify-center",
-                    active
-                      ? "bg-slate-200 dark:bg-emerald-500/20"
-                      : "hover:bg-slate-200 dark:hover:bg-white/10",
-                  )}
                   title={!open ? label : undefined}
+                  className={cn(
+                    "group relative flex items-center gap-3 rounded-lg transition-all duration-150",
+                    open ? "px-2.5 py-2" : "py-2 justify-center",
+                    active
+                      ? "bg-white/[0.08] text-white"
+                      : "text-white/40 hover:bg-white/[0.04] hover:text-white/70",
+                  )}
                 >
+                  {/* Active left bar */}
+                  {active && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-white/60" />
+                  )}
+
                   <div
                     className={cn(
-                      "h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
+                      "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
                       active
-                        ? "bg-slate-300 dark:bg-emerald-500/30"
-                        : "bg-slate-200 dark:bg-white/10 group-hover:bg-slate-300 dark:group-hover:bg-white/20",
+                        ? "bg-white/[0.1] text-white"
+                        : "bg-white/[0.04] text-white/40 group-hover:bg-white/[0.07] group-hover:text-white/60",
                     )}
                   >
-                    <Icon
-                      className={cn(
-                        "h-5 w-5",
-                        active
-                          ? "text-slate-900 dark:text-emerald-400"
-                          : "text-slate-600 dark:text-slate-400",
-                      )}
-                    />
+                    <Icon className="h-4 w-4" />
                   </div>
+
                   <AnimatePresence>
                     {open && (
                       <motion.div
                         initial={{ opacity: 0, width: 0 }}
                         animate={{ opacity: 1, width: "auto" }}
                         exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.15 }}
                         className="flex-1 min-w-0 overflow-hidden"
                       >
-                        <div
-                          className={cn(
-                            "text-sm truncate",
-                            active
-                              ? "text-slate-900 dark:text-emerald-400 font-medium"
-                              : "text-slate-700 dark:text-slate-300",
-                          )}
-                        >
+                        <p className={cn("text-sm truncate font-medium", active ? "text-white" : "text-white/50 group-hover:text-white/70")}>
                           {label}
-                        </div>
+                        </p>
                         {description && (
-                          <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
-                            {description}
-                          </div>
+                          <p className="text-[10px] text-white/25 truncate">{description}</p>
                         )}
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  {active && open && (
-                    <div className="h-1.5 w-1.5 rounded-full bg-slate-700 dark:bg-emerald-500 flex-shrink-0" />
-                  )}
 
-                  {/* Tooltip for collapsed state */}
+                  {/* Tooltip */}
                   {!open && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50">
+                    <div className="absolute left-full ml-2.5 px-2 py-1 bg-[#1a2235] border border-white/[0.08] text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
                       {label}
                     </div>
                   )}
@@ -251,48 +207,46 @@ export function AppSidebar({
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-200 dark:border-white/10 p-3">
-          {/* Homepage Link */}
+        <div className="border-t border-white/[0.06] p-2.5 space-y-1 shrink-0">
+          {/* Homepage */}
           <Link
             href="/"
-            className={cn(
-              "flex items-center gap-2 mb-2 rounded-lg transition-colors",
-              "bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-slate-300",
-              "hover:bg-slate-300 dark:hover:bg-white/10",
-              open ? "px-3 py-2" : "px-0 py-2 justify-center",
-            )}
             title={!open ? "Homepage" : undefined}
+            className={cn(
+              "group relative flex items-center gap-2.5 rounded-lg transition-colors text-white/40 hover:bg-white/[0.04] hover:text-white/70",
+              open ? "px-2.5 py-2" : "py-2 justify-center",
+            )}
           >
-            <Home className="h-4 w-4 flex-shrink-0" />
+            <Home className="h-4 w-4 shrink-0" />
             <AnimatePresence>
               {open && (
                 <motion.span
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  className="text-sm font-medium overflow-hidden whitespace-nowrap"
+                  className="text-sm overflow-hidden whitespace-nowrap"
                 >
                   Homepage
                 </motion.span>
               )}
             </AnimatePresence>
+            {!open && (
+              <div className="absolute left-full ml-2.5 px-2 py-1 bg-[#1a2235] border border-white/[0.08] text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
+                Homepage
+              </div>
+            )}
           </Link>
 
           {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
-            className={cn(
-              "flex items-center gap-2 w-full mb-2 rounded-lg transition-colors",
-              "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10",
-              open ? "px-3 py-2" : "px-0 py-2 justify-center",
-            )}
             title={!open ? (isDark ? "Light Mode" : "Dark Mode") : undefined}
-          >
-            {isDark ? (
-              <Sun className="h-4 w-4 flex-shrink-0" />
-            ) : (
-              <Moon className="h-4 w-4 flex-shrink-0" />
+            className={cn(
+              "group relative flex items-center gap-2.5 w-full rounded-lg transition-colors text-white/40 hover:bg-white/[0.04] hover:text-white/70",
+              open ? "px-2.5 py-2" : "py-2 justify-center",
             )}
+          >
+            {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
             <AnimatePresence>
               {open && (
                 <motion.span
@@ -305,22 +259,23 @@ export function AppSidebar({
                 </motion.span>
               )}
             </AnimatePresence>
+            {!open && (
+              <div className="absolute left-full ml-2.5 px-2 py-1 bg-[#1a2235] border border-white/[0.08] text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
+                {isDark ? "Light Mode" : "Dark Mode"}
+              </div>
+            )}
           </button>
 
           {/* User Profile */}
           <div
             className={cn(
-              "flex items-center gap-3 p-2 rounded-lg bg-slate-200 dark:bg-white/5",
-              !open && "justify-center",
+              "flex items-center gap-2.5 rounded-lg bg-white/[0.03] border border-white/[0.05] transition-colors",
+              open ? "px-2.5 py-2" : "p-2 justify-center",
             )}
           >
             <UserButton
               afterSignOutUrl="/"
-              appearance={{
-                elements: {
-                  avatarBox: "h-9 w-9",
-                },
-              }}
+              appearance={{ elements: { avatarBox: "h-8 w-8" } }}
             />
             <AnimatePresence>
               {open && (
@@ -328,41 +283,38 @@ export function AppSidebar({
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
                   className="flex-1 min-w-0 overflow-hidden"
                 >
-                  <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                  <p className="text-xs font-medium text-white/80 truncate">
                     {user?.firstName || "User"}
-                  </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  </p>
+                  <p className="text-[10px] text-white/30 truncate">
                     {user?.primaryEmailAddress?.emailAddress || "Account"}
-                  </div>
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Version */}
           <AnimatePresence>
             {open && (
-              <motion.div
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mt-3 px-2 text-[10px] text-slate-400 dark:text-slate-500 text-center"
+                className="text-[10px] text-white/20 text-center pt-1"
               >
-                v1.0.0 • © 2025 Wapzen
-              </motion.div>
+                v1.0.0 · © 2025 Wapzen
+              </motion.p>
             )}
           </AnimatePresence>
         </div>
       </motion.aside>
-
-      {/* Mobile Sidebar - handled via Sheet in layout */}
     </SidebarContext.Provider>
   );
 }
 
-// Shimmer Button Component (Aceternity UI style)
 function ActionButton({
   icon: Icon,
   label,
@@ -377,35 +329,31 @@ function ActionButton({
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "group relative inline-flex items-center gap-3 overflow-hidden rounded-xl transition-all duration-300 w-full",
-        // Shimmer background
-        "bg-[linear-gradient(110deg,#0d1424,45%,#1e3a5f,55%,#0d1424)] bg-[length:200%_100%] animate-shimmer",
-        // Border only, no shadow
-        "border border-emerald-500/30",
-        "hover:border-emerald-400/50",
-        open ? "px-4 py-3" : "px-0 py-3 justify-center",
-      )}
       title={!open ? label : undefined}
+      className={cn(
+        "group relative flex items-center gap-2.5 w-full rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-150",
+        open ? "px-2.5 py-2" : "py-2 justify-center",
+      )}
     >
-      {/* Icon with glow effect */}
-      <div className="relative">
-        <Icon className="h-5 w-5 text-emerald-400 flex-shrink-0 relative z-10" />
-        <div className="absolute inset-0 bg-emerald-400/20 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-      </div>
-
+      <Icon className="h-4 w-4 text-white/50 shrink-0 group-hover:text-white/80 transition-colors" />
       <AnimatePresence>
         {open && (
           <motion.span
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: "auto" }}
             exit={{ opacity: 0, width: 0 }}
-            className="text-sm text-white font-semibold overflow-hidden whitespace-nowrap relative z-10"
+            transition={{ duration: 0.15 }}
+            className="text-sm font-medium text-white/60 group-hover:text-white/90 overflow-hidden whitespace-nowrap transition-colors"
           >
             {label}
           </motion.span>
         )}
       </AnimatePresence>
+      {!open && (
+        <div className="absolute left-full ml-2.5 px-2 py-1 bg-[#1a2235] border border-white/[0.08] text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
+          {label}
+        </div>
+      )}
     </button>
   );
 }
@@ -426,16 +374,12 @@ export function SidebarActionButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 bg-[#0d1424] hover:bg-[#111827] border border-emerald-400/30 hover:border-emerald-400/50 ring-1 ring-inset ring-emerald-400/20 rounded-xl transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20",
-        collapsed
-          ? "h-10 w-10 p-0 justify-center"
-          : "w-full px-5 py-3 justify-start",
+        "flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.14] rounded-xl transition-all",
+        collapsed ? "h-10 w-10 p-0 justify-center" : "w-full px-4 py-2.5 justify-start",
       )}
     >
-      <Icon className="h-5 w-5 text-emerald-400" />
-      {!collapsed && (
-        <span className="text-base text-white font-semibold">{label}</span>
-      )}
+      <Icon className="h-4 w-4 text-white/50" />
+      {!collapsed && <span className="text-sm text-white/70 font-medium">{label}</span>}
     </button>
   );
 }
@@ -450,27 +394,23 @@ export function NavList({
   collapsed: boolean;
 }) {
   return (
-    <nav className="grid gap-1">
+    <nav className="grid gap-0.5">
       {items.map(({ href, label, Icon, description }) => {
-        const active =
-          pathname === href ||
-          (href !== "/dashboard" && pathname?.startsWith(href));
+        const active = pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
 
         if (collapsed) {
           return (
             <Link
               key={href}
               href={href}
+              title={label}
               className={cn(
                 "h-10 w-full flex items-center justify-center rounded-lg transition-all group relative",
-                active
-                  ? "bg-slate-200 dark:bg-emerald-500/20 text-slate-900 dark:text-emerald-400"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white",
+                active ? "bg-white/[0.08] text-white" : "text-white/40 hover:bg-white/[0.04] hover:text-white/70",
               )}
-              title={label}
             >
-              <Icon className="h-5 w-5" />
-              <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50">
+              <Icon className="h-4.5 w-4.5" />
+              <div className="absolute left-full ml-2.5 px-2 py-1 bg-[#1a2235] border border-white/[0.08] text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
                 {label}
               </div>
             </Link>
@@ -482,33 +422,26 @@ export function NavList({
             key={href}
             href={href}
             className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg transition-all group",
-              active
-                ? "bg-slate-200 dark:bg-emerald-500/20 text-slate-900 dark:text-emerald-400 font-medium"
-                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white",
+              "relative flex items-center gap-3 px-2.5 py-2 rounded-lg transition-all group",
+              active ? "bg-white/[0.08] text-white" : "text-white/40 hover:bg-white/[0.04] hover:text-white/70",
             )}
           >
+            {active && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-white/60" />
+            )}
             <div
               className={cn(
-                "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
-                active
-                  ? "bg-slate-300 dark:bg-emerald-500/30 text-slate-900 dark:text-emerald-400"
-                  : "bg-slate-100 dark:bg-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/20",
+                "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+                active ? "bg-white/[0.1]" : "bg-white/[0.04] group-hover:bg-white/[0.07]",
               )}
             >
               <Icon className="h-4 w-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm truncate">{label}</div>
-              {description && (
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
-                  {description}
-                </div>
-              )}
+              <p className="text-sm font-medium truncate">{label}</p>
+              {description && <p className="text-[10px] text-white/25 truncate">{description}</p>}
             </div>
-            {active && (
-              <div className="h-1.5 w-1.5 rounded-full bg-slate-700 dark:bg-emerald-500 flex-shrink-0" />
-            )}
+            {active && <span className="h-1.5 w-1.5 rounded-full bg-white/40 shrink-0" />}
           </Link>
         );
       })}

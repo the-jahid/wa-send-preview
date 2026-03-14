@@ -58,3 +58,35 @@ export interface SentNumbersResponse {
   total: number;
   numbers: string[];
 }
+
+/* -------------------------------------------------------------------------- */
+/*                          AI PAUSE/RESUME TYPES                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Response from GET /conversations/agent/:agentId/pause/:senderJid/status
+ */
+export interface PauseStatus {
+  isPaused: boolean;
+  reason?: string | null;
+  pausedAt?: string | null;
+  pausedBy?: string | null;
+}
+
+/**
+ * A paused user entry
+ */
+export interface PausedUser {
+  senderJid: string;
+  reason?: string | null;
+  pausedAt: string;
+  pausedBy?: string | null;
+}
+
+/**
+ * Payload for POST /conversations/agent/:agentId/pause/:senderJid
+ */
+export interface PauseUserPayload {
+  reason: string;
+  pausedBy: string;
+}

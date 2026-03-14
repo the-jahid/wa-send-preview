@@ -53,6 +53,35 @@ export const SentNumbersResponseSchema = z.object({
 });
 
 /* -------------------------------------------------------------------------- */
+/*                         AI PAUSE/RESUME SCHEMAS                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Response from GET /conversations/agent/:agentId/pause/:senderJid/status
+ */
+export const PauseStatusSchema = z.object({
+  isPaused: z.boolean(),
+  reason: z.string().optional().nullable(),
+  pausedAt: z.string().optional().nullable(),
+  pausedBy: z.string().optional().nullable(),
+});
+
+/**
+ * A single paused user entry
+ */
+export const PausedUserSchema = z.object({
+  senderJid: z.string(),
+  reason: z.string().optional().nullable(),
+  pausedAt: z.string(),
+  pausedBy: z.string().optional().nullable(),
+});
+
+/**
+ * Response from GET /conversations/agent/:agentId/paused
+ */
+export const PausedUsersListSchema = z.array(PausedUserSchema);
+
+/* -------------------------------------------------------------------------- */
 /*                             EXPORT TYPES                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -60,3 +89,6 @@ export type Conversation = z.infer<typeof ConversationSchema>;
 export type ConversationList = z.infer<typeof ConversationListSchema>;
 export type CreateConversation = z.infer<typeof CreateConversationSchema>;
 export type SentNumbersResponse = z.infer<typeof SentNumbersResponseSchema>;
+export type PauseStatus = z.infer<typeof PauseStatusSchema>;
+export type PausedUser = z.infer<typeof PausedUserSchema>;
+export type PausedUsersList = z.infer<typeof PausedUsersListSchema>;

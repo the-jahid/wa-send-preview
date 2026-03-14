@@ -23,6 +23,14 @@ export const conversationKeys = {
   /** All unique sent numbers for a specific campaign */
   campaignSentNumbers: (campaignId: string) =>
     ["conversations", "campaign", "sent-numbers", campaignId] as const,
+
+  /** All paused users for a specific agent */
+  pausedUsers: (agentId: string) =>
+    ["conversations", "pausedUsers", agentId] as const,
+
+  /** Pause status for a specific user */
+  pauseStatus: (agentId: string, senderJid: string) =>
+    ["conversations", "pauseStatus", agentId, senderJid] as const,
 };
 
 export type ConversationKey =
@@ -30,7 +38,9 @@ export type ConversationKey =
   | ReturnType<typeof conversationKeys.agent>
   | ReturnType<typeof conversationKeys.user>
   | ReturnType<typeof conversationKeys.detail>
-  | ReturnType<typeof conversationKeys.campaignSentNumbers>;
+  | ReturnType<typeof conversationKeys.campaignSentNumbers>
+  | ReturnType<typeof conversationKeys.pausedUsers>
+  | ReturnType<typeof conversationKeys.pauseStatus>;
 
 
 

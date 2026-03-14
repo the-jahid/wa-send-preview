@@ -2,13 +2,8 @@
 
 import { useEffect, useState } from "react"
 import type { Agent } from "@/app/features/agent"
-
-// shadcn/ui
-import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import { FileText, Settings2, CalendarDays, History, User, CheckCircle2, Circle } from "lucide-react"
 
 export default function AgentEditForm({
     initial,
@@ -21,13 +16,11 @@ export default function AgentEditForm({
     onCancel: () => void
     isSaving?: boolean
 }) {
-    // local state
     const [name, setName] = useState("")
     const [isActive, setIsActive] = useState(true)
     const [historyLimit, setHistoryLimit] = useState<number>(0)
     const [prompt, setPrompt] = useState("")
 
-    // hydrate when initial changes
     useEffect(() => {
         setName(initial.name)
         setIsActive(initial.isActive)
@@ -36,7 +29,7 @@ export default function AgentEditForm({
     }, [initial])
 
     const handleSave = async () => {
-        const payload: any = {
+        await onSave({
             name: name.trim(),
             isActive,
             memoryType: "BUFFER",
@@ -48,120 +41,142 @@ export default function AgentEditForm({
             openAIModel: null,
             geminiModel: null,
             claudeModel: null,
-        }
-
-        await onSave(payload)
+        })
     }
 
-    // Check if form is dirty
     const isDirty =
         name.trim() !== initial.name ||
         isActive !== initial.isActive ||
         (historyLimit || 0) !== (initial.historyLimit || 0) ||
         (prompt || "").trim() !== (initial.prompt || "").trim()
 
+    const promptDirty = (prompt || "").trim() !== (initial.prompt || "").trim()
+
     return (
-        <div className="space-y-8">
-            {/* Header Card - Landing Page Style */}
-            <div className="relative rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0d1424] to-cyan-500/10 p-6 overflow-hidden">
-                <div className="relative">
-                    <div className="flex items-start gap-4 mb-6">
-                        <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                            <span className="text-white text-2xl">✏️</span>
+        <div className="space-y-4">
+
+            {/* ── System Prompt ── */}
+            <div className="rounded-xl border border-white/[0.06] bg-[#0d1424] overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.05]">
+                    <div className="flex items-center gap-2.5">
+                        <div className="h-7 w-7 rounded-lg bg-violet-400/10 border border-violet-400/20 flex items-center justify-center">
+                            <FileText className="h-3.5 w-3.5 text-violet-400" />
                         </div>
-                        <div className="flex-1">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Edit Agent</h2>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">Configure your agent's settings and behavior</p>
-                        </div>
+                        <h3 className="text-sm font-semibold text-white">System Prompt</h3>
                     </div>
-
-                    {/* Form Fields Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Agent Name */}
-                        <div className="p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                            <Label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">Agent Name</Label>
-                            <input
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full bg-transparent border-none p-0 text-slate-900 dark:text-white font-semibold focus:outline-none focus:ring-0"
-                                placeholder="Agent Name"
-                            />
-                        </div>
-
-                        {/* Active Status */}
-                        <div className="p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                            <Label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">Status</Label>
-                            <div className="flex items-center gap-3">
-                                <span className={`font-semibold ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500"}`}>
-                                    {isActive ? "Active" : "Inactive"}
-                                </span>
-                                <Switch
-                                    checked={isActive}
-                                    onCheckedChange={(v) => setIsActive(Boolean(v))}
-                                    className="data-[state=checked]:bg-emerald-500"
-                                />
-                            </div>
-                        </div>
-
-                        {/* History Limit */}
-                        <div className="p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                            <Label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">History Limit</Label>
-                            <input
-                                type="number"
-                                min={0}
-                                value={historyLimit}
-                                onChange={(e) => setHistoryLimit(Number.parseInt(e.target.value || "0", 10) || 0)}
-                                className="w-full bg-transparent border-none p-0 text-slate-900 dark:text-white font-semibold focus:outline-none focus:ring-0"
-                            />
-                        </div>
-
-                        {/* Created Date (Read-only) */}
-                        <div className="p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                            <Label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">Created</Label>
-                            <span className="text-slate-900 dark:text-white font-semibold">
-                                {new Date(initial.createdAt).toLocaleDateString()}
-                            </span>
-                        </div>
-                    </div>
+                    <button
+                        onClick={promptDirty ? handleSave : () => document.getElementById('system-prompt-textarea')?.focus()}
+                        disabled={isSaving}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors disabled:opacity-50
+                            ${promptDirty
+                                ? 'bg-white/[0.08] border-white/[0.1] text-white hover:bg-white/[0.12]'
+                                : 'bg-white/[0.04] border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.07]'
+                            }`}
+                    >
+                        {isSaving ? "Saving…" : promptDirty ? "Save" : "Edit"}
+                    </button>
                 </div>
-            </div>
-
-            {/* System Prompt Card */}
-            <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1424] overflow-hidden shadow-sm hover:border-emerald-500/30 transition-all duration-300">
-                <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
-                    <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm shadow-emerald-500/25">
-                            <span className="text-white text-sm">📝</span>
-                        </div>
-                        <h3 className="font-semibold text-slate-900 dark:text-white">System Prompt</h3>
-                    </div>
-                </div>
-                <div className="p-6">
-                    <Textarea
+                <div className="p-5">
+                    <textarea
+                        id="system-prompt-textarea"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="You are a helpful assistant..."
-                        className="min-h-[150px] font-mono text-sm leading-relaxed bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-emerald-500/20 focus:border-emerald-500 resize-y p-4 rounded-xl"
+                        placeholder="You are a helpful assistant…"
+                        rows={7}
+                        className="w-full bg-[#080d17] border border-white/[0.06] rounded-lg px-4 py-3 text-sm font-mono text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-white/[0.12] leading-relaxed resize-y transition-colors"
                     />
                 </div>
             </div>
 
-            {/* Footer Actions (Only visible when dirty) */}
+            {/* ── Agent Settings ── */}
+            <div className="rounded-xl border border-white/[0.06] bg-[#0d1424] overflow-hidden">
+                <div className="flex items-center gap-2.5 px-5 py-4 border-b border-white/[0.05]">
+                    <div className="h-7 w-7 rounded-lg bg-sky-400/10 border border-sky-400/20 flex items-center justify-center">
+                        <Settings2 className="h-3.5 w-3.5 text-sky-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">Agent Settings</h3>
+                </div>
+
+                <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {/* Agent Name */}
+                    <div className="rounded-lg border border-white/[0.06] bg-[#080d17] px-4 py-3">
+                        <div className="flex items-center gap-1.5 mb-2">
+                            <User className="h-3 w-3 text-slate-500" />
+                            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Agent Name</span>
+                        </div>
+                        <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full bg-transparent text-sm font-semibold text-white focus:outline-none placeholder:text-slate-600"
+                            placeholder="Agent name"
+                        />
+                    </div>
+
+                    {/* Status */}
+                    <div className="rounded-lg border border-white/[0.06] bg-[#080d17] px-4 py-3">
+                        <div className="flex items-center gap-1.5 mb-2">
+                            {isActive
+                                ? <CheckCircle2 className="h-3 w-3 text-slate-500" />
+                                : <Circle className="h-3 w-3 text-slate-500" />
+                            }
+                            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Status</span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                            <Switch
+                                checked={isActive}
+                                onCheckedChange={(v) => setIsActive(Boolean(v))}
+                                className="data-[state=checked]:bg-emerald-600 scale-90"
+                            />
+                            <span className={`text-sm font-semibold ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                {isActive ? "Active" : "Inactive"}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* History Limit */}
+                    <div className="rounded-lg border border-white/[0.06] bg-[#080d17] px-4 py-3">
+                        <div className="flex items-center gap-1.5 mb-2">
+                            <History className="h-3 w-3 text-slate-500" />
+                            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">History Limit</span>
+                        </div>
+                        <input
+                            type="number"
+                            min={0}
+                            value={historyLimit}
+                            onChange={(e) => setHistoryLimit(parseInt(e.target.value || "0", 10) || 0)}
+                            className="w-full bg-transparent text-sm font-semibold text-white focus:outline-none"
+                        />
+                    </div>
+
+                    {/* Created */}
+                    <div className="rounded-lg border border-white/[0.06] bg-[#080d17] px-4 py-3">
+                        <div className="flex items-center gap-1.5 mb-2">
+                            <CalendarDays className="h-3 w-3 text-slate-500" />
+                            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Created</span>
+                        </div>
+                        <span className="text-sm font-semibold text-white">
+                            {new Date(initial.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Save bar (only when dirty) ── */}
             {isDirty && (
-                <div className="flex justify-end gap-3 pt-2 animate-in fade-in slide-in-from-bottom-2">
+                <div className="flex items-center justify-end gap-2 px-1 animate-in fade-in slide-in-from-bottom-1 duration-200">
                     <button
                         onClick={onCancel}
                         disabled={isSaving}
-                        className="px-5 py-2.5 rounded-full border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white font-semibold hover:bg-slate-100 dark:hover:bg-white/5 transition-all disabled:opacity-50"
+                        className="px-4 py-2 rounded-lg border border-white/[0.08] bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] text-sm font-medium transition-colors disabled:opacity-50"
                     >
-                        Reset Changes
+                        Reset
                     </button>
                     <button
                         onClick={handleSave}
-                        disabled={isSaving}
-                        className="px-6 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 backdrop-blur-2xl text-emerald-700 dark:text-emerald-50 font-semibold border border-emerald-400/25 hover:border-emerald-400/40 ring-1 ring-inset ring-emerald-300/10 transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 disabled:opacity-50 min-w-[120px]"
+                        disabled={isSaving || !name.trim()}
+                        className="px-5 py-2 rounded-lg bg-white text-[#080d17] hover:bg-slate-100 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isSaving ? "Saving..." : "Save Changes"}
+                        {isSaving ? "Saving…" : "Save Changes"}
                     </button>
                 </div>
             )}

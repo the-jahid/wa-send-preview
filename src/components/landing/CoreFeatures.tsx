@@ -27,14 +27,14 @@ export default function CoreFeatures() {
         },
         {
             icon: <Send className="h-7 w-7" />,
-            title: "CSV Bulk Messaging",
-            desc: "Upload your contact list and blast messages to unlimited users instantly. Personalize with merge tags, schedule campaigns, track everything.",
+            title: "Smart AI Replies",
+            desc: "AI responds to customers instantly, 24/7. Handle support, sales inquiries, and follow-ups automatically with natural conversation.",
             gradient: "from-violet-500 to-purple-500"
         },
         {
             icon: <Infinity className="h-7 w-7" />,
             title: "Unlimited Messages",
-            desc: "No per-message fees, ever. Send broadcasts, follow-ups, promotions to thousands of contacts. One flat monthly price.",
+            desc: "No per-message fees, ever. Handle unlimited customer conversations, follow-ups, and support replies. One flat monthly price.",
             gradient: "from-emerald-500 to-teal-500"
         },
         {

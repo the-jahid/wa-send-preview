@@ -7,6 +7,9 @@ export {
   ConversationListSchema,
   CreateConversationSchema,
   SentNumbersResponseSchema,
+  PauseStatusSchema,
+  PausedUserSchema,
+  PausedUsersListSchema,
 } from "./schemas";
 
 // Re-export TS types from types.ts (type-only export to keep tree clean)
@@ -16,6 +19,9 @@ export type {
   ConversationList,
   CreateConversationPayload,
   SentNumbersResponse,
+  PauseStatus,
+  PausedUser,
+  PauseUserPayload,
 } from "./types";
 
 // Re-export API helpers, React Query hooks and keys
